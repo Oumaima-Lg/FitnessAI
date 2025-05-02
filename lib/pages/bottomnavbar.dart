@@ -41,7 +41,7 @@ class _BottomNavState extends State<BottomNavBar> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       bottomNavigationBar: CurvedNavigationBar(
-        height: 70,
+        height: 60,
         backgroundColor: Colors.transparent,
         buttonBackgroundColor: Color(0xffEB62BC).withAlpha(170),
         color: Color(0xff373856),

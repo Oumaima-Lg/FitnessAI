@@ -21,15 +21,12 @@ class Welcome extends StatelessWidget {
           ),
         ),
         child: Column(
-          // mainAxisAlignment: MainAxisAlignment.center,
-          // crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: 10,
           children: [
             Container(
               // margin: EdgeInsets.only(top: 80),
               width: double.infinity,
               height: MediaQuery.of(context).size.height / 1.95,
-              //   decoration:
-              //       BoxDecoration(border: Border.all(color: Colors.white)),
               child: Stack(
                 children: [
                   GradientComponent.gradientCircle(
@@ -42,41 +39,40 @@ class Welcome extends StatelessWidget {
                       255, 60, Color(0xFF3A3464), Color(0xFF1B1C2A)),
                   GradientComponent.gradientCircle(
                       255, 20, Color(0xFFE8ACFF), Color(0xFF7800FF)),
-                  Container(
-                    margin: EdgeInsets.only(top: 75, left: 35, right: 35),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
-                      borderRadius: BorderRadius.circular(41),
-                      color: Color(0xFF4023D7).withAlpha(38),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Text(
-                          'Without health, \neverything else loses its meaning. \nTake care of it, \nyour health is the key to everything.',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          textAlign: TextAlign.center),
+                  Center(
+                    child: Container(
+                      margin: EdgeInsets.only(top: 75, left: 35, right: 35),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
+                        borderRadius: BorderRadius.circular(41),
+                        color: Color(0xFF4023D7).withAlpha(38),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(
+                            'Without health, \neverything else loses its meaning. \nTake care of it, \nyour health is the key to everything.',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            SizedBox(
-              height: 40,
-            ),
             GradientComponent.gradientButton('Next', 220, 50),
             Container(
+              alignment: Alignment.center,
+              constraints: BoxConstraints(
+                maxHeight: 200,
+              ),
               padding: EdgeInsets.only(left: 10, right: 10),
               child: Image.asset(
                 'images/fitness.png',
-                // fit: BoxFit.cover,
-                width: MediaQuery.of(context).size.width,
-                //   height: MediaQuery.of(context).size.height / 4,
-                // height: 200,
               ),
             ),
           ],
