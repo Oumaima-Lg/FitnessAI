@@ -68,7 +68,7 @@ class Welcome extends StatelessWidget {
             SizedBox(
               height: 40,
             ),
-            GradientComponent.gradientButton('Next'),
+            GradientComponent.gradientButton('Next', 220, 50),
             Container(
               padding: EdgeInsets.only(left: 10, right: 10),
               child: Image.asset(

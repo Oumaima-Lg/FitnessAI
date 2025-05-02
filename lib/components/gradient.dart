@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class GradientComponent {
-  static ElevatedButton gradientButton(String text) {
+  static ElevatedButton gradientButton(
+      String text, double maxWidth, double maxHeight) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.transparent,
@@ -20,8 +21,8 @@ class GradientComponent {
           borderRadius: BorderRadius.circular(30),
         ),
         constraints: BoxConstraints(
-          maxWidth: 220,
-          maxHeight: 50,
+          maxWidth: maxWidth,
+          maxHeight: maxHeight,
         ),
         alignment: Alignment.center,
         child: Text(
