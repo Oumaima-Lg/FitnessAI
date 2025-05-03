@@ -10,8 +10,8 @@ class GradientTitleText extends StatelessWidget {
   const GradientTitleText({
     super.key,
     required this.text,
-    this.alignment = Alignment.centerLeft,
-    this.fontSize = 20,
+    this.alignment = Alignment.center,
+    this.fontSize = 15,
     this.fontWeight = FontWeight.w600,
   });
 
@@ -31,13 +31,14 @@ class GradientTitleText extends StatelessWidget {
             fontWeight: fontWeight,
             fontFamily: 'Poppins',
           ),
+          textAlign: TextAlign.center, // Centrer le texte
         ),
       ),
     );
   }
 }
 
-// Button lmove li kayt3awed 
+// Button lmove li kayt3awed
 class GradientButton extends StatelessWidget {
   final String title;
   final IconData icon;
