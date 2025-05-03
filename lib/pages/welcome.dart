@@ -24,7 +24,7 @@ class Welcome extends StatelessWidget {
           // mainAxisAlignment: MainAxisAlignment.center,
           // crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
+            SizedBox(
               // margin: EdgeInsets.only(top: 80),
               width: double.infinity,
               height: MediaQuery.of(context).size.height / 1.95,

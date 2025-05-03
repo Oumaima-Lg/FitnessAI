@@ -16,46 +16,10 @@ class ExercicePage extends StatefulWidget {
 }
 
 class _ExercicePageState extends State<ExercicePage> {
-  final List<Map<String, String>> activities = [
-    {
-      'name': 'Jumping Jack',
-      'image': 'Jumping Jack/1.png',
-      'route': '/jumping_jack'
-    },
-    {'name': 'Wall Sit', 'image': 'Wall Sit/img2.png', 'route': '/wall_sit'},
-    {'name': 'Push-Ups', 'image': 'img3.png', 'route': '/push_ups'},
-    {'name': 'Crunches', 'image': 'img4.png', 'route': '/crunches'},
-    {
-      'name': 'Step-Ups onto a Chair',
-      'image': 'img5.png',
-      'route': '/steps_ups'
-    },
-    {'name': 'Squats', 'image': 'img6.png', 'route': '/squats'},
-    {
-      'name': 'Tricep Dips Using a Chair',
-      'image': 'img7.png',
-      'route': '/tricep_dips_using_a_chair'
-    },
-    {'name': 'Plank', 'image': 'img8.png', 'route': '/plank'},
-    {'name': 'High Knees', 'image': 'img9.png', 'route': '/high_knees'},
-    {
-      'name': 'Forward Lunges',
-      'image': 'img10.png',
-      'route': '/forward_lunges'
-    },
-    {'name': 'T-Push-Ups', 'image': 'img11.png', 'route': '/t_push_ups'},
-    {'name': 'Side Plank', 'image': 'img12.png', 'route': '/side_plank'},
-  ];
-
-  final List<Map<String, String>> exerciseTypes = [
-    {'title': 'HIIT', 'image': 'HIIT'},
-    {'title': 'Cardio', 'image': 'Cardio'},
-    {'title': 'Gym', 'image': 'Gym'},
-    {'title': 'Recovery', 'image': 'recovery'},
-  ];
+// class _ExercicePageState extends State<ExercicePage> {
+  String selectedExercise = 'HIIT';
 
   List<Exercice> exercices = [];
-  int currentIndex = 0;
   int track = 0;
 
   @override
@@ -86,7 +50,7 @@ class _ExercicePageState extends State<ExercicePage> {
                   children: exercices
                       .map((exercise) => Row(
                             children: [
-                              ExerciceType(
+                              exerciceType(
                                 title: exercise.title,
                                 imageName: exercise.imageUrl,
                                 exerciceIndex: int.parse(exercise.id) - 1,
@@ -106,7 +70,7 @@ class _ExercicePageState extends State<ExercicePage> {
                     children: [
                       Etoile(),
                       GradientTitleText(
-                        text: 'HIIT',
+                        text: exercices[track].title,
                         alignment: Alignment.center,
                         fontSize: 20,
                       ),
@@ -115,12 +79,12 @@ class _ExercicePageState extends State<ExercicePage> {
                   ),
                   SizedBox(height: 10),
                   GradientTitleText(
-                    text: 'High-Intensity Interval Training',
+                    text: exercices[track].subtitle,
                     alignment: Alignment.center,
                   ),
                   SizedBox(height: 20),
                   Image(
-                    image: AssetImage('images/icons/HIIT.png'),
+                    image: AssetImage(exercices[track].imageUrl),
                     width: 110,
                     height: 110,
                   ),
@@ -141,22 +105,23 @@ class _ExercicePageState extends State<ExercicePage> {
                   ),
                   SizedBox(height: 20),
                   ListView.separated(
-                    itemCount: activities.length,
+                    itemCount: exercices[track].activities.length,
                     shrinkWrap: true,
                     separatorBuilder: (context, index) => SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      var activities = exercices[0].activities;
+                      var activities = exercices[track].activities;
                       final activity = activities[index];
                       return ActivityButton(
                         activityName: activity.title,
                         imageName: activity.iconUrl,
                         activity: activity,
-                        // routeName: activity['route'] ?? '/jumping_jack',
                       );
                     },
                   ),
                 ],
               ),
+              // SizedBox(height: 50),
+              // getSelectedActivity(),
             ],
           ),
         ),
@@ -164,49 +129,79 @@ class _ExercicePageState extends State<ExercicePage> {
     );
   }
 
-  // Widget ExerciceType(String title, String imageName, int exerciceIndex) {
-  //   return GestureDetector(
-  //     onTap: () {
-  //       setState(() {
-  //         track = exerciceIndex;
-  //       });
-  //     },
-  //     child: Container(
-  //       width: 115,
-  //       height: 112,
-  //       decoration: BoxDecoration(
-  //         color: exerciceTypeSelected ? null : Color(0xFF2E2F55),
-  //         gradient: exerciceTypeSelected
-  //             ? LinearGradient(
-  //                 colors: [Color(0xFFFFA992), Color(0xFFFD0D92)],
-  //                 begin: Alignment.topCenter,
-  //                 end: Alignment.bottomCenter,
-  //               )
-  //             : null,
-  //         border: Border.all(color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
-  //         borderRadius: BorderRadius.circular(24),
-  //       ),
-  //       child: Padding(
-  //         padding: const EdgeInsets.all(10),
-  //         child: Column(
-  //           children: [
-  //             Text(
-  //               widget.title,
-  //               style: titleTextStyle(color: Color(0xFFE9E3E4), fontSize: 15),
-  //             ),
-  //             SizedBox(height: 10),
-  //             Image.asset(
-  //               // 'images/icons/${widget.imageName}.png',
-  //               widget.imageName,
-  //               width: 51,
-  //               height: 51,
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget exerciceType(
+      {required String title,
+      required String imageName,
+      required int exerciceIndex}) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          track = exerciceIndex;
+        });
+      },
+      child: track == exerciceIndex
+          ? Container(
+              width: 115,
+              height: 112,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFFFA992), Color(0xFFFD0D92)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                border: Border.all(
+                    color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    Text(
+                      title,
+                      style: titleTextStyle(
+                          color: Color(0xFFE9E3E4), fontSize: 15),
+                    ),
+                    SizedBox(height: 10),
+                    Image.asset(
+                      imageName,
+                      width: 51,
+                      height: 51,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : Container(
+              width: 115,
+              height: 112,
+              decoration: BoxDecoration(
+                color: Color(0xFF2E2F55),
+                border: Border.all(
+                    color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    Text(
+                      title,
+                      style: titleTextStyle(
+                          color: Color(0xFFE9E3E4), fontSize: 15),
+                    ),
+                    SizedBox(height: 10),
+                    Image.asset(
+                      imageName,
+                      width: 51,
+                      height: 51,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
 }
 
 class Etoile extends StatelessWidget {
@@ -228,90 +223,21 @@ class Etoile extends StatelessWidget {
   }
 }
 
-class ExerciceType extends StatefulWidget {
-  final String title;
-  final String imageName;
-  final int exerciceIndex;
-
-  const ExerciceType({
-    super.key,
-    required this.title,
-    required this.imageName,
-    required this.exerciceIndex,
-  });
-
-  @override
-  State<ExerciceType> createState() => _ExerciceTypeState();
-}
-
-class _ExerciceTypeState extends State<ExerciceType> {
-  bool exerciceTypeSelected = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          // track = exerciceTypeSelected = true;
-        });
-      },
-      child: Container(
-        width: 115,
-        height: 112,
-        decoration: BoxDecoration(
-          color: exerciceTypeSelected ? null : Color(0xFF2E2F55),
-          gradient: exerciceTypeSelected
-              ? LinearGradient(
-                  colors: [Color(0xFFFFA992), Color(0xFFFD0D92)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )
-              : null,
-          border: Border.all(color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              Text(
-                widget.title,
-                style: titleTextStyle(color: Color(0xFFE9E3E4), fontSize: 15),
-              ),
-              SizedBox(height: 10),
-              Image.asset(
-                // 'images/icons/${widget.imageName}.png',
-                widget.imageName,
-                width: 51,
-                height: 51,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class ActivityButton extends StatelessWidget {
   final String activityName;
   final String imageName;
   final Activity activity;
-  // final String routeName;
 
   const ActivityButton(
       {super.key,
       required this.activityName,
       required this.imageName,
-      required this.activity
-      // required this.routeName,
-      });
+      required this.activity});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // Navigator.pushNamed(context, routeName);
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => Hiit(activity: activity)));
       },

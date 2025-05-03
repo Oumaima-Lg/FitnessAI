@@ -6,6 +6,7 @@ class GradientTitleText extends StatelessWidget {
   final double fontSize;
   final FontWeight fontWeight;
   final Alignment alignment;
+  // final TextAlign textAlign;
 
   const GradientTitleText({
     super.key,
@@ -25,6 +26,7 @@ class GradientTitleText extends StatelessWidget {
         ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
         child: Text(
           text,
+          // textAlign: textAlign,
           style: TextStyle(
             color: Colors.white,
             fontSize: fontSize,

@@ -10,13 +10,12 @@ TextStyle normalTextStyle() {
   );
 }
 
-TextStyle titleTextStyle({Color color = Colors.white}) {
+TextStyle titleTextStyle({Color color = Colors.white, double fontSize = 20}) {
   return TextStyle(
     color: color,
-    fontSize: 20,
+    fontSize: fontSize,
     fontFamily: 'Poppins',
     fontWeight: FontWeight.w600,
     height: 1.71,
   );
 }
-
