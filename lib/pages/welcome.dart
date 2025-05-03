@@ -23,7 +23,7 @@ class Welcome extends StatelessWidget {
         child: Column(
           spacing: 10,
           children: [
-            Container(
+            SizedBox(
               // margin: EdgeInsets.only(top: 80),
               width: double.infinity,
               height: MediaQuery.of(context).size.height / 1.95,
