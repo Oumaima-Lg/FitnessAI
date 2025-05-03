@@ -63,7 +63,7 @@ class _RegisterState extends State<Register> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 24),
+                          SizedBox(height: 44),
                         ],
                       )
                     ],
@@ -151,7 +151,7 @@ class _RegisterState extends State<Register> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 32),
+                        SizedBox(height: 52),
 
                         // Register Button
                         GradientComponent.gradientButton(
@@ -185,13 +185,15 @@ class _RegisterState extends State<Register> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             CustomSocialIcon(
-                              borderColor: Colors.white24,
-                              child: Image.asset('images/google_icon.png', width: MediaQuery.of(context).size.width),
+                              borderColor: Color(0xFF423C3D),
+                              child: Image.asset('images/google_icon.png',
+                                  width: MediaQuery.of(context).size.width),
                             ),
                             const SizedBox(width: 20),
                             CustomSocialIcon(
-                              borderColor: Colors.white24,
-                              child: Image.asset('images/facebook_icon.png', width: MediaQuery.of(context).size.width),
+                              borderColor: Color(0xFF423C3D),
+                              child: Image.asset('images/facebook_icon.png',
+                                  width: MediaQuery.of(context).size.width),
                             ),
                             const SizedBox(width: 20),
                           ],
@@ -204,7 +206,7 @@ class _RegisterState extends State<Register> {
                           children: [
                             Text(
                               'Already have an account? ',
-                              style: TextStyle(color: Colors.white60),
+                              style: TextStyle(color: Colors.white),
                             ),
                             GestureDetector(
                               onTap: () {
@@ -217,7 +219,7 @@ class _RegisterState extends State<Register> {
                               child: Text(
                                 'Login',
                                 style: TextStyle(
-                                  color: Color(0xFFB266FF),
+                                  color: Color(0xFF983BCB),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -258,9 +260,9 @@ class _RegisterState extends State<Register> {
         prefixIcon: Icon(prefixIcon, color: Colors.white60),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: Colors.black26,
+        fillColor: Color(0xFF161818),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
         contentPadding: EdgeInsets.symmetric(vertical: 16),
@@ -268,8 +270,6 @@ class _RegisterState extends State<Register> {
       validator: validator,
     );
   }
-
-
 }
 
 class CustomSocialIcon extends StatelessWidget {
@@ -288,7 +288,7 @@ class CustomSocialIcon extends StatelessWidget {
       width: 50,
       height: 50,
       decoration: BoxDecoration(
-        color: const Color(0xFF1D1E33),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: borderColor,

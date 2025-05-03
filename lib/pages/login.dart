@@ -11,7 +11,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
 
@@ -62,7 +61,7 @@ class _LoginState extends State<Login> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 24),
+                          SizedBox(height: 44),
                         ],
                       )
                     ],
@@ -71,7 +70,6 @@ class _LoginState extends State<Login> {
                     key: _formKey,
                     child: Column(
                       children: [
-
                         // Email Field
                         _buildTextFormField(
                           controller: _emailController,
@@ -120,7 +118,7 @@ class _LoginState extends State<Login> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 32),
+                        SizedBox(height: 52),
 
                         // Login Button
                         GradientComponent.gradientButton(
@@ -155,12 +153,14 @@ class _LoginState extends State<Login> {
                           children: [
                             CustomSocialIcon(
                               borderColor: Colors.white24,
-                              child: Image.asset('images/google_icon.png', width: MediaQuery.of(context).size.width),
+                              child: Image.asset('images/google_icon.png',
+                                  width: MediaQuery.of(context).size.width),
                             ),
                             const SizedBox(width: 20),
                             CustomSocialIcon(
                               borderColor: Colors.white24,
-                              child: Image.asset('images/facebook_icon.png', width: MediaQuery.of(context).size.width),
+                              child: Image.asset('images/facebook_icon.png',
+                                  width: MediaQuery.of(context).size.width),
                             ),
                             const SizedBox(width: 20),
                           ],
@@ -173,7 +173,7 @@ class _LoginState extends State<Login> {
                           children: [
                             Text(
                               'Don\'t have an account yet? ',
-                              style: TextStyle(color: Colors.white60),
+                              style: TextStyle(color: Colors.white),
                             ),
                             GestureDetector(
                               onTap: () {
@@ -185,7 +185,7 @@ class _LoginState extends State<Login> {
                               child: Text(
                                 'Register',
                                 style: TextStyle(
-                                  color: Color(0xFFB266FF),
+                                  color: Color(0xFF983BCB),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -226,9 +226,9 @@ class _LoginState extends State<Login> {
         prefixIcon: Icon(prefixIcon, color: Colors.white60),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: Colors.black26,
+        fillColor: Color(0xFF161818),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
         contentPadding: EdgeInsets.symmetric(vertical: 16),
@@ -236,5 +236,4 @@ class _LoginState extends State<Login> {
       validator: validator,
     );
   }
-  
 }
