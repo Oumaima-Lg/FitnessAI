@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class GradientComponent {
-  static ElevatedButton gradientButton(String text) {
+  static ElevatedButton gradientButton(String text, {VoidCallback? onPressed}) { // gradiant dyal lbouton with rounded corners
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
       ),
-      onPressed: () {
+      onPressed: onPressed ?? () {
         // Action when button is pressed
       },
       child: Container(

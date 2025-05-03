@@ -1,4 +1,5 @@
 import 'package:fitness/components/gradient.dart';
+import 'package:fitness/pages/register.dart';
 import 'package:flutter/material.dart';
 
 class Welcome extends StatelessWidget {
@@ -10,6 +11,8 @@ class Welcome extends StatelessWidget {
       body: Container(
         padding: EdgeInsets.only(bottom: 10, top: 10),
         width: double.infinity,
+
+        /* background degrade : */
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -20,11 +23,12 @@ class Welcome extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
+        /******************************/
         child: Column(
           // mainAxisAlignment: MainAxisAlignment.center,
           // crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
+            SizedBox(
               // margin: EdgeInsets.only(top: 80),
               width: double.infinity,
               height: MediaQuery.of(context).size.height / 1.95,
@@ -46,9 +50,10 @@ class Welcome extends StatelessWidget {
                     margin: EdgeInsets.only(top: 75, left: 35, right: 35),
                     decoration: BoxDecoration(
                       border: Border.all(
-                          color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
+                          color: Color(0xFFE8ACFF).withAlpha(51),
+                          width: 2), //color dyal l border
                       borderRadius: BorderRadius.circular(41),
-                      color: Color(0xFF4023D7).withAlpha(38),
+                      color: Color(0xFF4023D7).withAlpha(38), // bg dyal l box
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
@@ -68,15 +73,20 @@ class Welcome extends StatelessWidget {
             SizedBox(
               height: 40,
             ),
-            GradientComponent.gradientButton('Next'),
+            GradientComponent.gradientButton(
+              'Next',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Register()),
+                );
+              },
+            ),
             Container(
               padding: EdgeInsets.only(left: 10, right: 10),
               child: Image.asset(
                 'images/fitness.png',
-                // fit: BoxFit.cover,
                 width: MediaQuery.of(context).size.width,
-                //   height: MediaQuery.of(context).size.height / 4,
-                // height: 200,
               ),
             ),
           ],
