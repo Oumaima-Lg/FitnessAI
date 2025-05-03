@@ -1,17 +1,5 @@
 import 'package:flutter/material.dart';
 import 'pages/exercice_page.dart';
-import '../Hiit/crunches.dart';
-import '../Hiit/forward_lunges.dart';
-import '../Hiit/high_knees.dart';
-import '../Hiit/plank.dart';
-import '../Hiit/push_ups.dart';
-import '../Hiit/side_plank.dart';
-import '../Hiit/squats.dart';
-import '../Hiit/steps_ups.dart';
-import '../Hiit/t_push_ups.dart';
-import '../Hiit/tricep_dips_using_a_chair.dart';
-import '../Hiit/jumping_jack_page.dart';
-import '../Hiit/wall_sit.dart';
 
 void main() {
   runApp(MyApp());
