@@ -19,19 +19,19 @@ class _ExercicePageState extends State<ExercicePage> {
   ];
 
   Widget getSelectedActivity() {
-  switch (selectedExercise) {
-    case 'HIIT':
-      return HiitExercice();
-    case 'Cardio':
-      return CardioExercice();
-    case 'Gym':
-      return GymExercice();
-    case 'Recovery':
-      return RecoveryExercice();
-    default:
-      return SizedBox();
+    switch (selectedExercise) {
+      case 'HIIT':
+        return HiitExercice();
+      case 'Cardio':
+        return CardioExercice();
+      case 'Gym':
+        return GymExercice();
+      case 'Recovery':
+        return RecoveryExercice();
+      default:
+        return SizedBox();
+    }
   }
-}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,13 +67,13 @@ class _ExercicePageState extends State<ExercicePage> {
                             isSelected: selectedExercise == exercise['title'],
                           ),
                         ),
-                        const SizedBox(width: 20),
+                        SizedBox(width: 20),
                       ],
                     );
                   }).toList(),
                 ),
               ),
-              const SizedBox(height: 50),
+              SizedBox(height: 50),
               getSelectedActivity(),
             ],
           ),
@@ -190,7 +190,7 @@ class ExerciceActivities extends StatelessWidget {
           itemBuilder: (context, index) {
             final activity = activities[index];
             return ActivityButton(
-              actvityName: activity['name']!,
+              activityName: activity['name']!,
               imageName: activity['image']!,
               routeName: activity['route']!,
             );
@@ -305,13 +305,13 @@ class Etoile extends StatelessWidget {
 }
 
 class ActivityButton extends StatelessWidget {
-  final String actvityName;
+  final String activityName;
   final String imageName;
   final String routeName; 
 
   const ActivityButton({
     super.key,
-    required this.actvityName,
+    required this.activityName,
     required this.imageName,
     required this.routeName,
   });
@@ -337,7 +337,7 @@ class ActivityButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            actvityName,
+            activityName,
             style: TextStyle(
               color: Color(0xFFE9E3E4),
               fontSize: 20,
