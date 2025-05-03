@@ -61,10 +61,9 @@ flutter:
   assets:
     - images/
     - images/gif/
-    - images/png/
+    - images/ExerciceImages/
     - images/icons/
     - images/icons/HIIT/
-    - images/icons/HIIT/Wall Sit/
     - images/icons/HIIT/Jumping Jack/
 
   fonts:

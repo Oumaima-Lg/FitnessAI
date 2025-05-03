@@ -7,7 +7,7 @@ import '../components/personalized_widget.dart';
 import '../textStyle/textstyle.dart';
 
 class ExercicePage extends StatefulWidget {
-  ExercicePage({
+  const ExercicePage({
     super.key,
   });
 
@@ -129,77 +129,78 @@ class _ExercicePageState extends State<ExercicePage> {
     );
   }
 
-  Widget exerciceType(
-      {required String title,
-      required String imageName,
-      required int exerciceIndex}) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          track = exerciceIndex;
-        });
-      },
-      child: track == exerciceIndex
-          ? Container(
-              width: 115,
-              height: 112,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFFFFA992), Color(0xFFFD0D92)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                border: Border.all(
-                    color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
-                borderRadius: BorderRadius.circular(24),
+Widget exerciceType({
+    required String title,
+    required String imageName,
+    required int exerciceIndex })
+  {
+  return GestureDetector(
+    onTap: () {
+      setState(() {
+        track = exerciceIndex;
+      });
+    },
+    child: track == exerciceIndex
+        ? Container(
+            width: 115,
+            height: 112,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFFFA992), Color(0xFFFD0D92)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Text(
-                      title,
-                      style: titleTextStyle(
-                          color: Color(0xFFE9E3E4), fontSize: 15),
-                    ),
-                    SizedBox(height: 10),
-                    Image.asset(
-                      imageName,
-                      width: 51,
-                      height: 51,
-                    ),
-                  ],
-                ),
-              ),
-            )
-          : Container(
-              width: 115,
-              height: 112,
-              decoration: BoxDecoration(
-                color: Color(0xFF2E2F55),
-                border: Border.all(
-                    color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Text(
-                      title,
-                      style: titleTextStyle(
-                          color: Color(0xFFE9E3E4), fontSize: 15),
-                    ),
-                    SizedBox(height: 10),
-                    Image.asset(
-                      imageName,
-                      width: 51,
-                      height: 51,
-                    ),
-                  ],
-                ),
+              border: Border.all(
+                  color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Text(
+                    title,
+                    style: titleTextStyle(
+                        color: Color(0xFFE9E3E4), fontSize: 15),
+                  ),
+                  SizedBox(height: 10),
+                  Image.asset(
+                    imageName,
+                    width: 51,
+                    height: 51,
+                  ),
+                ],
               ),
             ),
+          )
+        : Container(
+            width: 115,
+            height: 112,
+            decoration: BoxDecoration(
+              color: Color(0xFF2E2F55),
+              border: Border.all(
+                  color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Text(
+                    title,
+                    style: titleTextStyle(
+                        color: Color(0xFFE9E3E4), fontSize: 15),
+                  ),
+                  SizedBox(height: 10),
+                  Image.asset(
+                    imageName,
+                    width: 51,
+                    height: 51,
+                  ),
+                ],
+              ),
+            ),
+          ),
     );
   }
 }
@@ -232,7 +233,8 @@ class ActivityButton extends StatelessWidget {
       {super.key,
       required this.activityName,
       required this.imageName,
-      required this.activity});
+      required this.activity
+  });
 
   @override
   Widget build(BuildContext context) {
