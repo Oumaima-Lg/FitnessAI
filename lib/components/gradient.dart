@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 
 class GradientComponent {
   static ElevatedButton gradientButton(
-      String text, double maxWidth, double maxHeight) {
+      {required String text,
+      required double maxWidth,
+      required double maxHeight,
+      required VoidCallback onPressed}) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
       ),
-      onPressed: () {
-        // Action when button is pressed
-      },
+      onPressed: onPressed,
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

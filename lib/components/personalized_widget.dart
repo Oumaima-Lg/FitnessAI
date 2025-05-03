@@ -11,8 +11,8 @@ class GradientTitleText extends StatelessWidget {
   const GradientTitleText({
     super.key,
     required this.text,
-    this.alignment = Alignment.center,
-    this.fontSize = 15,
+    this.alignment = Alignment.topLeft,
+    this.fontSize = 20,
     this.fontWeight = FontWeight.w600,
   });
 
@@ -33,7 +33,7 @@ class GradientTitleText extends StatelessWidget {
             fontWeight: fontWeight,
             fontFamily: 'Poppins',
           ),
-          textAlign: TextAlign.center, // Centrer le texte
+          textAlign: TextAlign.start, // Centrer le texte
         ),
       ),
     );
@@ -44,24 +44,32 @@ class GradientTitleText extends StatelessWidget {
 class GradientButton extends StatelessWidget {
   final String title;
   final IconData icon;
-  final double width;
+  // final double width;
+  final double maxWidth;
+  final double maxHeight;
   final VoidCallback onPressed;
 
   const GradientButton({
     super.key,
     required this.title,
     required this.icon,
-    this.width = 120,
+    // this.width = 120,
+    required this.maxWidth,
+    required this.maxHeight,
     required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: width,
+      // width: width,
+      constraints: BoxConstraints(
+        maxWidth: maxWidth,
+        maxHeight: maxHeight,
+      ),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF983BCB), Color(0xFF4023D7)],
+          colors: [Color(0xFF4023D7), Color(0xFF983BCB)],
         ),
         borderRadius: BorderRadius.circular(20),
       ),

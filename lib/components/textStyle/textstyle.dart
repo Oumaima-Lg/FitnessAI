@@ -15,7 +15,7 @@ TextStyle titleTextStyle({Color color = Colors.white, double fontSize = 20}) {
     color: color,
     fontSize: fontSize,
     fontFamily: 'Poppins',
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w200,
     height: 1.71,
   );
 }

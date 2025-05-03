@@ -4,7 +4,7 @@ import 'package:fitness/models/activity.dart';
 import 'package:fitness/models/exercice.dart';
 import 'package:flutter/material.dart';
 import '../components/personalized_widget.dart';
-import '../textStyle/textstyle.dart';
+import '../components/textStyle/textstyle.dart';
 
 class ExercicePage extends StatefulWidget {
   const ExercicePage({
@@ -16,9 +16,6 @@ class ExercicePage extends StatefulWidget {
 }
 
 class _ExercicePageState extends State<ExercicePage> {
-// class _ExercicePageState extends State<ExercicePage> {
-  String selectedExercise = 'HIIT';
-
   List<Exercice> exercices = [];
   int track = 0;
 
@@ -31,7 +28,7 @@ class _ExercicePageState extends State<ExercicePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF2E2F55),
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         child: Padding(
           padding:
@@ -129,78 +126,77 @@ class _ExercicePageState extends State<ExercicePage> {
     );
   }
 
-Widget exerciceType({
-    required String title,
-    required String imageName,
-    required int exerciceIndex })
-  {
-  return GestureDetector(
-    onTap: () {
-      setState(() {
-        track = exerciceIndex;
-      });
-    },
-    child: track == exerciceIndex
-        ? Container(
-            width: 115,
-            height: 112,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFFFFA992), Color(0xFFFD0D92)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+  Widget exerciceType(
+      {required String title,
+      required String imageName,
+      required int exerciceIndex}) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          track = exerciceIndex;
+        });
+      },
+      child: track == exerciceIndex
+          ? Container(
+              width: 115,
+              height: 112,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFFFA992), Color(0xFFFD0D92)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                border: Border.all(
+                    color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
+                borderRadius: BorderRadius.circular(24),
               ),
-              border: Border.all(
-                  color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  Text(
-                    title,
-                    style: titleTextStyle(
-                        color: Color(0xFFE9E3E4), fontSize: 15),
-                  ),
-                  SizedBox(height: 10),
-                  Image.asset(
-                    imageName,
-                    width: 51,
-                    height: 51,
-                  ),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    Text(
+                      title,
+                      style: titleTextStyle(
+                          color: Color(0xFFE9E3E4), fontSize: 15),
+                    ),
+                    SizedBox(height: 10),
+                    Image.asset(
+                      imageName,
+                      width: 51,
+                      height: 51,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : Container(
+              width: 115,
+              height: 112,
+              decoration: BoxDecoration(
+                color: Color(0xFF2E2F55),
+                border: Border.all(
+                    color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    Text(
+                      title,
+                      style: titleTextStyle(
+                          color: Color(0xFFE9E3E4), fontSize: 15),
+                    ),
+                    SizedBox(height: 10),
+                    Image.asset(
+                      imageName,
+                      width: 51,
+                      height: 51,
+                    ),
+                  ],
+                ),
               ),
             ),
-          )
-        : Container(
-            width: 115,
-            height: 112,
-            decoration: BoxDecoration(
-              color: Color(0xFF2E2F55),
-              border: Border.all(
-                  color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  Text(
-                    title,
-                    style: titleTextStyle(
-                        color: Color(0xFFE9E3E4), fontSize: 15),
-                  ),
-                  SizedBox(height: 10),
-                  Image.asset(
-                    imageName,
-                    width: 51,
-                    height: 51,
-                  ),
-                ],
-              ),
-            ),
-          ),
     );
   }
 }
@@ -233,8 +229,7 @@ class ActivityButton extends StatelessWidget {
       {super.key,
       required this.activityName,
       required this.imageName,
-      required this.activity
-  });
+      required this.activity});
 
   @override
   Widget build(BuildContext context) {

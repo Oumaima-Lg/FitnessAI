@@ -1,4 +1,8 @@
 import 'package:fitness/components/gradient.dart';
+import 'package:fitness/data/exercice_data.dart';
+import 'package:fitness/models/exercice.dart';
+import 'package:fitness/components/textStyle/textstyle.dart';
+import 'package:fitness/pages/exercice_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,11 +17,18 @@ class _HomePageState extends State<HomePage> {
     viewportFraction: 0.9, // 90% de la largeur visible par page
   );
   int _currentPage = 0;
+  List<Exercice> exercices = [];
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    exercices = ExerciceData.getExercices();
   }
 
   @override
@@ -140,16 +151,35 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(height: 25),
-                Container(
-                  height: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.white,
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: exercices
+                        .map((exercise) => Row(
+                              children: [
+                                exerciceType(
+                                  title: exercise.title,
+                                  imageName: exercise.imageUrl,
+                                ),
+                                SizedBox(width: 30),
+                              ],
+                            ))
+                        .toList(),
                   ),
                 ),
                 const SizedBox(height: 25),
                 Center(
-                    child: GradientComponent.gradientButton('Start', 100, 35)),
+                    child: GradientComponent.gradientButton(
+                        text: 'Start',
+                        maxWidth: 100,
+                        maxHeight: 35,
+                        onPressed: () {
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => ExercicePage()));
+                          print("Start");
+                        })),
               ],
             ),
           ),
@@ -168,5 +198,38 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Widget exerciceType({
+    required String title,
+    required String imageName,
+  }) {
+    return GestureDetector(
+        child: Container(
+      width: 115,
+      height: 112,
+      decoration: BoxDecoration(
+        color: Color(0xFF2E2F55),
+        border: Border.all(color: Color(0xFFE8ACFF).withAlpha(51), width: 2),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Text(
+              title,
+              style: titleTextStyle(color: Color(0xFFE9E3E4), fontSize: 15),
+            ),
+            SizedBox(height: 10),
+            Image.asset(
+              imageName,
+              width: 51,
+              height: 51,
+            ),
+          ],
+        ),
+      ),
+    ));
   }
 }

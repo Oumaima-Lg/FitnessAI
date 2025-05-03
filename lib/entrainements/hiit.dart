@@ -1,7 +1,7 @@
 import 'package:fitness/models/activity.dart';
 import 'package:flutter/material.dart';
 import '../components/personalized_widget.dart';
-import '../textStyle/textstyle.dart';
+import '../components/textStyle/textstyle.dart';
 
 class Hiit extends StatelessWidget {
   final Activity activity;
@@ -25,18 +25,24 @@ class Hiit extends StatelessWidget {
           padding: const EdgeInsets.all(14.0),
           child: Center(
             child: Column(
+              // crossAxisAlignment: CrossAxisAlignment.start,
+              // mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Image.asset(
                   activity.imageUrl,
+                  // height: 298,
+                  // width: 447,
+                  fit: BoxFit.cover,
                 ),
                 SizedBox(height: 20),
                 Text(
                   activity.description,
                   style: normalTextStyle(),
+                  textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 25),
                 GradientTitleText(text: 'Technique'),
-                SizedBox(height: 20),
+                SizedBox(height: 5),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -65,20 +71,39 @@ class Hiit extends StatelessWidget {
                 Image(
                   image: AssetImage(activity.muscleImageUrl!),
                 ),
+                SizedBox(height: 10),
                 Text(
                   activity.muscleDescription!,
                   style: normalTextStyle(),
+                  textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 25),
                 GradientTitleText(text: 'Demonstration'),
-                Image(
-                  image: AssetImage(activity.videoDemonstartionUrl!),
+                SizedBox(height: 20),
+                Stack(
+                  children: [
+                    Positioned(
+                        left: 0,
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(23),
+                            color: Color(0xFFF4E3DF),
+                          ),
+                        )),
+                    Image(
+                      image: AssetImage(activity.videoDemonstartionUrl!),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 20),
                 GradientButton(
                   title: 'Go',
                   icon: Icons.arrow_forward,
-                  width: 120,
+                  maxWidth: 120,
+                  maxHeight: 42,
                   onPressed: () {
                     print('Go pressed');
                   },

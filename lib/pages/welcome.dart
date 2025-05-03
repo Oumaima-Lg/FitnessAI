@@ -64,7 +64,11 @@ class Welcome extends StatelessWidget {
                 ],
               ),
             ),
-            GradientComponent.gradientButton('Next', 220, 50),
+            GradientComponent.gradientButton(
+                text: 'Next',
+                maxWidth: 220,
+                maxHeight: 50,
+                onPressed: () => print('OIOH')),
             Container(
               alignment: Alignment.center,
               constraints: BoxConstraints(
