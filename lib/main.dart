@@ -1,5 +1,6 @@
 import 'package:fitness/pages/bottomNavBar.dart';
 import 'package:fitness/pages/home.dart';
+import 'package:fitness/pages/welcome.dart';
 // import 'package:fitness/pages/welcome.dart';
 import 'package:flutter/material.dart';
 import 'pages/exercice_page.dart';
@@ -15,10 +16,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Fitness App',
-      // theme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      //   useMaterial3: true,
-      // ),
       debugShowCheckedModeBanner: false,
       home: Container(
         decoration: BoxDecoration(
@@ -31,7 +28,7 @@ class MyApp extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
-        child: const BottomNavBar(),
+        child: const Welcome(),
       ),
     );
   }

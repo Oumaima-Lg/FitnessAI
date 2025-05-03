@@ -1,4 +1,5 @@
 import 'package:fitness/components/gradient.dart';
+import 'package:fitness/pages/register.dart';
 import 'package:flutter/material.dart';
 
 class Welcome extends StatelessWidget {
@@ -10,6 +11,8 @@ class Welcome extends StatelessWidget {
       body: Container(
         padding: EdgeInsets.only(bottom: 10, top: 10),
         width: double.infinity,
+
+        /* background degrade : */
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -20,6 +23,7 @@ class Welcome extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
+        /******************************/
         child: Column(
           spacing: 10,
           children: [
@@ -68,7 +72,11 @@ class Welcome extends StatelessWidget {
                 text: 'Next',
                 maxWidth: 220,
                 maxHeight: 50,
-                onPressed: () => print('OIOH')),
+                onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Register(),
+                    ))),
             Container(
               alignment: Alignment.center,
               constraints: BoxConstraints(
