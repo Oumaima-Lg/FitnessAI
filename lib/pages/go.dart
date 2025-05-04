@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:gif/gif.dart';
 
-Widget go() {
-  return GoPage();
-}
+// Widget go() {
+//   return GoPage();
+// }
 
 class GoPage extends StatefulWidget {
   const GoPage({super.key});
@@ -113,23 +113,24 @@ class _GoPageState extends State<GoPage> with SingleTickerProviderStateMixin {
                     Color.fromARGB(255, 255, 2, 225),
                     Color(0xFFFFB19A),
                   ),
-                   GradientComponent.gradientCircle(
+                  GradientComponent.gradientCircle(
                     MediaQuery.of(context).size.width * 0.55,
                     35,
-                    Color(0xFF23253C),  Color.fromARGB(255, 7, 6, 54),
-
+                    Color(0xFF23253C),
+                    Color.fromARGB(255, 7, 6, 54),
                   ),
                   GradientComponent.gradientCircle(
                     22,
                     MediaQuery.of(context).size.height * 0.4,
-                    Color(0xFF23253C),  Color.fromARGB(255, 7, 6, 54),
+                    Color(0xFF23253C),
+                    Color.fromARGB(255, 7, 6, 54),
                   ),
                   // Cercle violet en bas à droite
                   GradientComponent.gradientCircle(
                     MediaQuery.of(context).size.width * 0.55,
                     MediaQuery.of(context).size.height * 0.4,
-                     Color(0xFFE8ACFF),
-                     Color(0xFF7800FF),
+                    Color(0xFFE8ACFF),
+                    Color(0xFF7800FF),
                   ),
 
                   // Container principal avec l'image
@@ -146,7 +147,8 @@ class _GoPageState extends State<GoPage> with SingleTickerProviderStateMixin {
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Gif(
-                        image: Image.asset('lib/assets/imgs/gif/fents.gif').image,
+                        image:
+                            Image.asset('lib/assets/imgs/gif/fents.gif').image,
                         controller: _controller,
                         autostart: Autostart.loop,
                         repeat: ImageRepeat.noRepeat,
@@ -156,7 +158,8 @@ class _GoPageState extends State<GoPage> with SingleTickerProviderStateMixin {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFE8ACFF)),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Color(0xFFE8ACFF)),
                               ),
                               SizedBox(height: 10),
                               Text(
@@ -171,7 +174,6 @@ class _GoPageState extends State<GoPage> with SingleTickerProviderStateMixin {
                           _controller.reset();
                           _controller.forward();
                         },
-                       
                       ),
                     ),
                   ),
@@ -229,10 +231,9 @@ class _GoPageState extends State<GoPage> with SingleTickerProviderStateMixin {
   }
 }
 
-
-
 class GradientComponent {
-  static ElevatedButton gradientButton(String text, double maxWidth, double maxHeight) {
+  static ElevatedButton gradientButton(
+      String text, double maxWidth, double maxHeight) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.transparent,

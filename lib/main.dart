@@ -1,3 +1,5 @@
+import 'package:fitness/pages/go.dart';
+import 'package:fitness/pages/profile.dart';
 import 'package:fitness/pages/welcome.dart';
 import 'package:flutter/material.dart';
 
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: Welcome(),
+      home: GoPage(),
     );
   }
 }

@@ -13,33 +13,20 @@ class ProfilePage extends StatelessWidget {
       backgroundColor: Color(0xFF23253C),
       body: Column(
         children: [
-          // Container avec gradient en haut et photo de profil
           Stack(
             alignment: Alignment.bottomCenter,
             clipBehavior: Clip.none,
             children: [
-              // Gradient en haut
-              Container(
-                width: double.infinity,
-                height: 220,
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment.center,
-                    radius: 1.0,
-                    colors: [
-                      Color.fromARGB(255, 253, 13, 146).withOpacity(0.6),
-                      Color.fromARGB(255, 253, 13, 146).withOpacity(0.0),
-                    ],
-                    stops: [0.0, 1.0],
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
+              Positioned(
+                child: Image.asset(
+                  'images/Ellipse Profil.png',
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: 333.5,
                 ),
               ),
-              // Photo de profil qui déborde du gradient
               Positioned(
-                bottom: -10,
+                top: 80,
                 child: Column(
                   children: [
                     Stack(
@@ -53,7 +40,7 @@ class ProfilePage extends StatelessWidget {
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: Color(0xFFE84F8A),
-                              width: 3,
+                              width: 2,
                             ),
                           ),
                         ),
@@ -67,7 +54,7 @@ class ProfilePage extends StatelessWidget {
                           ),
                           child: ClipOval(
                             child: Image.asset(
-                              'assets/fentes.png',
+                              'images/profilGirl.png',
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return Icon(
@@ -88,7 +75,8 @@ class ProfilePage extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: Color(0xFFE84F8A), width: 1),
+                              border: Border.all(
+                                  color: Color(0xFFE84F8A), width: 1),
                             ),
                             child: Icon(
                               Icons.camera_alt,
@@ -131,42 +119,48 @@ class ProfilePage extends StatelessWidget {
                   ],
                 ),
               ),
+              Positioned(
+                top: 260,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildInfoCard(
+                          imageUrl: 'images/heightIcon.png',
+                          value: "165.0 CM",
+                          label: "Height",
+                          bgColor: Color.fromARGB(168, 232, 79, 138),
+                        ),
+                        _buildInfoCard(
+                          imageUrl: 'images/weightIcon.png',
+                          value: "70.0 KG",
+                          label: "Weight",
+                          bgColor: Color.fromARGB(143, 69, 175, 194),
+                        ),
+                        _buildInfoCard(
+                          imageUrl: 'images/ageIcon.png',
+                          value: "22.9 Year",
+                          label: "Age",
+                          bgColor: Color.fromARGB(121, 247, 207, 29),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 0),
           Expanded(
             child: Column(
               children: [
-                // Informations utilisateur
+                SizedBox(height: 40),
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildInfoCard(
-                        icon: Icons.height,
-                        value: "165.0 CM",
-                        label: "Height",
-                        bgColor: Color.fromARGB(168, 232, 79, 138),
-                      ),
-                      _buildInfoCard(
-                        icon: Icons.fitness_center,
-                        value: "70.0 KG",
-                        label: "Weight",
-                        bgColor: Color.fromARGB(143, 69, 175, 194),
-                      ),
-                      _buildInfoCard(
-                        icon: Icons.hourglass_bottom_outlined,
-                        value: "22.9",
-                        label: "Age",
-                        bgColor: Color.fromARGB(121, 247, 207, 29),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 28),
                   child: Center(
                     child: Container(
                       constraints: BoxConstraints(
@@ -177,22 +171,27 @@ class ProfilePage extends StatelessWidget {
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
-                            child: _buildMenuButton('Edit profile', Icons.person_outline, () {}),
+                            child: _buildMenuButton(
+                                'Edit profile', Icons.person_outline, () {}),
                           ),
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
-                            child: _buildMenuButton('Notification', Icons.notifications_outlined, () {}),
+                            child: _buildMenuButton('Notification',
+                                Icons.notifications_outlined, () {}),
                           ),
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
-                            child: _buildMenuButton('Delete my account', Icons.delete_outline, () {}, isDestructive: true),
+                            child: _buildMenuButton('Delete my account',
+                                Icons.delete_outline, () {},
+                                isDestructive: true),
                           ),
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
-                            child: _buildMenuButton('Log out', Icons.logout, () {}),
+                            child: _buildMenuButton(
+                                'Log out', Icons.logout, () {}),
                           ),
                         ],
                       ),
@@ -204,41 +203,34 @@ class ProfilePage extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: ClipRRect(
-        borderRadius: BorderRadius.all(
-          Radius.circular(20),
-        ),
-        child: BottomNavigationBar(
-          items: [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: '', backgroundColor: Color(0xFF373856)),
-            BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: '', backgroundColor: Color(0xFF373856)),
-            BottomNavigationBarItem(icon: Icon(Icons.restaurant_menu), label: '', backgroundColor: Color(0xFF373856)),
-            BottomNavigationBarItem(icon: Icon(Iconsax.activity), label: '', backgroundColor: Color(0xFF373856)),
-            BottomNavigationBarItem(icon: Icon(Iconsax.profile_circle), label: '', backgroundColor: Color(0xFF373856)),
-          ],
-          showSelectedLabels: false,
-        ),
-      ),
     );
   }
 
-  Widget _buildMenuButton(String text, IconData icon, VoidCallback onPressed, {bool isDestructive = false}) {
+  Widget _buildMenuButton(String text, IconData icon, VoidCallback onPressed,
+      {bool isDestructive = false}) {
     return Container(
+      width: 315,
+      height: 60,
       margin: EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D2D4A),
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFF4E457B).withAlpha(127),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(0),
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
       ),
       child: TextButton(
         style: TextButton.styleFrom(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(12),
-              bottomRight: Radius.circular(12),
-              topLeft: Radius.circular(12),
-            ),
-          ),
+          // shape: RoundedRectangleBorder(
+          //   borderRadius: BorderRadius.only(
+          //     bottomLeft: Radius.circular(24),
+          //     bottomRight: Radius.circular(24),
+          //     topLeft: Radius.circular(24),
+          //   ),
+          // ),
         ),
         onPressed: onPressed,
         child: Row(
@@ -246,13 +238,14 @@ class ProfilePage extends StatelessWidget {
             Icon(
               icon,
               color: isDestructive ? Colors.red : Colors.white,
-              size: 24,
+              size: 28,
             ),
             SizedBox(width: 12),
             Text(
               text,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
                 color: isDestructive ? Colors.red : Colors.white,
               ),
             ),
@@ -263,7 +256,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildInfoCard({
-    required IconData icon,
+    required String imageUrl,
     required String value,
     required String label,
     required Color bgColor,
@@ -271,18 +264,14 @@ class ProfilePage extends StatelessWidget {
     return Row(
       children: [
         Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 24,
-          ),
+          // padding: EdgeInsets.all(8),
+          // decoration: BoxDecoration(
+          //   color: bgColor,
+          //   borderRadius: BorderRadius.circular(12),
+          // ),
+          child: Image.asset(imageUrl),
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -290,14 +279,14 @@ class ProfilePage extends StatelessWidget {
               value,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                fontWeight: FontWeight.w100,
               ),
             ),
             Text(
               label,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
+                color: Color(0xFFEBEBF5),
                 fontSize: 14,
               ),
             ),
