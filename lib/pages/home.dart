@@ -151,20 +151,22 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(height: 25),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: exercices
-                        .map((exercise) => Row(
-                              children: [
-                                exerciceType(
-                                  title: exercise.title,
-                                  imageName: exercise.imageUrl,
-                                ),
-                                SizedBox(width: 30),
-                              ],
-                            ))
-                        .toList(),
+                Center(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: exercices
+                          .map((exercise) => Row(
+                                children: [
+                                  exerciceType(
+                                    title: exercise.title,
+                                    imageName: exercise.imageUrl,
+                                  ),
+                                  SizedBox(width: 30),
+                                ],
+                              ))
+                          .toList(),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 25),

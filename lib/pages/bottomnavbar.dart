@@ -1,6 +1,6 @@
 import 'package:fitness/pages/exercice_page.dart';
 import 'package:fitness/pages/home.dart';
-import 'package:fitness/pages/page3.dart';
+import 'package:fitness/pages/profile.dart';
 import 'package:fitness/pages/page4.dart';
 import 'package:fitness/pages/page5.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +18,9 @@ class _BottomNavState extends State<BottomNavBar> {
 
   late HomePage homePage;
   late ExercicePage exercicePage;
-  late Page3 page3;
   late Page4 page4;
   late Page5 page5;
+  late ProfilePage profilePage;
 
   int currentTabIndex = 0;
 
@@ -28,11 +28,11 @@ class _BottomNavState extends State<BottomNavBar> {
   void initState() {
     homePage = HomePage();
     exercicePage = ExercicePage();
-    page3 = Page3();
+    profilePage = ProfilePage();
     page4 = Page4();
     page5 = Page5();
 
-    pages = [homePage, exercicePage, page3, page4, page5];
+    pages = [homePage, exercicePage, page4, page5, profilePage];
     super.initState();
   }
 

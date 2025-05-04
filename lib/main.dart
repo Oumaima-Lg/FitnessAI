@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
-        child: const Welcome(),
+        child: const BottomNavBar(),
       ),
     );
   }
