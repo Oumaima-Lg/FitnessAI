@@ -11,9 +11,9 @@ class Hiit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF2E2F55),
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: Color(0xFF2E2F55),
+        backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
           activity.title,

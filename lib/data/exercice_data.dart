@@ -1,9 +1,12 @@
 import 'package:fitness/models/exercice.dart';
 import 'package:fitness/models/activity.dart';
+import 'package:fitness/services/activity_service.dart';
 
 class ExerciceData {
   // Une méthode statique qui renvoie une liste d'exercices avec leurs activités associées
-  static List<Exercice> getExercices() {
+  static Future<List<Exercice>> getExercices() async {
+    List<Activity> gymActivities = await ActivityService.fetchGymActivities();
+
     return [
       Exercice(
         id: '1',
@@ -70,7 +73,6 @@ class ExerciceData {
               'Push through your arms, keeping your entire body locked, until you reach the high position with arms fully extended and locked. Be careful not to be too explosive when straightening your arms to avoid injury.\n',
               'Keep your body braced throughout the entire movement.\n',
               'Inhale during the lowering phase and exhale during the pushing phase.\n',
-
             ],
             muscleImageUrl: 'images/ExerciceImages/Jumping_jacks_muscles.png',
             muscleDescription:
@@ -111,7 +113,8 @@ class ExerciceData {
               'Repeat the movement during the work period;\n',
               'Switch sides during the next round;\n',
             ],
-            muscleImageUrl: 'images/ExerciceImages/montees_sur_chaise_muscle.png',
+            muscleImageUrl:
+                'images/ExerciceImages/montees_sur_chaise_muscle.png',
             muscleDescription:
                 'The main muscles worked during step-ups are the glutes and quadriceps.',
             videoDemonstartionUrl: 'images/gif/montee_sur_chaise.gif',
@@ -179,7 +182,7 @@ class ExerciceData {
             ],
             muscleImageUrl: 'images/ExerciceImages/planche_muscles.png',
             muscleDescription:
-              'The primary muscle worked in the plank is the rectus abdominis (the abdominal muscles). The glutes and obliques are worked secondarily.',
+                'The primary muscle worked in the plank is the rectus abdominis (the abdominal muscles). The glutes and obliques are worked secondarily.',
             videoDemonstartionUrl: 'images/gif/planche.gif',
           ),
           Activity(
@@ -188,8 +191,8 @@ class ExerciceData {
             iconUrl: 'images/icons/HIIT/icon9.png',
             imageUrl: 'images/ExerciceImages/leves_genoux.png',
             description:
-              'The knee raises or knee lifts exercise involves running in place; it is a very effective cardio exercise that will also work the legs and abs.\n'
-              'If you don\'t have space to run or the weather doesn\'t allow you to train outside, it can be a good substitute for sprints.',
+                'The knee raises or knee lifts exercise involves running in place; it is a very effective cardio exercise that will also work the legs and abs.\n'
+                'If you don\'t have space to run or the weather doesn\'t allow you to train outside, it can be a good substitute for sprints.',
             techniques: [
               'Start running in place by lifting your knees high;\n',
               'Run on the balls of your feet;\n',
@@ -210,10 +213,10 @@ class ExerciceData {
             description:
                 'Lunges (forward or backward) are effective exercises that target the thighs and glutes.',
             techniques: [
-                'Take a big step forward while keeping your back straight (your other foot stays behind);\n',
-                'Lower your body until your back knee nearly touches the floor (control the descent to avoid hitting your knee);\n',
-                'The shin of your front leg should be perpendicular to the floor, with your knee above your foot (don’t let the knee go past your toes);\n',
-                'Return to the starting position and alternate the movement on the other side.',
+              'Take a big step forward while keeping your back straight (your other foot stays behind);\n',
+              'Lower your body until your back knee nearly touches the floor (control the descent to avoid hitting your knee);\n',
+              'The shin of your front leg should be perpendicular to the floor, with your knee above your foot (don’t let the knee go past your toes);\n',
+              'Return to the starting position and alternate the movement on the other side.',
             ],
             muscleImageUrl: 'images/ExerciceImages/fents_muscle.png',
             muscleDescription:
@@ -261,7 +264,8 @@ class ExerciceData {
       Exercice(
         id: '2',
         title: 'Cardio',
-        subtitle: 'Boost your heart health and burn calories with high-energy movement.',
+        subtitle:
+            'Boost your heart health and burn calories with high-energy movement.',
         imageUrl: 'images/icons/Cardio.png',
         activities: [
           Activity(
@@ -307,34 +311,16 @@ class ExerciceData {
       Exercice(
         id: '3',
         title: 'Gym',
-        subtitle: 'Train safely and effectively with machines designed to target specific muscle groups.',
+        subtitle:
+            'Train safely and effectively with machines designed to target specific muscle groups.',
         imageUrl: 'images/icons/Gym.png',
-        activities: [
-          Activity(
-            id: 'a1',
-            title: 'Strength Training Machines',
-            iconUrl: 'images/icons/HIIT/icon1.png',
-            imageUrl: 'images/ExerciceImages/jumping_jacks.png',
-            description:
-                'Jumping jacks are vertical jumps performed on the spot with arms and legs spread apart. This exercise gets its name from the articulated puppet, a wooden toy where the arms raise and the legs spread when you pull the string 😉.',
-            techniques: [
-              'Jump vertically, spreading your feet and raising your arms to the sides above your head.',
-              'Touch your hands together.',
-              'Keep your body straight.',
-              'Jump again, returning to the starting position, arms by your sides and feet together.',
-              'Repeat.'
-            ],
-            muscleImageUrl: 'images/ExerciceImages/Jumping_jacks_muscles.png',
-            muscleDescription:
-                'The main muscles worked during jumping jacks are the leg muscles: quadriceps (muscles in the front of the thighs), glutes, and hip flexors.',
-            videoDemonstartionUrl: 'images/gif/jumping_jacks.gif',
-          ),
-        ],
+        activities: gymActivities,
       ),
       Exercice(
         id: '4',
         title: 'Recovery',
-        subtitle: 'Relax, restore, and strengthen the connection between your body and mind.',
+        subtitle:
+            'Relax, restore, and strengthen the connection between your body and mind.',
         imageUrl: 'images/icons/recovery.png',
         activities: [
           Activity(
@@ -358,8 +344,6 @@ class ExerciceData {
           ),
         ],
       ),
-
-      // Vous pouvez ajouter d'autres exercices avec leurs activités ici
     ];
   }
 }

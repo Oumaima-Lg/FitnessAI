@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final PageController _pageController = PageController(
-    viewportFraction: 0.9, // 90% de la largeur visible par page
+    viewportFraction: 0.9,
   );
   int _currentPage = 0;
   List<Exercice> exercices = [];
@@ -28,11 +28,24 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    exercices = ExerciceData.getExercices();
+    loadData();
+  }
+
+  void loadData() async {
+    List<Exercice> data = await ExerciceData.getExercices();
+    setState(() {
+      exercices = data;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (exercices.isEmpty) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     return Stack(
       children: [
         Positioned(
@@ -73,116 +86,121 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          body: Container(
-            margin: const EdgeInsets.only(left: 22, right: 22, top: 40),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Hello, Daniel Matt',
-                    style: TextStyle(
-                      color: Color.fromARGB(179, 255, 255, 255),
-                      fontSize: 13,
-                      fontWeight: FontWeight.normal,
-                    )),
-                const Text("let's Get Exercise",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 23,
-                      fontWeight: FontWeight.w600,
-                    )),
-                const SizedBox(height: 30),
-                SizedBox(
-                  height: 150,
-                  child: PageView.builder(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentPage = index;
-                      });
-                    },
-                    itemCount: 5,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      return itemBuilder(context, index);
-                    },
-                  ),
-                ),
-                const SizedBox(height: 13),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(5, (index) {
-                    return GestureDetector(
-                      onTap: () => _pageController.animateToPage(
-                        index,
-                        duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeIn,
-                      ),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: _currentPage == index
-                                ? [
-                                    Color(0xFFFFA992),
-                                    Color(0xFFFD0D92),
-                                  ]
-                                : [
-                                    Color(0xFFFFA992).withAlpha(76),
-                                    Color(0xFFFD0D92).withAlpha(76),
-                                  ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 35),
-                Text(
-                  'Fitness Exercises & Activities',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 25),
-                Center(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: exercices
-                          .map((exercise) => Row(
-                                children: [
-                                  exerciceType(
-                                    title: exercise.title,
-                                    imageName: exercise.imageUrl,
-                                  ),
-                                  SizedBox(width: 30),
-                                ],
-                              ))
-                          .toList(),
+          body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Container(
+              margin: const EdgeInsets.only(left: 22, right: 22, top: 40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Hello, Daniel Matt',
+                      style: TextStyle(
+                        color: Color.fromARGB(179, 255, 255, 255),
+                        fontSize: 13,
+                        fontWeight: FontWeight.normal,
+                      )),
+                  const Text("let's Get Exercise",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 23,
+                        fontWeight: FontWeight.w600,
+                      )),
+                  const SizedBox(height: 30),
+                  SizedBox(
+                    height: 150,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentPage = index;
+                        });
+                      },
+                      itemCount: 5,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        return itemBuilder(context, index);
+                      },
                     ),
                   ),
-                ),
-                const SizedBox(height: 25),
-                Center(
-                    child: GradientComponent.gradientButton(
-                        text: 'Start',
-                        maxWidth: 100,
-                        maxHeight: 35,
-                        onPressed: () {
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => ExercicePage()));
-                          print("Start");
-                        })),
-              ],
+                  const SizedBox(height: 13),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      return GestureDetector(
+                        onTap: () => _pageController.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeIn,
+                        ),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: _currentPage == index
+                                  ? [
+                                      Color(0xFFFFA992),
+                                      Color(0xFFFD0D92),
+                                    ]
+                                  : [
+                                      Color(0xFFFFA992).withAlpha(76),
+                                      Color(0xFFFD0D92).withAlpha(76),
+                                    ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 35),
+                  Text(
+                    'Fitness Exercises & Activities',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+                  Center(
+                    child: SizedBox(
+                      height: 130,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: exercices
+                              .map((exercise) => Padding(
+                                    padding: const EdgeInsets.only(right: 30),
+                                    child: exerciceType(
+                                      title: exercise.title,
+                                      imageName: exercise.imageUrl,
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+                  Center(
+                      child: GradientComponent.gradientButton(
+                          text: 'Start',
+                          maxWidth: 100,
+                          maxHeight: 35,
+                          onPressed: () {
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (context) => ExercicePage()));
+                            print("Start");
+                          })),
+                  const SizedBox(height: 20), // Espace supplémentaire en bas
+                ],
+              ),
             ),
           ),
         ),

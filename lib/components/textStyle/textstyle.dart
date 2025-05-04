@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-TextStyle normalTextStyle() {
+TextStyle normalTextStyle({double size = 14}) {
   return TextStyle(
     color: Colors.white,
-    fontSize: 14,
+    fontSize: size,
     fontFamily: 'Poppins',
     height: 1.71,
     fontWeight: FontWeight.normal,

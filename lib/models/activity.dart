@@ -8,6 +8,10 @@ class Activity {
   String? muscleImageUrl;
   String? muscleDescription;
   String? videoDemonstartionUrl;
+  String? bodyPart;
+  String? equipment;
+  String? target;
+  List<String>? secondaryMuscles;
 
   Activity({
     required this.id,
@@ -19,20 +23,25 @@ class Activity {
     this.muscleImageUrl,
     this.muscleDescription,
     this.videoDemonstartionUrl,
+    this.bodyPart,
+    this.equipment,
+    this.target,
+    this.secondaryMuscles,
   });
 
-  // factory Activity.fromJson(Map<String, dynamic> json) {
-  //   return Activity(
-  //     id: json['id'] as String?,
-  //     title: json['title'] as String?,
-  //     iconUrl: json['iconUrl'] as String?,
-  //     imageUrl: json['imageUrl'] as String?,
-  //     description: json['description'] as String?,
-  //     techniques: (json['techniques'] as List<dynamic>?)?.map((e) => e as String).toList(),
-  //     muscleImageUrl: json['muscleImageUrl'] as String?,
-  //     muscleDescription: json['muscleDescription'] as String?,
-  //     videoDemonstartionUrl: json['videoDemonstartionUrl'] as String?,
-
-  //   );
-  // }
+  factory Activity.fromJson(Map<String, dynamic> json) {
+    return Activity(
+      id: json['id'],
+      iconUrl: json['gifUrl'],
+      videoDemonstartionUrl: json['gifUrl'],
+      title: json['name'],
+      imageUrl: json['gifUrl'],
+      bodyPart: json['bodyPart'],
+      equipment: json['equipment'],
+      target: json['target'],
+      secondaryMuscles: List<String>.from(json['secondaryMuscles']),
+      techniques: List<String>.from(json['instructions']),
+      description: 'Target muscle: ${json['target']}',
+    );
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:fitness/data/exercice_data.dart';
+import 'package:fitness/entrainements/gym.dart';
 import 'package:fitness/entrainements/hiit.dart';
 import 'package:fitness/models/activity.dart';
 import 'package:fitness/models/exercice.dart';
@@ -22,11 +23,25 @@ class _ExercicePageState extends State<ExercicePage> {
   @override
   void initState() {
     super.initState();
-    exercices = ExerciceData.getExercices();
+    loadData();
+  }
+
+  void loadData() async {
+    List<Exercice> data = await ExerciceData.getExercices();
+    setState(() {
+      exercices = data;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (exercices.isEmpty) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
@@ -78,6 +93,7 @@ class _ExercicePageState extends State<ExercicePage> {
                   GradientTitleText(
                     text: exercices[track].subtitle,
                     alignment: Alignment.center,
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   Image(
@@ -108,7 +124,7 @@ class _ExercicePageState extends State<ExercicePage> {
                     itemBuilder: (context, index) {
                       var activities = exercices[track].activities;
                       final activity = activities[index];
-                      return ActivityButton(
+                      return activitybutton(
                         activityName: activity.title,
                         imageName: activity.iconUrl,
                         activity: activity,
@@ -161,7 +177,7 @@ class _ExercicePageState extends State<ExercicePage> {
                     ),
                     SizedBox(height: 10),
                     Image.asset(
-                      imageName,
+                      'images/icons/Gym.png',
                       width: 51,
                       height: 51,
                     ),
@@ -199,44 +215,49 @@ class _ExercicePageState extends State<ExercicePage> {
             ),
     );
   }
-}
 
-class Etoile extends StatelessWidget {
-  const Etoile({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      '★',
-      style: TextStyle(
-        color: Color(0xFFFFA992),
-        fontSize: 20,
-        fontFamily: 'Poppins',
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
-}
-
-class ActivityButton extends StatelessWidget {
-  final String activityName;
-  final String imageName;
-  final Activity activity;
-
-  const ActivityButton(
-      {super.key,
-      required this.activityName,
-      required this.imageName,
-      required this.activity});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget activitybutton(
+      {required String activityName,
+      required String imageName,
+      required Activity activity}) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => Hiit(activity: activity)));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              // Retourner un Container avec la décoration
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF2E2F55),
+                      Color(0xFF23253C),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Builder(
+                  builder: (context) {
+                    switch (track) {
+                      case 0:
+                        return Hiit(activity: activity);
+                      case 1:
+                        return Hiit(activity: activity);
+                      case 2:
+                        return Gym(activity: activity);
+                      case 3:
+                        return Hiit(activity: activity);
+                      default:
+                        return Hiit(activity: activity);
+                    }
+                  },
+                ),
+              );
+            },
+          ),
+        );
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Color(0xFF2E2F55),
@@ -252,20 +273,35 @@ class ActivityButton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            activityName,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.normal,
+          Flexible(
+            flex: 3,
+            child: Text(
+              activityName,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.normal,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
             ),
           ),
           SizedBox(width: 10),
-          Image.asset(
-            imageName,
-            width: 57,
-            height: 86,
+          Flexible(
+            flex: 1,
+            child: track == 2
+                ? Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: 20,
+                  )
+                : Image(
+                    image: AssetImage(imageName),
+                    width: 57,
+                    height: 86,
+                    fit: BoxFit.contain,
+                  ),
           ),
         ],
       ),

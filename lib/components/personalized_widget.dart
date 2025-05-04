@@ -6,7 +6,7 @@ class GradientTitleText extends StatelessWidget {
   final double fontSize;
   final FontWeight fontWeight;
   final Alignment alignment;
-  // final TextAlign textAlign;
+  final TextAlign textAlign;
 
   const GradientTitleText({
     super.key,
@@ -14,6 +14,7 @@ class GradientTitleText extends StatelessWidget {
     this.alignment = Alignment.topLeft,
     this.fontSize = 20,
     this.fontWeight = FontWeight.w600,
+    this.textAlign = TextAlign.start,
   });
 
   @override
@@ -33,7 +34,7 @@ class GradientTitleText extends StatelessWidget {
             fontWeight: fontWeight,
             fontFamily: 'Poppins',
           ),
-          textAlign: TextAlign.start, // Centrer le texte
+          textAlign: textAlign, // Centrer le texte
         ),
       ),
     );
@@ -103,6 +104,27 @@ class GradientButton extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class Etoile extends StatelessWidget {
+  final double size;
+  const Etoile({
+    super.key,
+    this.size = 20,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      '★',
+      style: TextStyle(
+        color: Color(0xFFFFA992),
+        fontSize: size,
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.bold,
       ),
     );
   }

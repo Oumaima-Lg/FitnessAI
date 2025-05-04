@@ -5,154 +5,148 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Column(
-        children: [
-          Stack(
-            alignment: Alignment.bottomCenter,
-            clipBehavior: Clip.none,
-            children: [
-              Positioned(
-                // top: 0,
-                child: Image.asset(
-                  'images/Ellipse Profil.png',
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 333.5,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Stack(
+              alignment: Alignment.bottomCenter,
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  // top: 0,
+                  child: Image.asset(
+                    'images/Ellipse Profil.png',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 290,
+                  ),
                 ),
-              ),
-              Positioned(
-                top: 30,
-                child: Column(
-                  children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Cercle rose extérieur
-                        Container(
-                          width: 110,
-                          height: 110,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Color(0xFFE84F8A),
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                        // Avatar
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.blue.shade300,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              'images/profilGirl.png',
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(
-                                  Icons.person,
-                                  size: 60,
-                                  color: Colors.white,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        // Icône de caméra positionnée en bas à droite
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            padding: EdgeInsets.all(4),
+                Positioned(
+                  top: 30,
+                  child: Column(
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Cercle rose extérieur
+                          Container(
+                            width: 110,
+                            height: 110,
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(4),
+                              shape: BoxShape.circle,
                               border: Border.all(
-                                  color: Color(0xFFE84F8A), width: 1),
-                            ),
-                            child: Icon(
-                              Icons.camera_alt,
-                              color: Color(0xFFE84F8A),
-                              size: 20,
+                                color: Color(0xFFE84F8A),
+                                width: 2,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    // Nom d'utilisateur
-                    Text(
-                      'Mophsic',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                          // Avatar
+                          Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.blue.shade300,
+                            ),
+                            child: ClipOval(
+                              child: Image.asset(
+                                'images/profilGirl.png',
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(
+                                    Icons.person,
+                                    size: 60,
+                                    color: Colors.white,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          // Icône de caméra positionnée en bas à droite
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                    color: Color(0xFFE84F8A), width: 1),
+                              ),
+                              child: Icon(
+                                Icons.camera_alt,
+                                color: Color(0xFFE84F8A),
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    // Localisation
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.location_on_outlined,
+                      const SizedBox(height: 12),
+                      // Nom d'utilisateur
+                      Text(
+                        'Mophsic',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
-                        SizedBox(width: 4),
-                        Text(
-                          'Beijing Haidian-District',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withOpacity(0.7),
+                      ),
+                      const SizedBox(height: 6),
+                      // Localisation
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            color: Colors.white,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 4),
+                          Text(
+                            'Beijing Haidian-District',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildInfoCard(
+                      imageUrl: 'images/heightIcon.png',
+                      value: "165.0 CM",
+                      label: "Height",
+                      bgColor: Color.fromARGB(168, 232, 79, 138),
+                    ),
+                    _buildInfoCard(
+                      imageUrl: 'images/weightIcon.png',
+                      value: "70.0 KG",
+                      label: "Weight",
+                      bgColor: Color.fromARGB(143, 69, 175, 194),
+                    ),
+                    _buildInfoCard(
+                      imageUrl: 'images/ageIcon.png',
+                      value: "22.9 Year",
+                      label: "Age",
+                      bgColor: Color.fromARGB(121, 247, 207, 29),
                     ),
                   ],
                 ),
               ),
-              Positioned(
-                top: 210,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildInfoCard(
-                          imageUrl: 'images/heightIcon.png',
-                          value: "165.0 CM",
-                          label: "Height",
-                          bgColor: Color.fromARGB(168, 232, 79, 138),
-                        ),
-                        _buildInfoCard(
-                          imageUrl: 'images/weightIcon.png',
-                          value: "70.0 KG",
-                          label: "Weight",
-                          bgColor: Color.fromARGB(143, 69, 175, 194),
-                        ),
-                        _buildInfoCard(
-                          imageUrl: 'images/ageIcon.png',
-                          value: "22.9 Year",
-                          label: "Age",
-                          bgColor: Color.fromARGB(121, 247, 207, 29),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            flex: 1,
-            child: Column(
+            ),
+            const SizedBox(height: 20),
+            Column(
               children: [
                 SizedBox(height: 0),
                 Padding(
@@ -196,8 +190,8 @@ class ProfilePage extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
