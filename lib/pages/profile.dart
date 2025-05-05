@@ -1,6 +1,9 @@
+import 'package:fitness/pages/login.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,7 +190,12 @@ class ProfilePage extends StatelessWidget {
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
                             child: _buildMenuButton(
-                                'Log out', Icons.logout, () {}),
+                                'Log out', Icons.logout, () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Login()));
+                                }),
                           ),
                         ],
                       ),

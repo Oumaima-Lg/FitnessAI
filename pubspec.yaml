@@ -35,6 +35,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   iconsax: ^0.0.8
+  permission_handler: ^12.0.0+1
+  camera: ^0.11.1
+  path_provider: ^2.0.11
+  image_picker: ^0.8.5+3
 
 
 dev_dependencies:
@@ -72,7 +76,9 @@ flutter:
     - images/icons/HIIT/
     # - images/icons/HIIT/Jumping Jack/
     #   - images/
-    #   - lib/assets/
+    - lib/data/
+    - images/progress/
+
     #   - lib/assets/imgs/gif/
     #   - lib/assets/imgs/png/
     #   - lib/assets/imgs/gif/fents.gif

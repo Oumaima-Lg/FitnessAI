@@ -1,0 +1,58 @@
+[
+    {
+        "id": 1,
+        "path": "images/progress/front_pose.jpg",
+        "date": "7 June"
+    },
+    {
+        "id": 2,
+        "path": "images/progress/side_pose.jpg",
+        "date": "2023-06-07"
+    },
+    {
+        "id": 3,
+        "path": "images/progress/stretch.jpg",
+        "date": "2023-06-07"
+    },
+    {
+        "id": 4,
+        "path": "images/progress/weights.jpg",
+        "date": "5 May"
+    }
+    ,
+    {
+        "id": 5,
+        "path": "images/progress/yoga_pose.jpg",
+        "date": "5 May"
+    }
+    ,
+    {
+        "id": 6,
+        "path": "images/progress/yoga_pose.jpg",
+        "date": "5 May"
+    }
+    ,
+    {
+        "id": 7,
+        "path": "images/progress/yoga_pose.jpg",
+        "date": "5 May"
+    }
+    ,
+    {
+        "id": 8,
+        "path": "images/progress/yoga_pose.jpg",
+        "date": "5 May"
+    }
+    ,
+    {
+        "id": 9,
+        "path": "images/progress/yoga_pose.jpg",
+        "date": "5 May"
+    }
+    ,
+    {
+        "id": 10,
+        "path": "images/progress/yoga_pose.jpg",
+        "date": "2023-06-07"
+    }
+]
