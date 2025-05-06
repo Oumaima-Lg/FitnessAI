@@ -35,13 +35,17 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   iconsax: ^0.0.8
-
-
+  intl: ^0.18.0
+  dotted_border: ^2.0.0
+  image_picker: ^1.0.4
+  permission_handler: ^11.0.0  # Updated to latest version
+  device_info_plus: ^9.0.2
+  file_picker: ^6.1.1
+  image_picker_for_web: ^3.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
   curved_navigation_bar: ^1.0.6
-
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

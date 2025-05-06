@@ -1,158 +1,225 @@
 import 'package:flutter/material.dart';
+import 'package:fitness/pages/EditProfilePage.dart';
+import 'package:fitness/pages/notifications.dart';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:fitness/pages/ImagePicker.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  
+  final ImagePickerHandler _imagePickerHandler = ImagePickerHandler();
+  File? _profileImage;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Column(
-        children: [
-          Stack(
-            alignment: Alignment.bottomCenter,
-            clipBehavior: Clip.none,
-            children: [
-              Positioned(
-                // top: 0,
-                child: Image.asset(
-                  'images/Ellipse Profil.png',
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 333.5,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Stack(
+              alignment: Alignment.bottomCenter,
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  // top: 0,
+                  child: Image.asset(
+                    'images/Ellipse Profil.png',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 290,
+                  ),
                 ),
-              ),
-              Positioned(
-                top: 30,
-                child: Column(
-                  children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Cercle rose extérieur
-                        Container(
-                          width: 110,
-                          height: 110,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Color(0xFFE84F8A),
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                        // Avatar
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.blue.shade300,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              'images/profilGirl.png',
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(
-                                  Icons.person,
-                                  size: 60,
-                                  color: Colors.white,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        // Icône de caméra positionnée en bas à droite
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            padding: EdgeInsets.all(4),
+                Positioned(
+                  top: 30,
+                  child: Column(
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Cercle rose extérieur
+                          Container(
+                            width: 110,
+                            height: 110,
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(4),
+                              shape: BoxShape.circle,
                               border: Border.all(
-                                  color: Color(0xFFE84F8A), width: 1),
-                            ),
-                            child: Icon(
-                              Icons.camera_alt,
-                              color: Color(0xFFE84F8A),
-                              size: 20,
+                                color: Color(0xFFE84F8A),
+                                width: 2,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    // Nom d'utilisateur
-                    Text(
-                      'Mophsic',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                          // Avatar
+                          Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.blue.shade300,
+                            ),
+                            child: ClipOval(
+                              child: _profileImage != null
+                                  ? kIsWeb 
+                                      ? Image.network(
+                                          _profileImage!.path,
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.file(
+                                          _profileImage!,
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        )
+                                  : Image.asset(
+                                      'images/profilGirl.png',
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Icon(
+                                          Icons.person,
+                                          size: 60,
+                                          color: Colors.white,
+                                        );
+                                      },
+                                    ),
+                            ),
+                          ),
+                          // Icône de caméra positionnée en bas à droite
+                          Positioned(
+                            bottom: -4, // ajuste si nécessaire
+                            right: 0,
+                            child: DottedBorder(
+                              color: Colors.white,
+                              strokeWidth: 1.5,
+                              dashPattern: [3, 2],
+                              borderType: BorderType.RRect,
+                              radius: const Radius.circular(4),
+                              padding: EdgeInsets.zero,
+                              child: PopupMenuButton<String>(
+                                padding: EdgeInsets.zero,
+                                offset: const Offset(0, 40),
+                                color: const Color(0xFF4E457B).withAlpha(253),
+                                icon: const Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                  size: 20, // taille réduite
+                                ),
+                                itemBuilder: (BuildContext context) => [
+                                  PopupMenuItem<String>(
+                                    value: 'camera',
+                                    child: Row(
+                                      children: const [
+                                        Icon(Icons.camera_alt, color: Colors.white),
+                                        SizedBox(width: 12),
+                                        Text('Take a photo', style: TextStyle(color: Colors.white)),
+                                      ],
+                                    ),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'gallery',
+                                    child: Row(
+                                      children: const [
+                                        Icon(Icons.photo_library, color: Colors.white),
+                                        SizedBox(width: 12),
+                                        Text('Choose from gallery', style: TextStyle(color: Colors.white)),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              onSelected: (String value) async {
+                                  if (value == 'camera') {
+                                    final File? image = await _imagePickerHandler.takePhoto();
+                                    if (image != null) {
+                                      setState(() {
+                                        _profileImage = image;
+                                      });
+                                    }
+                                  } else if (value == 'gallery') {
+                                    final File? image = await _imagePickerHandler.pickFromGallery();
+                                    if (image != null) {
+                                      setState(() {
+                                        _profileImage = image;
+                                      });
+                                    }
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    // Localisation
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.location_on_outlined,
+                      const SizedBox(height: 14),
+                      // Nom d'utilisateur
+                      Text(
+                        'Mophsic',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
-                        SizedBox(width: 4),
-                        Text(
-                          'Beijing Haidian-District',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withOpacity(0.7),
+                      ),
+                      const SizedBox(height: 6),
+                      // Localisation
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            color: Colors.white,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 4),
+                          Text(
+                            'Beijing Haidian-District',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildInfoCard(
+                      imageUrl: 'images/heightIcon.png',
+                      value: "165.0 CM",
+                      label: "Height",
+                      bgColor: Color.fromARGB(168, 232, 79, 138),
+                    ),
+                    _buildInfoCard(
+                      imageUrl: 'images/weightIcon.png',
+                      value: "70.0 KG",
+                      label: "Weight",
+                      bgColor: Color.fromARGB(143, 69, 175, 194),
+                    ),
+                    _buildInfoCard(
+                      imageUrl: 'images/ageIcon.png',
+                      value: "22.9 Year",
+                      label: "Age",
+                      bgColor: Color.fromARGB(121, 247, 207, 29),
                     ),
                   ],
                 ),
               ),
-              Positioned(
-                top: 210,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildInfoCard(
-                          imageUrl: 'images/heightIcon.png',
-                          value: "165.0 CM",
-                          label: "Height",
-                          bgColor: Color.fromARGB(168, 232, 79, 138),
-                        ),
-                        _buildInfoCard(
-                          imageUrl: 'images/weightIcon.png',
-                          value: "70.0 KG",
-                          label: "Weight",
-                          bgColor: Color.fromARGB(143, 69, 175, 194),
-                        ),
-                        _buildInfoCard(
-                          imageUrl: 'images/ageIcon.png',
-                          value: "22.9 Year",
-                          label: "Age",
-                          bgColor: Color.fromARGB(121, 247, 207, 29),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            flex: 1,
-            child: Column(
+            ),
+            const SizedBox(height: 20),
+            Column(
               children: [
                 SizedBox(height: 0),
                 Padding(
@@ -168,13 +235,27 @@ class ProfilePage extends StatelessWidget {
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
                             child: _buildMenuButton(
-                                'Edit profile', Icons.person_outline, () {}),
+                                'Edit profile', Icons.person_outline, () {
+                                  Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => EditProfilePage(), 
+                                        ),
+                                      );
+                                }),
                           ),
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
                             child: _buildMenuButton('Notification',
-                                Icons.notifications_outlined, () {}),
+                                Icons.notifications_outlined, () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => NotificationPage(), 
+                                        ),
+                                      );
+                                }),
                           ),
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 4),
@@ -196,8 +277,8 @@ class ProfilePage extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -220,13 +301,6 @@ class ProfilePage extends StatelessWidget {
       child: TextButton(
         style: TextButton.styleFrom(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          // shape: RoundedRectangleBorder(
-          //   borderRadius: BorderRadius.only(
-          //     bottomLeft: Radius.circular(24),
-          //     bottomRight: Radius.circular(24),
-          //     topLeft: Radius.circular(24),
-          //   ),
-          // ),
         ),
         onPressed: onPressed,
         child: Row(
@@ -260,11 +334,6 @@ class ProfilePage extends StatelessWidget {
     return Row(
       children: [
         Container(
-          // padding: EdgeInsets.all(8),
-          // decoration: BoxDecoration(
-          //   color: bgColor,
-          //   borderRadius: BorderRadius.circular(12),
-          // ),
           child: Image.asset(imageUrl),
         ),
         SizedBox(width: 12),
@@ -288,7 +357,7 @@ class ProfilePage extends StatelessWidget {
             ),
           ],
         ),
-      ],
-    );
-  }
+     ],
+ );
+}
 }
