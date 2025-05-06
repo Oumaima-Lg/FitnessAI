@@ -161,8 +161,8 @@ class _CompleteRegisterState extends State<CompleteRegister> {
                       // Image extérieure
                       Image.asset(
                         'images/Kg.png', // ton chemin vers l'image
-                        width: 60,
-                        height: 60,
+                        width: 62,
+                        height: 62,
                       ),
                     ],
                   ),
@@ -172,7 +172,7 @@ class _CompleteRegisterState extends State<CompleteRegister> {
 
                     // Taille
                     Row(
-                                          children: [
+                      children: [
                       // Champ de saisie étirable
                       Expanded(
                         child: TextFormField(
@@ -194,8 +194,8 @@ class _CompleteRegisterState extends State<CompleteRegister> {
                       // Image extérieure
                       Image.asset(
                         'images/Cm.png', // ton chemin vers l'image
-                        width: 60,
-                        height: 60,
+                        width: 65,
+                        height: 65,
                       ),
                     ],
                   ),
