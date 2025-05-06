@@ -2,6 +2,7 @@ import 'package:fitness/components/gradient.dart';
 import 'package:fitness/pages/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fitness/pages/completeRegister.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -158,10 +159,16 @@ class _RegisterState extends State<Register> {
                           text: 'Register',
                           maxWidth: 220,
                           maxHeight: 50,
-                          onPressed: () {},
+                          
+                          onPressed: () {
+                            // Navigate to login page
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CompleteRegister()));
+                          },
                         ),
-
-                        SizedBox(height: 16),
+                         SizedBox(height: 16),
 
                         // ------------ Or --------------- (dividor)
                         Row(
