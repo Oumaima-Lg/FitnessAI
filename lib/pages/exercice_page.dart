@@ -41,12 +41,14 @@ class _ExercicePageState extends State<ExercicePage> {
     if (query.isEmpty) {
       return exercices[track].activities;
     }
-    return exercices[track].activities.where((activity) {
-      return activity.title
-          .toLowerCase()
-          .split(' ') 
-          .any((word) => word.startsWith(query)); 
-    }).toList();
+    return exercices
+        .expand((ex) => ex.activities)
+        .where((activity) =>
+            activity.title
+                .toLowerCase()
+                .split(' ')
+                .any((word) => word.startsWith(query))) 
+        .toList();
   }
 
   @override
@@ -55,8 +57,7 @@ class _ExercicePageState extends State<ExercicePage> {
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         child: Padding(
-          padding:
-              const EdgeInsets.only(top: 30, bottom: 20, left: 20, right: 20),
+          padding: const EdgeInsets.only(top: 30, bottom: 20, left: 20, right: 20),
           child: Column(
             children: [
               Text(
@@ -66,54 +67,55 @@ class _ExercicePageState extends State<ExercicePage> {
               ),
               SizedBox(height: 35),
               searchBar(),
-              SizedBox(height: 10,),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: exercices
-                    .map((exercise) => Row(
-                          children: [
-                            exerciceType(
-                              title: exercise.title,
-                              imageName: exercise.imageUrl,
-                              exerciceIndex: int.parse(exercise.id) - 1,
-                            ),
-                            SizedBox(width: 30),
-                          ],
-                        ))
-                    .toList(),
+              SizedBox(height: 10),
+              if (!_isWriting)
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: exercices
+                        .map((exercise) => Row(
+                              children: [
+                                exerciceType(
+                                  title: exercise.title,
+                                  imageName: exercise.imageUrl,
+                                  exerciceIndex: int.parse(exercise.id) - 1,
+                                ),
+                                SizedBox(width: 30),
+                              ],
+                            ))
+                        .toList(),
+                  ),
                 ),
-              ),
               SizedBox(height: 40),
-              Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 20,
-                    children: [
-                      Etoile(),
-                      GradientTitleText(
-                        text: exercices[track].title,
-                        alignment: Alignment.center,
-                        fontSize: 20,
-                      ),
-                      Etoile(),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  GradientTitleText(
-                    text: exercices[track].subtitle,
-                    alignment: Alignment.center,
-                  ),
-                  SizedBox(height: 20),
-                  Image(
-                    image: AssetImage(exercices[track].imageUrl),
-                    width: 110,
-                    height: 110,
-                  ),
-                  SizedBox(height: 20),
-                ],
-              ),
+              if (!_isWriting)
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Etoile(),
+                        GradientTitleText(
+                          text: exercices[track].title,
+                          alignment: Alignment.center,
+                          fontSize: 20,
+                        ),
+                        Etoile(),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    GradientTitleText(
+                      text: exercices[track].subtitle,
+                      alignment: Alignment.center,
+                    ),
+                    SizedBox(height: 20),
+                    Image(
+                      image: AssetImage(exercices[track].imageUrl),
+                      width: 110,
+                      height: 110,
+                    ),
+                    SizedBox(height: 20),
+                  ],
+                ),
               SizedBox(height: 10),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -127,20 +129,31 @@ class _ExercicePageState extends State<ExercicePage> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  ListView.separated(
-                    itemCount: filteredActivities.length,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    separatorBuilder: (context, index) => SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      final activity = filteredActivities[index];
-                      return ActivityButton(
-                        activityName: activity.title,
-                        imageName: activity.iconUrl,
-                        activity: activity,
-                      );
-                    },
-                  ),
+                  filteredActivities.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Text(
+                            'There is no activity',
+                            style: normalTextStyle(color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                    : ListView.separated(
+                        itemCount: filteredActivities.length,
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        separatorBuilder: (context, index) => SizedBox(height: 10),
+                        itemBuilder: (context, index) {
+                          final activity = filteredActivities[index];
+                          return ActivityButton(
+                            activityName: activity.title,
+                            imageName: activity.iconUrl,
+                            activity: activity,
+                          );
+                        },
+                      ),
                 ],
               ),
             ],
@@ -152,9 +165,6 @@ class _ExercicePageState extends State<ExercicePage> {
 
   GestureDetector searchBar() {
     return GestureDetector(
-      onTap: () {
-        print("Search bar tapped");
-      },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 15),
         margin: EdgeInsets.all(10),
