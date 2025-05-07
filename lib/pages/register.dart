@@ -159,7 +159,6 @@ class _RegisterState extends State<Register> {
                           text: 'Register',
                           maxWidth: 220,
                           maxHeight: 50,
-                          
                           onPressed: () {
                             // Navigate to login page
                             Navigator.push(
@@ -168,7 +167,7 @@ class _RegisterState extends State<Register> {
                                     builder: (context) => CompleteRegister()));
                           },
                         ),
-                         SizedBox(height: 16),
+                        SizedBox(height: 16),
 
                         // ------------ Or --------------- (dividor)
                         Row(
@@ -286,10 +285,10 @@ class CustomSocialIcon extends StatelessWidget {
   final Color borderColor;
 
   const CustomSocialIcon({
-    Key? key,
+    super.key,
     required this.child,
     required this.borderColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -8,12 +8,13 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  
   final ImagePickerHandler _imagePickerHandler = ImagePickerHandler();
   File? _profileImage;
   @override
@@ -65,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             child: ClipOval(
                               child: _profileImage != null
-                                  ? kIsWeb 
+                                  ? kIsWeb
                                       ? Image.network(
                                           _profileImage!.path,
                                           width: 100,
@@ -81,7 +82,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                   : Image.asset(
                                       'images/profilGirl.png',
                                       fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
                                         return Icon(
                                           Icons.person,
                                           size: 60,
@@ -116,9 +118,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                     value: 'camera',
                                     child: Row(
                                       children: const [
-                                        Icon(Icons.camera_alt, color: Colors.white),
+                                        Icon(Icons.camera_alt,
+                                            color: Colors.white),
                                         SizedBox(width: 12),
-                                        Text('Take a photo', style: TextStyle(color: Colors.white)),
+                                        Text('Take a photo',
+                                            style:
+                                                TextStyle(color: Colors.white)),
                                       ],
                                     ),
                                   ),
@@ -126,23 +131,29 @@ class _ProfilePageState extends State<ProfilePage> {
                                     value: 'gallery',
                                     child: Row(
                                       children: const [
-                                        Icon(Icons.photo_library, color: Colors.white),
+                                        Icon(Icons.photo_library,
+                                            color: Colors.white),
                                         SizedBox(width: 12),
-                                        Text('Choose from gallery', style: TextStyle(color: Colors.white)),
+                                        Text('Choose from gallery',
+                                            style:
+                                                TextStyle(color: Colors.white)),
                                       ],
                                     ),
                                   ),
                                 ],
-                              onSelected: (String value) async {
+                                onSelected: (String value) async {
                                   if (value == 'camera') {
-                                    final File? image = await _imagePickerHandler.takePhoto();
+                                    final File? image =
+                                        await _imagePickerHandler.takePhoto();
                                     if (image != null) {
                                       setState(() {
                                         _profileImage = image;
                                       });
                                     }
                                   } else if (value == 'gallery') {
-                                    final File? image = await _imagePickerHandler.pickFromGallery();
+                                    final File? image =
+                                        await _imagePickerHandler
+                                            .pickFromGallery();
                                     if (image != null) {
                                       setState(() {
                                         _profileImage = image;
@@ -153,7 +164,6 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ),
                           ),
-
                         ],
                       ),
                       const SizedBox(height: 14),
@@ -236,26 +246,27 @@ class _ProfilePageState extends State<ProfilePage> {
                             width: double.infinity,
                             child: _buildMenuButton(
                                 'Edit profile', Icons.person_outline, () {
-                                  Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => EditProfilePage(), 
-                                        ),
-                                      );
-                                }),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditProfilePage(),
+                                ),
+                              );
+                            }),
                           ),
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
-                            child: _buildMenuButton('Notification',
-                                Icons.notifications_outlined, () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => NotificationPage(), 
-                                        ),
-                                      );
-                                }),
+                            child: _buildMenuButton(
+                                'Notification', Icons.notifications_outlined,
+                                () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NotificationPage(),
+                                ),
+                              );
+                            }),
                           ),
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 4),
@@ -357,7 +368,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ],
         ),
-     ],
- );
-}
+      ],
+    );
+  }
 }

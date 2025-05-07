@@ -83,29 +83,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _buildLabel("Name"),
         _buildTextField(_nameController),
         const SizedBox(height: 16),
-
         _buildLabel("Email"),
         _buildTextField(_emailController),
         const SizedBox(height: 16),
-
         _buildLabel("Password"),
         _buildTextField(_passwordController, obscureText: true),
         const SizedBox(height: 16),
-
         _buildLabel("Phone Number"),
         _buildTextField(_phoneController, keyboardType: TextInputType.phone),
         const SizedBox(height: 16),
-
         _buildLabel("Date of Birth"),
         _buildDatePicker(),
         const SizedBox(height: 16),
-
         _buildLabel("Weight"),
-        _buildDropdown(_weight, List.generate(200, (i) => (30 + i).toString()), suffix: "kg"),
+        _buildDropdown(_weight, List.generate(200, (i) => (30 + i).toString()),
+            suffix: "kg"),
         const SizedBox(height: 16),
-
         _buildLabel("Height"),
-        _buildDropdown(_height, List.generate(200, (i) => (130 + i).toString()), suffix: "cm"),
+        _buildDropdown(_height, List.generate(200, (i) => (130 + i).toString()),
+            suffix: "cm"),
       ],
     );
   }
@@ -124,7 +120,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, {
+  Widget _buildTextField(
+    TextEditingController controller, {
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
   }) {
@@ -135,11 +132,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       child: TextField(
         controller: controller,
-        obscureText: controller == _passwordController ? !_passwordVisible : obscureText,
+        obscureText:
+            controller == _passwordController ? !_passwordVisible : obscureText,
         keyboardType: keyboardType,
         style: const TextStyle(color: Colors.white, fontSize: 16),
         decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           border: InputBorder.none,
           hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
           // Ajout du suffixIcon pour le champ mot de passe
@@ -163,10 +162,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Widget _buildDropdown(String value, List<String> items, {String? suffix}) {
     return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: Colors.white, width: 1), // Ajout de la bordure blanche
-    ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+            color: Colors.white, width: 1), // Ajout de la bordure blanche
+      ),
       child: ButtonTheme(
         alignedDropdown: true,
         child: DropdownButtonFormField<String>(
@@ -174,14 +174,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
           menuMaxHeight: 200, // Limite la hauteur du menu déroulant
           onChanged: (newValue) => setState(() {
             if (newValue != null) {
-              if (suffix == "kg") _weight = newValue;
-              else if (suffix == "cm") _height = newValue;
+              if (suffix == "kg") {
+                _weight = newValue;
+              } else if (suffix == "cm") _height = newValue;
             }
           }),
           items: items.map((item) {
             return DropdownMenuItem(
               value: item,
-              child: Container(
+              child: SizedBox(
                 width: 60, // Largeur du contenu dans la liste déroulante
                 child: Text(
                   suffix != null ? "$item $suffix" : item,
@@ -193,7 +194,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           dropdownColor: const Color(0xFF2B2D4A),
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
             border: InputBorder.none,
           ),
           icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
@@ -206,8 +208,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget _buildDatePicker() {
     return Container(
       decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: Colors.white, width: 1), // Ajout de la bordure blanche
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+            color: Colors.white, width: 1), // Ajout de la bordure blanche
       ),
       child: TextFormField(
         controller: _dobController,
@@ -236,9 +239,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 return Theme(
                   data: Theme.of(context).copyWith(
                     colorScheme: ColorScheme.dark(
-                      primary:Color(0xFF983BCB),
+                      primary: Color(0xFF983BCB),
                       onPrimary: Colors.white,
-                        surface: const Color(0xFF2E2F55),
+                      surface: const Color(0xFF2E2F55),
                       onSurface: Colors.white,
                     ),
                   ),
@@ -248,7 +251,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
             );
             if (pickedDate != null) {
               setState(() {
-                _dobController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+                _dobController.text =
+                    DateFormat('dd/MM/yyyy').format(pickedDate);
                 _birthDate = _dobController.text;
               });
             }

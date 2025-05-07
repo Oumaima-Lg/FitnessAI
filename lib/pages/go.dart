@@ -82,7 +82,7 @@ class _GoPageState extends State<GoPage> with SingleTickerProviderStateMixin {
         ),
         child: Column(
           children: [
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width * 0.7,
               height: MediaQuery.of(context).size.height * 0.45,
               child: Stack(
