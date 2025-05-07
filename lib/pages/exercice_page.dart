@@ -35,6 +35,20 @@ class _ExercicePageState extends State<ExercicePage> {
     });
   }
 
+  List<Activity> get filteredActivities {
+    final query = _controller.text.toLowerCase();
+
+    if (query.isEmpty) {
+      return exercices[track].activities;
+    }
+    return exercices[track].activities.where((activity) {
+      return activity.title
+          .toLowerCase()
+          .split(' ') 
+          .any((word) => word.startsWith(query)); 
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,12 +128,12 @@ class _ExercicePageState extends State<ExercicePage> {
                   ),
                   SizedBox(height: 20),
                   ListView.separated(
-                    itemCount: exercices[track].activities.length,
+                    itemCount: filteredActivities.length,
                     shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
                     separatorBuilder: (context, index) => SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      var activities = exercices[track].activities;
-                      final activity = activities[index];
+                      final activity = filteredActivities[index];
                       return ActivityButton(
                         activityName: activity.title,
                         imageName: activity.iconUrl,
