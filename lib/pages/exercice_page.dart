@@ -4,7 +4,6 @@ import 'package:fitness/entrainements/recovery.dart';
 import 'package:fitness/entrainements/hiit.dart';
 import 'package:fitness/models/activity.dart';
 import 'package:fitness/models/exercice.dart';
-import 'package:fitness/pages/go.dart';
 import 'package:flutter/material.dart';
 import '../components/personalized_widget.dart';
 import '../components/textStyle/textstyle.dart';
@@ -21,11 +20,19 @@ class ExercicePage extends StatefulWidget {
 class _ExercicePageState extends State<ExercicePage> {
   List<Exercice> exercices = [];
   int track = 0;
+  final TextEditingController _controller = TextEditingController();
+  bool _isWriting = false;
 
   @override
   void initState() {
     super.initState();
     exercices = ExerciceData.getExercices();
+
+    _controller.addListener(() {
+      setState(() {
+        _isWriting = _controller.text.isNotEmpty;
+      });
+    });
   }
 
   @override
@@ -44,21 +51,23 @@ class _ExercicePageState extends State<ExercicePage> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 35),
+              searchBar(),
+              SizedBox(height: 10,),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: exercices
-                      .map((exercise) => Row(
-                            children: [
-                              exerciceType(
-                                title: exercise.title,
-                                imageName: exercise.imageUrl,
-                                exerciceIndex: int.parse(exercise.id) - 1,
-                              ),
-                              SizedBox(width: 30),
-                            ],
-                          ))
-                      .toList(),
+                    .map((exercise) => Row(
+                          children: [
+                            exerciceType(
+                              title: exercise.title,
+                              imageName: exercise.imageUrl,
+                              exerciceIndex: int.parse(exercise.id) - 1,
+                            ),
+                            SizedBox(width: 30),
+                          ],
+                        ))
+                    .toList(),
                 ),
               ),
               SizedBox(height: 40),
@@ -120,10 +129,53 @@ class _ExercicePageState extends State<ExercicePage> {
                   ),
                 ],
               ),
-              // SizedBox(height: 50),
-              // getSelectedActivity(),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  GestureDetector searchBar() {
+    return GestureDetector(
+      onTap: () {
+        print("Search bar tapped");
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        margin: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Color(0x804E457B),
+          borderRadius: BorderRadius.circular(22),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(
+              Icons.search,
+              color: Color(0xFF8E8E8E),
+              size: 24,
+            ),
+            SizedBox(width: 15),
+            Expanded( 
+              child: TextField(
+                controller: _controller,
+                style: TextStyle(
+                  color: _isWriting ? Colors.white : Color(0xFF8E8E8E),
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Search your favourite activity',
+                  hintStyle: normalTextStyle(color: Color(0xFF8E8E8E)),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.tune,
+              color: Color(0xFF8E8E8E),
+              size: 24,
+            ),
+          ],
         ),
       ),
     );
