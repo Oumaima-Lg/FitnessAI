@@ -226,7 +226,6 @@ class _ExercicePageState extends State<ExercicePage> {
           context,
           MaterialPageRoute(
             builder: (context) {
-              // Retourner un Container avec la décoration
               return Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
