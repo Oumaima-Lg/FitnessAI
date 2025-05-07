@@ -1,5 +1,6 @@
 import 'package:fitness/pages/exercice_page.dart';
 import 'package:fitness/pages/home.dart';
+import 'package:fitness/pages/progress_photo.dart';
 import 'package:fitness/pages/profile.dart';
 import 'package:fitness/pages/page4.dart';
 import 'package:fitness/pages/page5.dart';
@@ -17,6 +18,7 @@ class _BottomNavState extends State<BottomNavBar> {
   late List<Widget> pages;
 
   late HomePage homePage;
+  // late ProgressePage homePage;
   late ExercicePage exercicePage;
   late Page4 page4;
   late Page5 page5;
@@ -27,6 +29,7 @@ class _BottomNavState extends State<BottomNavBar> {
   @override
   void initState() {
     homePage = HomePage();
+    // homePage = ProgressePage();
     exercicePage = ExercicePage();
     profilePage = ProfilePage();
     page4 = Page4();

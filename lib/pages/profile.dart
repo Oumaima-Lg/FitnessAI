@@ -1,3 +1,4 @@
+import 'package:fitness/pages/login.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/pages/EditProfilePage.dart';
 import 'package:fitness/pages/notifications.dart';
@@ -278,8 +279,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
-                            child: _buildMenuButton(
-                                'Log out', Icons.logout, () {}),
+                            child:
+                                _buildMenuButton('Log out', Icons.logout, () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Login()));
+                            }),
                           ),
                         ],
                       ),

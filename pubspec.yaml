@@ -39,11 +39,17 @@ dependencies:
   iconsax: ^0.0.8
   intl: ^0.18.0
   dotted_border: ^2.0.0
-  image_picker: ^1.0.4
-  permission_handler: ^11.0.0  # Updated to latest version
+  # image_picker: ^1.0.4
+  # permission_handler: ^11.0.0  # Updated to latest version
   device_info_plus: ^9.0.2
   file_picker: ^6.1.1
   image_picker_for_web: ^3.0.1
+  permission_handler: ^12.0.0+1
+  camera: ^0.11.1
+  path_provider: ^2.0.11
+  image_picker: 1.1.2
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -79,7 +85,9 @@ flutter:
     - images/icons/HIIT/
     # - images/icons/HIIT/Jumping Jack/
     #   - images/
-    #   - lib/assets/
+    - lib/data/
+    - images/progress/
+
     #   - lib/assets/imgs/gif/
     #   - lib/assets/imgs/png/
     #   - lib/assets/imgs/gif/fents.gif
