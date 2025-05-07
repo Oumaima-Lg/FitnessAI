@@ -1,4 +1,5 @@
 import 'package:fitness/pages/bottomNavBar.dart';
+import 'package:fitness/pages/progress_photo.dart';
 // import 'package:fitness/pages/welcome.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
-        child: const BottomNavBar(),
+        child: const ProgressePage(),
       ),
     );
   }
