@@ -2,7 +2,6 @@ import 'package:fitness/components/gradient.dart';
 import 'package:fitness/data/exercice_data.dart';
 import 'package:fitness/models/exercice.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
-import 'package:fitness/pages/exercice_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -141,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                     );
                   }),
                 ),
-                const SizedBox(height: 35),
+                const SizedBox(height: 25),
                 Text(
                   'Fitness Exercises & Activities',
                   style: TextStyle(
@@ -169,7 +168,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 25),
+                const SizedBox(height: 14),
                 Center(
                     child: GradientComponent.gradientButton(
                         text: 'Start',

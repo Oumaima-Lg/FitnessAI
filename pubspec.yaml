@@ -70,6 +70,8 @@ flutter:
     - images/ExerciceImages/
     - images/icons/
     - images/icons/HIIT/
+    - images/icons/Recovery/
+    - images/icons/Cardio/
     # - images/icons/HIIT/Jumping Jack/
     #   - images/
     #   - lib/assets/

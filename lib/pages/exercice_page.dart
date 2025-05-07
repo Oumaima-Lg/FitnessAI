@@ -1,7 +1,10 @@
 import 'package:fitness/data/exercice_data.dart';
+import 'package:fitness/entrainements/cardio.dart';
+import 'package:fitness/entrainements/recovery.dart';
 import 'package:fitness/entrainements/hiit.dart';
 import 'package:fitness/models/activity.dart';
 import 'package:fitness/models/exercice.dart';
+import 'package:fitness/pages/go.dart';
 import 'package:flutter/material.dart';
 import '../components/personalized_widget.dart';
 import '../components/textStyle/textstyle.dart';
@@ -235,8 +238,22 @@ class ActivityButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => Hiit(activity: activity)));
+        if (activity.techniques != null && activity.techniques!.isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Hiit(activity: activity)),
+          );
+        } else if (activity.steps != null && activity.steps!.isNotEmpty && activity.steps!.every((s) => s.stepImage != null && s.stepImage!.isNotEmpty)) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Recovery(activity: activity)),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Cardio(activity: activity,)),
+          );
+        } 
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Color(0xFF2E2F55),
