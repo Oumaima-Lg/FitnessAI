@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-TextStyle normalTextStyle({color= Colors.white , fontSize= 14}) {
+TextStyle normalTextStyle({color = Colors.white, double fontSize = 14}) {
   return TextStyle(
     color: color,
     fontSize: fontSize,
@@ -10,7 +10,10 @@ TextStyle normalTextStyle({color= Colors.white , fontSize= 14}) {
   );
 }
 
-TextStyle titleTextStyle({Color color = Colors.white, double fontSize = 20, fontWeight= FontWeight.w200}) {
+TextStyle titleTextStyle(
+    {Color color = Colors.white,
+    double fontSize = 20,
+    fontWeight = FontWeight.w200}) {
   return TextStyle(
     color: color,
     fontSize: fontSize,
