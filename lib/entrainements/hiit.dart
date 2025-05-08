@@ -1,4 +1,5 @@
 import 'package:fitness/models/activity.dart';
+import 'package:fitness/pages/go.dart';
 import 'package:flutter/material.dart';
 import '../components/personalized_widget.dart';
 import '../components/textStyle/textstyle.dart';
@@ -25,18 +26,16 @@ class Hiit extends StatelessWidget {
           padding: const EdgeInsets.all(14.0),
           child: Center(
             child: Column(
-              // crossAxisAlignment: CrossAxisAlignment.start,
-              // mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Image.asset(
-                  activity.imageUrl,
+                  activity.imageUrl!,
                   // height: 298,
                   // width: 447,
                   fit: BoxFit.cover,
                 ),
                 SizedBox(height: 20),
                 Text(
-                  activity.description,
+                  activity.description!,
                   style: normalTextStyle(),
                   textAlign: TextAlign.center,
                 ),
@@ -51,7 +50,7 @@ class Hiit extends StatelessWidget {
                     //   style: normalTextStyle(),
                     // ),
                     SizedBox(height: 8),
-                    ...activity.techniques.map((item) => Padding(
+                    ...(activity.techniques ?? []).map((item) => Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2),
                           child: Text(
                             ' •  $item',
@@ -99,15 +98,7 @@ class Hiit extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 20),
-                GradientButton(
-                  title: 'Go',
-                  icon: Icons.arrow_forward,
-                  maxWidth: 120,
-                  maxHeight: 42,
-                  onPressed: () {
-                    print('Go pressed');
-                  },
-                ),
+                goButton(context, activity: activity),
               ],
             ),
           ),

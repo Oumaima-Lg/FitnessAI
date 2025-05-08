@@ -1,259 +1,119 @@
 import 'dart:async';
+import 'package:fitness/components/personalized_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import '../components/textStyle/textstyle.dart';
+import 'package:fitness/models/activity.dart';
 
 class GoPage extends StatefulWidget {
-  const GoPage({super.key});
-
+  final Activity activity;
+  const GoPage({super.key, required this.activity});
   @override
   State<GoPage> createState() => _GoPageState();
 }
 
-class _GoPageState extends State<GoPage> with SingleTickerProviderStateMixin {
-  bool isRunning = false;
-  int time = 0;
+class _GoPageState extends State<GoPage> {
+  bool start = false;
+  int seconds = 0;
   Timer? timer;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  void toggleTimer() {
+  void startTime() {
     setState(() {
-      if (isRunning) {
-        timer?.cancel();
-      } else {
-        timer = Timer.periodic(Duration(seconds: 1), (timer) {
-          setState(() {
-            time++;
-          });
-        });
-      }
-      isRunning = !isRunning;
+      start = !start;
     });
+    if (start) {
+      timer = Timer.periodic(Duration(seconds: 1), (t) {
+        setState(() {
+          seconds++;
+        });
+      });
+    } else {
+      timer?.cancel();
+    }
   }
 
-  String formatTime(int seconds) {
-    int minutes = seconds ~/ 60;
-    int remainingSeconds = seconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  String get formattedTime {
+    final minutes =
+        (seconds ~/ 60).toString().padLeft(2, '0'); // hadi katzid 0 flbdya
+    final secs = (seconds % 60).toString().padLeft(2, '0');
+    return "$minutes:$secs";
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFF2E2F55),
-                Color(0xFF23253C),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
-        title: Text('Titre de la page',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            )),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          onPressed: () {},
-        ),
-      ),
-      body: Container(
-        padding: EdgeInsets.only(bottom: 10, top: 10),
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF2E2F55),
-              Color(0xFF23253C),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Column(
-          children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
-              height: MediaQuery.of(context).size.height * 0.45,
-              child: Stack(
-                children: [
-                  GradientComponent.gradientCircle(
-                    0,
-                    35,
-                    Color.fromARGB(255, 255, 2, 225),
-                    Color(0xFFFFB19A),
-                  ),
-                  GradientComponent.gradientCircle(
-                    MediaQuery.of(context).size.width * 0.55,
-                    35,
-                    Color(0xFF23253C),
-                    Color.fromARGB(255, 7, 6, 54),
-                  ),
-                  GradientComponent.gradientCircle(
-                    22,
-                    MediaQuery.of(context).size.height * 0.4,
-                    Color(0xFF23253C),
-                    Color.fromARGB(255, 7, 6, 54),
-                  ),
-                  GradientComponent.gradientCircle(
-                    MediaQuery.of(context).size.width * 0.55,
-                    MediaQuery.of(context).size.height * 0.4,
-                    Color(0xFFE8ACFF),
-                    Color(0xFF7800FF),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 75, left: 35, right: 35),
+      backgroundColor: Color(0xFF2E2F55),
+      appBar: Appbar(activity: widget.activity),
+      body: Column(
+        spacing: 10,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height / 1.95,
+            child: Stack(
+              children: [
+                Center(
+                  child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: Color(0xFFE8ACFF).withAlpha(51),
-                        width: 2,
+                        color: Colors.black,
+                        width: 4,
                       ),
-                      borderRadius: BorderRadius.circular(41),
-                      color: const Color.fromARGB(255, 203, 200, 200),
+                      borderRadius: BorderRadius.circular(23),
+                      color: Color(0xFFF4E3DF),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(23),
+                      child: Image(
+                        image: NetworkImage(
+                            widget.activity.videoDemonstartionUrl!),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 60,
-            ),
-            GradientComponent.gradientIconButton(
-              isRunning ? Icons.pause : Icons.play_arrow,
-              Color(0xFFE8ACFF),
-              Color(0xFF7800FF),
-              80,
-              30,
-              onPressed: toggleTimer,
-            ),
-            SizedBox(height: 40),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Column(
-                  children: [
-                    ShaderMask(
-                      shaderCallback: (Rect bounds) {
-                        return LinearGradient(
-                          colors: [Color(0xFFE8ACFF), Color(0xFF7800FF)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ).createShader(bounds);
-                      },
-                      child: Icon(
-                        Icons.history,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      formatTime(time),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class GradientComponent {
-  static ElevatedButton gradientButton(
-      String text, double maxWidth, double maxHeight) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-      ),
-      onPressed: () {},
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF4023D7), Color(0xFF983BCB)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(30),
-        ),
-        constraints: BoxConstraints(
-          maxWidth: maxWidth,
-          maxHeight: maxHeight,
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          text,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+          GradientButton(
+            title: '',
+            icon: start ? Icons.pause : Icons.play_arrow,
+            maxWidth: 103,
+            maxHeight: 42,
+            onPressed: startTime,
           ),
-        ),
-      ),
-    );
-  }
-
-  static Widget gradientCircle(
-      double left, double top, Color color1, Color color2) {
-    return Positioned(
-      left: left,
-      top: top,
-      child: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(
-            colors: [color1, color2],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+          SizedBox(height: 10),
+          Icon(
+            Icons.watch_later_outlined,
+            color: Color(0xFF983BCB),
+            size: 54,
           ),
-        ),
-      ),
-    );
-  }
-
-  static Widget gradientIconButton(
-      IconData icon, Color color1, Color color2, double width, double height,
-      {VoidCallback? onPressed}) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color1, color2],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: MaterialButton(
-        onPressed: onPressed ?? () {},
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Icon(
-          icon,
-          color: Colors.white,
-          size: 24,
-        ),
+          SizedBox(height: 10),
+          Stack(
+            children: [
+              Text(
+                formattedTime,
+                style: titleTextStyle(fontSize: 36, fontWeight: FontWeight.w600)
+                    .copyWith(
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 3
+                    ..color = Colors.black,
+                ),
+              ),
+              Text(
+                formattedTime,
+                style:
+                    titleTextStyle(fontSize: 36, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

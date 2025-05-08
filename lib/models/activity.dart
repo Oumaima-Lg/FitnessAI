@@ -1,10 +1,12 @@
+import 'package:fitness/models/step.dart';
+
 class Activity {
   String id;
   String title;
   String iconUrl;
-  String imageUrl;
-  String description;
-  List<String> techniques;
+  String? imageUrl;
+  String? description;
+  List<String>? techniques;
   String? muscleImageUrl;
   String? muscleDescription;
   String? videoDemonstartionUrl;
@@ -12,14 +14,15 @@ class Activity {
   String? equipment;
   String? target;
   List<String>? secondaryMuscles;
+  List<StepItem>? steps;
 
   Activity({
     required this.id,
     required this.title,
     required this.iconUrl,
-    required this.imageUrl,
-    required this.description,
-    required this.techniques,
+    this.imageUrl,
+    this.description,
+    this.techniques,
     this.muscleImageUrl,
     this.muscleDescription,
     this.videoDemonstartionUrl,
@@ -27,6 +30,7 @@ class Activity {
     this.equipment,
     this.target,
     this.secondaryMuscles,
+    this.steps,
   });
 
   factory Activity.fromJson(Map<String, dynamic> json) {

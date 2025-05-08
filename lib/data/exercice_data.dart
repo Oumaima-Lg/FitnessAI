@@ -1,6 +1,7 @@
 import 'package:fitness/models/exercice.dart';
 import 'package:fitness/models/activity.dart';
 import 'package:fitness/services/activity_service.dart';
+import 'package:fitness/models/step.dart';
 
 class ExerciceData {
   // Une méthode statique qui renvoie une liste d'exercices avec leurs activités associées
@@ -271,40 +272,78 @@ class ExerciceData {
           Activity(
             id: 'a1',
             title: 'Running',
-            iconUrl: 'images/icons/HIIT/icon1.png',
-            imageUrl: 'images/ExerciceImages/jumping_jacks.png',
+            iconUrl: 'images/icons/Cardio/icon1.png',
+            imageUrl: 'images/ExerciceImages/running2.png',
             description:
-                'Jumping jacks are vertical jumps performed on the spot with arms and legs spread apart. This exercise gets its name from the articulated puppet, a wooden toy where the arms raise and the legs spread when you pull the string 😉.',
-            techniques: [
-              'Jump vertically, spreading your feet and raising your arms to the sides above your head.',
-              'Touch your hands together.',
-              'Keep your body straight.',
-              'Jump again, returning to the starting position, arms by your sides and feet together.',
-              'Repeat.'
+                'Running is a fundamental cardiovascular exercise involving continuous, rhythmic movement where individuals propel themselves forward on foot at a pace faster than walking. It enhances cardiovascular health, strengthens muscles, improves endurance, and supports mental well-being. \n Widely practiced for fitness, sport, and recreation, running can range from light jogging to competitive racing. It requires minimal equipment, is accessible to all fitness levels, and can be done almost anywhere—from treadmills and tracks to city streets and nature trails.\n Whether for stress relief, weight loss, or athletic training, running remains a timeless and effective full-body workout.',
+            videoDemonstartionUrl: 'images/gif/running.gif',
+            steps: [
+              StepItem(
+                id: 'r1',
+                stepTitle: 'Warm Up Properly',
+                stepDescription:
+                    'Start with dynamic stretches or light jogging to gradually increase your heart rate and loosen your muscles, preparing your body for the run.',
+              ),
+              StepItem(
+                id: 'r2',
+                stepTitle: 'Maintain Good Posture',
+                stepDescription:
+                    'Keep your back straight, head up, and shoulders relaxed. Proper posture improves breathing and running efficiency.',
+              ),
+              StepItem(
+                id: 'r3',
+                stepTitle: 'Control Your Breathing',
+                stepDescription:
+                    'Breathe deeply and rhythmically, ideally through both your nose and mouth. This helps maintain endurance and reduces fatigue.',
+              ),
+              StepItem(
+                id: 'r4',
+                stepTitle: 'Find Your Pace',
+                stepDescription:
+                    'Start at a comfortable pace you can maintain. Don’t rush early—conserve energy for the entire run or later sprints.',
+              ),
+              StepItem(
+                id: 'r5',
+                stepTitle: 'Cool Down & Stretch',
+                stepDescription:
+                    'Slow down gradually to a walk, then stretch your muscles to aid recovery and prevent stiffness.',
+              ),
             ],
-            muscleImageUrl: 'images/ExerciceImages/Jumping_jacks_muscles.png',
-            muscleDescription:
-                'The main muscles worked during jumping jacks are the leg muscles: quadriceps (muscles in the front of the thighs), glutes, and hip flexors.',
-            videoDemonstartionUrl: 'images/gif/jumping_jacks.gif',
           ),
           Activity(
             id: 'a2',
             title: 'Jump Rope',
-            iconUrl: 'images/icons/HIIT/icon1.png',
-            imageUrl: 'images/ExerciceImages/jumping_jacks.png',
+            iconUrl: 'images/icons/Cardio/icon2.png',
+            imageUrl: 'images/ExerciceImages/jumpRope2.png',
             description:
-                'Jumping jacks are vertical jumps performed on the spot with arms and legs spread apart. This exercise gets its name from the articulated puppet, a wooden toy where the arms raise and the legs spread when you pull the string 😉.',
-            techniques: [
-              'Jump vertically, spreading your feet and raising your arms to the sides above your head.',
-              'Touch your hands together.',
-              'Keep your body straight.',
-              'Jump again, returning to the starting position, arms by your sides and feet together.',
-              'Repeat.'
+                'Jump Rope (Skipping) is a dynamic cardiovascular exercise where individuals swing a rope around their body and jump over it rhythmically. It improves coordination, agility, endurance, and burns calories efficiently.\n Popular in fitness routines, sports training, and playgrounds, it can be adapted for speed, tricks (e.g., double-unders, crossovers), or group challenges. Affordable and portable, it’s a versatile workout for all fitness levels.',
+            videoDemonstartionUrl: 'images/gif/JumpRope.gif',
+            steps: [
+              StepItem(
+                id: 's1',
+                stepTitle: 'Spread Your Arms',
+                stepDescription:
+                    'To make the gestures feel more relaxed, stretch your arms as you start this movement. No bending of hands.',
+              ),
+              StepItem(
+                id: 's2',
+                stepTitle: 'Rest at The Toe',
+                stepDescription:
+                    'The basis of this movement is jumping. Now, what needs to be considered is that you have to use the tips of your feet',
+              ),
+              StepItem(
+                id: 's3',
+                stepTitle: 'Adjust Foot Movement',
+                stepDescription:
+                    'Jumping Jack is not just an ordinary jump. But, you also have to pay close attention to leg movements.',
+              ),
+              StepItem(
+                id: 's4',
+                stepTitle: 'Clapping Both Hands',
+                stepDescription:
+                    'This cannot be taken lightly. You see, without realizing it, the clapping of your hands helps you to keep your rhythm while doing the Jumping Jack',
+              ),
             ],
-            muscleImageUrl: 'images/ExerciceImages/Jumping_jacks_muscles.png',
-            muscleDescription:
-                'The main muscles worked during jumping jacks are the leg muscles: quadriceps (muscles in the front of the thighs), glutes, and hip flexors.',
-            videoDemonstartionUrl: 'images/gif/jumping_jacks.gif',
           ),
         ],
       ),
@@ -327,20 +366,106 @@ class ExerciceData {
             id: 'a1',
             title: 'Breathing Exercises',
             iconUrl: 'images/icons/HIIT/icon1.png',
-            imageUrl: 'images/ExerciceImages/jumping_jacks.png',
-            description:
-                'Jumping jacks are vertical jumps performed on the spot with arms and legs spread apart. This exercise gets its name from the articulated puppet, a wooden toy where the arms raise and the legs spread when you pull the string 😉.',
-            techniques: [
-              'Jump vertically, spreading your feet and raising your arms to the sides above your head.',
-              'Touch your hands together.',
-              'Keep your body straight.',
-              'Jump again, returning to the starting position, arms by your sides and feet together.',
-              'Repeat.'
+            videoDemonstartionUrl: 'images/gif/breathing.gif',
+            steps: [
+              StepItem(
+                id: 's1',
+                stepTitle: 'Step 1',
+                stepImage: 'images/icons/Recovery/etape1.png',
+                stepDescription:
+                    'Start by getting into a comfortable position (for example, sitting on a chair with armrests and feet flat on the floor or on a stool; or lying on the floor or bed, with your lower legs resting on cushions and a rolled towel under your neck).',
+              ),
+              StepItem(
+                id: 's2',
+                stepTitle: 'Step 2',
+                stepImage: 'images/icons/Recovery/etape1.png',
+                stepDescription:
+                    'Make sure you won’t be interrupted during the exercise (you can turn off your phone). Let those around you know that you DO NOT WANT TO BE DISTURBED.',
+              ),
+              StepItem(
+                id: 's3',
+                stepTitle: 'Step 3',
+                stepImage: 'images/icons/Recovery/etape1.png',
+                stepDescription:
+                    'Remove your shoes and loosen any tight clothing. Make sure you’re not feeling cold.',
+              ),
+              StepItem(
+                id: 's4',
+                stepTitle: 'Step 4',
+                stepImage: 'images/icons/Recovery/etape2.png',
+                stepDescription:
+                    'Close your eyes. Place your hands on your belly.',
+              ),
+              StepItem(
+                id: 's5',
+                stepTitle: 'Step 5',
+                stepImage: 'images/icons/Recovery/etape2.png',
+                stepDescription:
+                    'Tell yourself: “I’m now going to relax by learning how to breathe down into my belly.”',
+              ),
+              StepItem(
+                id: 's6',
+                stepTitle: 'Step 6',
+                stepImage: 'images/icons/Recovery/etape3.png',
+                stepDescription:
+                    'First, take a deep breath and then exhale forcefully, making a sigh of relief. (This is called a cleansing breath. It signals your body to begin breathing more deeply.) Repeat two or three times.',
+              ),
+              StepItem(
+                id: 's7',
+                stepTitle: 'Step 7',
+                stepImage: 'images/icons/Recovery/etape3.png',
+                stepDescription:
+                    'Then, focus on breathing slowly at a pace that feels comfortable for you.',
+              ),
+              StepItem(
+                id: 's8',
+                stepTitle: 'Step 8',
+                stepImage: 'images/icons/Recovery/etape3.png',
+                stepDescription: 'Inhale through your nose.',
+              ),
+              StepItem(
+                id: 's9',
+                stepTitle: 'Step 9',
+                stepImage: 'images/icons/Recovery/etape3.png',
+                stepDescription:
+                    'Exhale through your mouth, with your lips slightly pursed.',
+              ),
+              StepItem(
+                id: 's10',
+                stepTitle: 'Step 10',
+                stepImage: 'images/icons/Recovery/etape4.png',
+                stepDescription:
+                    'To help you inhale slowly and deeply, imagine the air moving gently down into your belly. Feel your belly expand.',
+              ),
+              StepItem(
+                id: 's11',
+                stepTitle: 'Step 11',
+                stepImage: 'images/icons/Recovery/etape5.png',
+                stepDescription:
+                    'To help you exhale slowly, purse your lips and imagine you’re blowing on a candle flame—just enough to make it flicker, but not go out.',
+              ),
+              StepItem(
+                id: 's12',
+                stepTitle: 'Step 12',
+                stepImage: 'images/icons/Recovery/etape5.png',
+                stepDescription:
+                    'Continue the exercise at your own pace. Think about breathing in slowly through your nose, filling your belly with air, and then exhaling so that your abdomen slowly deflates as the air flows out through your mouth.',
+              ),
+              StepItem(
+                id: 's13',
+                stepTitle: 'Step 13',
+                stepImage: 'images/icons/Recovery/etape5.png',
+                stepDescription:
+                    'With each exhalation, focus on relaxing a different part of your body and feeling a sense of warmth and support. Start with your toes and gradually move up toward your head.',
+              ),
+              StepItem(
+                id: 's14',
+                stepTitle: 'Step 14',
+                stepImage: 'images/icons/Recovery/etape5.png',
+                stepDescription:
+                    'Continue this exercise for 10 to 15 minutes to reach a deep state of relaxation, then finish with one last cleansing breath.',
+              ),
             ],
-            muscleImageUrl: 'images/ExerciceImages/Jumping_jacks_muscles.png',
-            muscleDescription:
-                'The main muscles worked during jumping jacks are the leg muscles: quadriceps (muscles in the front of the thighs), glutes, and hip flexors.',
-            videoDemonstartionUrl: 'images/gif/jumping_jacks.gif',
           ),
         ],
       ),

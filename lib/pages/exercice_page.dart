@@ -1,6 +1,8 @@
 import 'package:fitness/data/exercice_data.dart';
+import 'package:fitness/entrainements/cardio.dart';
 import 'package:fitness/entrainements/gym.dart';
 import 'package:fitness/entrainements/hiit.dart';
+import 'package:fitness/entrainements/recovery.dart';
 import 'package:fitness/models/activity.dart';
 import 'package:fitness/models/exercice.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,8 @@ class ExercicePage extends StatefulWidget {
 class _ExercicePageState extends State<ExercicePage> {
   List<Exercice> exercices = [];
   int track = 0;
+  final TextEditingController _controller = TextEditingController();
+  bool _isWriting = false;
 
   @override
   void initState() {
@@ -31,6 +35,28 @@ class _ExercicePageState extends State<ExercicePage> {
     setState(() {
       exercices = data;
     });
+    // exercices = ExerciceData.getExercices();
+
+    _controller.addListener(() {
+      setState(() {
+        _isWriting = _controller.text.isNotEmpty;
+      });
+    });
+  }
+
+  List<Activity> get filteredActivities {
+    final query = _controller.text.toLowerCase();
+
+    if (query.isEmpty) {
+      return exercices[track].activities;
+    }
+    return exercices
+        .expand((ex) => ex.activities)
+        .where((activity) => activity.title
+            .toLowerCase()
+            .split(' ')
+            .any((word) => word.startsWith(query)))
+        .toList();
   }
 
   @override
@@ -56,54 +82,56 @@ class _ExercicePageState extends State<ExercicePage> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 35),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: exercices
-                      .map((exercise) => Row(
-                            children: [
-                              exerciceType(
-                                title: exercise.title,
-                                imageName: exercise.imageUrl,
-                                exerciceIndex: int.parse(exercise.id) - 1,
-                              ),
-                              SizedBox(width: 30),
-                            ],
-                          ))
-                      .toList(),
+              searchBar(),
+              SizedBox(height: 10),
+              if (!_isWriting)
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: exercices
+                        .map((exercise) => Row(
+                              children: [
+                                exerciceType(
+                                  title: exercise.title,
+                                  imageName: exercise.imageUrl,
+                                  exerciceIndex: int.parse(exercise.id) - 1,
+                                ),
+                                SizedBox(width: 30),
+                              ],
+                            ))
+                        .toList(),
+                  ),
                 ),
-              ),
               SizedBox(height: 40),
-              Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 20,
-                    children: [
-                      Etoile(),
-                      GradientTitleText(
-                        text: exercices[track].title,
-                        alignment: Alignment.center,
-                        fontSize: 20,
-                      ),
-                      Etoile(),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  GradientTitleText(
-                    text: exercices[track].subtitle,
-                    alignment: Alignment.center,
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 20),
-                  Image(
-                    image: AssetImage(exercices[track].imageUrl),
-                    width: 110,
-                    height: 110,
-                  ),
-                  SizedBox(height: 20),
-                ],
-              ),
+              if (!_isWriting)
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Etoile(),
+                        GradientTitleText(
+                          text: exercices[track].title,
+                          alignment: Alignment.center,
+                          fontSize: 20,
+                        ),
+                        Etoile(),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    GradientTitleText(
+                      text: exercices[track].subtitle,
+                      alignment: Alignment.center,
+                    ),
+                    SizedBox(height: 20),
+                    Image(
+                      image: AssetImage(exercices[track].imageUrl),
+                      width: 110,
+                      height: 110,
+                    ),
+                    SizedBox(height: 20),
+                  ],
+                ),
               SizedBox(height: 10),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -117,26 +145,78 @@ class _ExercicePageState extends State<ExercicePage> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  ListView.separated(
-                    itemCount: exercices[track].activities.length,
-                    shrinkWrap: true,
-                    separatorBuilder: (context, index) => SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      var activities = exercices[track].activities;
-                      final activity = activities[index];
-                      return activitybutton(
-                        activityName: activity.title,
-                        imageName: activity.iconUrl,
-                        activity: activity,
-                      );
-                    },
-                  ),
+                  filteredActivities.isEmpty
+                      ? Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Text(
+                              'There is no activity',
+                              style: normalTextStyle(color: Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        )
+                      : ListView.separated(
+                          itemCount: filteredActivities.length,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          separatorBuilder: (context, index) =>
+                              SizedBox(height: 10),
+                          itemBuilder: (context, index) {
+                            final activity = filteredActivities[index];
+                            return activitybutton(
+                              activityName: activity.title,
+                              imageName: activity.iconUrl,
+                              activity: activity,
+                            );
+                          },
+                        ),
                 ],
               ),
-              // SizedBox(height: 50),
-              // getSelectedActivity(),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  GestureDetector searchBar() {
+    return GestureDetector(
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        margin: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Color(0x804E457B),
+          borderRadius: BorderRadius.circular(22),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(
+              Icons.search,
+              color: Color(0xFF8E8E8E),
+              size: 24,
+            ),
+            SizedBox(width: 15),
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                style: TextStyle(
+                  color: _isWriting ? Colors.white : Color(0xFF8E8E8E),
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Search your favourite activity',
+                  hintStyle: normalTextStyle(color: Color(0xFF8E8E8E)),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.tune,
+              color: Color(0xFF8E8E8E),
+              size: 24,
+            ),
+          ],
         ),
       ),
     );
@@ -243,11 +323,11 @@ class _ExercicePageState extends State<ExercicePage> {
                       case 0:
                         return Hiit(activity: activity);
                       case 1:
-                        return Hiit(activity: activity);
+                        return Cardio(activity: activity);
                       case 2:
                         return Gym(activity: activity);
                       case 3:
-                        return Hiit(activity: activity);
+                        return Recovery(activity: activity);
                       default:
                         return Hiit(activity: activity);
                     }
@@ -257,6 +337,22 @@ class _ExercicePageState extends State<ExercicePage> {
             },
           ),
         );
+        // if (activity.techniques != null && activity.techniques!.isNotEmpty) {
+        //   Navigator.push(
+        //     context,
+        //     MaterialPageRoute(builder: (context) => Hiit(activity: activity)),
+        //   );
+        // } else if (activity.steps != null && activity.steps!.isNotEmpty && activity.steps!.every((s) => s.stepImage != null && s.stepImage!.isNotEmpty)) {
+        //   Navigator.push(
+        //     context,
+        //     MaterialPageRoute(builder: (context) => Recovery(activity: activity)),
+        //   );
+        // } else {
+        //   Navigator.push(
+        //     context,
+        //     MaterialPageRoute(builder: (context) => Cardio(activity: activity,)),
+        //   );
+        // }
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Color(0xFF2E2F55),

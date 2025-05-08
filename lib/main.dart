@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
-        child: ProgressePage(),
+        child: BottomNavBar(),
       ),
     );
   }

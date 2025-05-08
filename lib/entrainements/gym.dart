@@ -131,7 +131,7 @@ class Gym extends StatelessWidget {
                                 vertical: 12.0, horizontal: 16),
                             child: Text(
                               activity.bodyPart!,
-                              style: normalTextStyle(size: 15),
+                              style: normalTextStyle(fontSize: 15),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -196,7 +196,7 @@ class Gym extends StatelessWidget {
                       style: normalTextStyle(),
                     ),
                     SizedBox(height: 8),
-                    ...activity.techniques.map((item) => Padding(
+                    ...activity.techniques!.map((item) => Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2),
                           child: Text(
                             ' •  $item',
@@ -232,15 +232,16 @@ class Gym extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 20),
-                GradientButton(
-                  title: 'Go',
-                  icon: Icons.arrow_forward,
-                  maxWidth: 120,
-                  maxHeight: 42,
-                  onPressed: () {
-                    print('Go pressed');
-                  },
-                ),
+                goButton(context, activity: activity),
+                // GradientButton(
+                //   title: 'Go',
+                //   icon: Icons.arrow_forward,
+                //   maxWidth: 120,
+                //   maxHeight: 42,
+                //   onPressed: () {
+                //     print('Go pressed');
+                //   },
+                // ),
               ],
             ),
           ),
