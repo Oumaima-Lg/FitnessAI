@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:fitness/pages/EditProfilePage.dart';
 import 'package:fitness/pages/notifications.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:fitness/pages/ImagePicker.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;

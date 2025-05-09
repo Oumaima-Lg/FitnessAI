@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fitness/components/return_button.dart';
@@ -32,10 +31,9 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
     _initCamera();
   }
 
+  /// ****************************************** METHODE DES ACTIONS *******************************************///
 
-/// ****************************************** METHODE DES ACTIONS *******************************************///
-
-/// initialisation de camera ::
+  /// initialisation de camera ::
   Future<void> _initCamera() async {
     // AWAL HAJA KHASSNA NTCHEKEW L PERMISSIONS WACH 3NDNA ^_- :
     final status = await Permission.camera.request();
@@ -144,14 +142,15 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
     }
   }
 
-///******************************************** FIN METHODE DES ACTIONS ********************************************///
+  ///******************************************** FIN METHODE DES ACTIONS ********************************************///
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Stack( // <-- Stack drnaha bachykono 3ndna layers mabin les widgets : src : "Stack provides a solution when you need to overlay widgets. For instance, if you want to display text over an image, the Stack widget is ideal for such scenarios."
+        child: Stack(
+          // <-- Stack drnaha bachykono 3ndna layers mabin les widgets : src : "Stack provides a solution when you need to overlay widgets. For instance, if you want to display text over an image, the Stack widget is ideal for such scenarios."
           children: [
             // hna kifach ghadi tban lcamera sayidati :_:
             if (!_isLoading &&
@@ -224,7 +223,6 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
-
                       Center(
                         child: Image.asset(
                           _poseImages[_selectedPoseIndex],

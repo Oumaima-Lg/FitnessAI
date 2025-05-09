@@ -1,5 +1,4 @@
 import 'package:fitness/models/activity.dart';
-import 'package:fitness/pages/go.dart';
 import 'package:flutter/material.dart';
 import '../components/personalized_widget.dart';
 import '../components/textStyle/textstyle.dart';

@@ -6,7 +6,8 @@ import 'package:fitness/models/activity.dart';
 
 class GoPage extends StatefulWidget {
   final Activity activity;
-  const GoPage({super.key, required this.activity});
+  final bool image;
+  const GoPage({super.key, required this.activity, this.image = true});
   @override
   State<GoPage> createState() => _GoPageState();
 }
@@ -70,9 +71,19 @@ class _GoPageState extends State<GoPage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(23),
                       child: Image(
-                        image: NetworkImage(
-                            widget.activity.videoDemonstartionUrl!),
+                        image: widget.image
+                            ? AssetImage(widget
+                                .activity.videoDemonstartionUrl!) // Asset local
+                            : NetworkImage(
+                                    widget.activity.videoDemonstartionUrl!)
+                                as ImageProvider, // Image réseau
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.error_outline, color: Colors.red),
+                        loadingBuilder: (context, child, loadingProgress) =>
+                            loadingProgress == null
+                                ? child
+                                : const CircularProgressIndicator(),
                       ),
                     ),
                   ),

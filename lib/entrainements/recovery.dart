@@ -1,5 +1,4 @@
 import 'package:fitness/entrainements/congratulation.dart';
-import 'package:fitness/pages/go.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/models/activity.dart';
@@ -15,29 +14,33 @@ class Recovery extends StatefulWidget {
 class _RecoveryState extends State<Recovery> {
   int indexCurrentStep = 0;
 
-  void nexStep(){
-    if(indexCurrentStep < widget.activity.steps!.length - 1){
+  void nexStep() {
+    if (indexCurrentStep < widget.activity.steps!.length - 1) {
       setState(() {
-        indexCurrentStep ++;
+        indexCurrentStep++;
       });
-    }
-    else{
+    } else {
       Navigator.push(
-        context,
+          context,
           MaterialPageRoute(
             // builder: (context) => GoPage(activity: widget.activity),
-            builder: (context) => Congratulation(imageUrl: 'congratulation_BE', title: 'Congratulations, You Have Finished Your Workout !', description: 'Exercises is king and nutrition is queen. Combine the two and you will have a kingdom.\n-Jack Lalanne'),
-          )
-      );
+            builder: (context) => Congratulation(
+                imageUrl: 'congratulation_BE',
+                title: 'Congratulations, You Have Finished Your Workout !',
+                description:
+                    'Exercises is king and nutrition is queen. Combine the two and you will have a kingdom.\n-Jack Lalanne'),
+          ));
     }
   }
-  void previousStep(){
-    if(indexCurrentStep > 0){
+
+  void previousStep() {
+    if (indexCurrentStep > 0) {
       setState(() {
-        indexCurrentStep --;
+        indexCurrentStep--;
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,14 +59,14 @@ class _RecoveryState extends State<Recovery> {
               child: Stack(
                 children: [
                   ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 80), 
+                    padding: const EdgeInsets.only(bottom: 80),
                     itemCount: widget.activity.steps!.length,
                     itemBuilder: (context, index) {
                       final step = widget.activity.steps![index];
                       return StepWidget(
-                        activity: widget.activity, 
-                        step: step, 
-                        index: index, 
+                        activity: widget.activity,
+                        step: step,
+                        index: index,
                         currentStep: index == indexCurrentStep,
                       );
                     },

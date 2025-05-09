@@ -1,6 +1,5 @@
 import 'package:fitness/pages/exercice_page.dart';
 import 'package:fitness/pages/home.dart';
-import 'package:fitness/pages/progress_photo.dart';
 import 'package:fitness/pages/profile.dart';
 import 'package:fitness/pages/page4.dart';
 import 'package:fitness/pages/page5.dart';
