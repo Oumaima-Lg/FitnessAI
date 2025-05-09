@@ -351,3 +351,82 @@ GradientButton goButton(BuildContext context, {required Activity activity}) {
         )),
   );
 }
+
+class ChatBotAppBar extends StatelessWidget implements PreferredSizeWidget{
+  const ChatBotAppBar({
+    super.key,
+  });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      backgroundColor: Color(0xFF23253C),
+      leading: IconButton(
+        icon: Icon(
+          Icons.arrow_back,
+          color: Colors.white,
+        ),
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image(
+            image: AssetImage('images/chatbot/icon_bot.png') 
+          ),
+          SizedBox(width: 35),
+          Column(
+            children: [
+              Text(
+                'M\'OI Chatbot',
+                style: titleTextStyle(),
+              ),
+              Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF1BC22E), 
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  SizedBox(width: 6),
+                  Text(
+                    'Online',
+                    style: TextStyle(
+                      color: Color(0xFF1BC22E),
+                      fontFamily: 'Nunito',
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+      actions: [
+        CircleAvatar(
+          backgroundColor: Color(0xFF23253C),
+          radius: 24,
+          child: Icon(
+            Icons.more_horiz, 
+            color: Colors.white
+          ),
+        ),
+      ],
+      bottom: PreferredSize(
+        preferredSize: Size.fromHeight(1.0),
+        child: Container(
+          color: const Color.fromARGB(255, 228, 228, 228),
+          height: 1.0,
+        ),
+      ),
+    );
+  }
+}
