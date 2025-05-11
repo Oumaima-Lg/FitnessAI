@@ -1,6 +1,4 @@
 import 'package:fitness/pages/bottomNavBar.dart';
-import 'package:fitness/pages/progress_photo.dart';
-// import 'package:fitness/pages/welcome.dart';
 import 'package:flutter/material.dart';
 
 void main() {

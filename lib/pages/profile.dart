@@ -1,10 +1,9 @@
 import 'package:fitness/pages/login.dart';
 import 'package:flutter/material.dart';
-import 'package:fitness/pages/EditProfilePage.dart';
-import 'package:fitness/pages/notifications.dart';
+import 'package:fitness/profil/EditProfilePage.dart';
+import 'package:fitness/profil/notificationsPage.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:fitness/pages/ImagePicker.dart';
+import 'package:fitness/profil/ImagePicker.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -259,12 +258,12 @@ class _ProfilePageState extends State<ProfilePage> {
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
                             child: _buildMenuButton(
-                                'Notification', Icons.notifications_outlined,
+                                'Notifications', Icons.notifications_outlined,
                                 () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => NotificationPage(),
+                                  builder: (context) => NotificationsPage(),
                                 ),
                               );
                             }),
