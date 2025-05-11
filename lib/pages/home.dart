@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
     if (exercices.isEmpty) {
       return Scaffold(
         backgroundColor: Colors.transparent,
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: Image.asset('images/gif/Animation.gif')),
       );
     }
     return Stack(
