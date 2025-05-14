@@ -69,6 +69,45 @@ class GradientTitleText extends StatelessWidget {
   }
 }
 
+class GradientTitleText2 extends StatelessWidget {
+  final String text;
+  final double fontSize;
+  final FontWeight fontWeight;
+  final Alignment alignment;
+  final TextAlign textAlign;
+
+  const GradientTitleText2({
+    super.key,
+    required this.text,
+    this.alignment = Alignment.center,
+    this.fontSize = 20,
+    this.fontWeight = FontWeight.w600,
+    this.textAlign = TextAlign.center,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: alignment,
+      child: ShaderMask(
+        shaderCallback: (bounds) => const LinearGradient(
+          colors: [Color(0xFF92A3FD), Color(0xFF9DCEFF)],
+        ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+            fontFamily: 'Poppins',
+          ),
+          textAlign: textAlign, // Centrer le texte
+        ),
+      ),
+    );
+  }
+}
+
 // Button lmove li kayt3awed
 class GradientButton extends StatelessWidget {
   final String title;
