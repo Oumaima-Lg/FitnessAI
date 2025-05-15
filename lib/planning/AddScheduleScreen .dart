@@ -1,5 +1,7 @@
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/components/return_button.dart';
+import 'package:fitness/data/exercice_data.dart';
+import 'package:fitness/models/exercice.dart';
 import 'package:fitness/planning/WorkoutSavedScreen.dart';
 import 'package:flutter/material.dart';
 
@@ -13,15 +15,30 @@ class AddScheduleScreen extends StatefulWidget {
 class _AddScheduleScreenState extends State<AddScheduleScreen> {
   late TimeOfDay selectedTime;
   late DateTime selectedDate;
-  String selectedWorkout = 'HIIT Workout';
-  String selectedActivity = 'Jumping Jack';
+  late String selectedWorkout;
+  late int indexWorkout;
+  late String selectedActivity;
   final TextEditingController descriptionController = TextEditingController();
+  List<Exercice> exercices = [];
 
   @override
   void initState() {
     super.initState();
     selectedTime = TimeOfDay.now();
     selectedDate = DateTime.now();
+    loadData();
+  }
+
+  void loadData() async {
+    List<Exercice> data = await ExerciceData.getExercices();
+    setState(() {
+      exercices = data;
+      selectedWorkout = exercices[0].title;
+      indexWorkout = 0;
+      selectedActivity = exercices[0].activities[0].title;
+    });
+
+    // exercices = ExerciceData.getExercices();
   }
 
   String _formatDate(DateTime date) {
@@ -119,6 +136,13 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (exercices.isEmpty) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(child: Image.asset('images/gif/Animation.gif')),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFF2A2D4A),
       body: SafeArea(
@@ -280,7 +304,7 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
               // Description
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFF343B67),
+                  color: Color(0xFF92A3FD).withAlpha(51),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 padding: const EdgeInsets.all(16),
@@ -327,35 +351,6 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
                 height: 40,
               ),
 
-              // const Spacer(),
-
-              // Save Button
-              // Container(
-              //   width: double.infinity,
-              //   margin: const EdgeInsets.only(bottom: 20),
-              //   child: ElevatedButton(
-              //     onPressed: () {
-              //       // Sauvegarder les données
-              //       _saveSchedule();
-              //     },
-              //     style: ElevatedButton.styleFrom(
-              //       backgroundColor: Colors.blue.shade300,
-              //       foregroundColor: Colors.white,
-              //       padding: const EdgeInsets.symmetric(vertical: 16),
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(30),
-              //       ),
-              //     ),
-              //     // child: ReturnButton.gradientButton('save'),
-              //     child: const Text(
-              //       'Save',
-              //       style: TextStyle(
-              //         fontSize: 16,
-              //         fontWeight: FontWeight.w600,
-              //       ),
-              //     ),
-              //   ),
-              // ),
               ReturnButton.gradientButton('Save',
                   onPressed: () => _saveSchedule()),
             ],
@@ -366,13 +361,13 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
   }
 
   void _showWorkoutSelectionDialog() {
-    final workouts = [
-      'HIIT Workout',
-      'Cardio',
-      'Strength Training',
-      'Yoga',
-      'Pilates'
-    ];
+    // final workouts = [
+    //   'HIIT Workout',
+    //   'Cardio',
+    //   'Strength Training',
+    //   'Yoga',
+    //   'Pilates'
+    // ];
 
     showDialog(
       context: context,
@@ -384,14 +379,15 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
           width: double.maxFinite,
           child: ListView.builder(
             shrinkWrap: true,
-            itemCount: workouts.length,
+            itemCount: exercices.length,
             itemBuilder: (context, index) {
               return ListTile(
-                title: Text(workouts[index],
+                title: Text(exercices[index].title,
                     style: const TextStyle(color: Colors.white)),
                 onTap: () {
                   setState(() {
-                    selectedWorkout = workouts[index];
+                    selectedWorkout = exercices[index].title;
+                    indexWorkout = index;
                   });
                   Navigator.pop(context);
                 },
@@ -404,14 +400,14 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
   }
 
   void _showActivitySelectionDialog() {
-    final activities = [
-      'Jumping Jack',
-      'Push-ups',
-      'Squats',
-      'Lunges',
-      'Burpees',
-      'Plank'
-    ];
+    // final activities = [
+    //   'Jumping Jack',
+    //   'Push-ups',
+    //   'Squats',
+    //   'Lunges',
+    //   'Burpees',
+    //   'Plank'
+    // ];
 
     showDialog(
       context: context,
@@ -423,14 +419,15 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
           width: double.maxFinite,
           child: ListView.builder(
             shrinkWrap: true,
-            itemCount: activities.length,
+            itemCount: exercices[indexWorkout].activities.length,
             itemBuilder: (context, index) {
               return ListTile(
-                title: Text(activities[index],
+                title: Text(exercices[indexWorkout].activities[index].title,
                     style: const TextStyle(color: Colors.white)),
                 onTap: () {
                   setState(() {
-                    selectedActivity = activities[index];
+                    selectedActivity =
+                        exercices[indexWorkout].activities[index].title;
                   });
                   Navigator.pop(context);
                 },
@@ -521,7 +518,7 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF343B67),
+        color: Color(0xFF92A3FD).withAlpha(51),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Material(
