@@ -1,6 +1,5 @@
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/pages/bottomnavbar.dart';
-import 'package:fitness/pages/home.dart';
 import 'package:fitness/planning/AddScheduleScreen%20.dart';
 import 'package:flutter/material.dart';
 
@@ -66,27 +65,6 @@ class WorkoutSavedScreen extends StatelessWidget {
                     }
                   },
                 )
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: [
-                //     GradientComponent.gradientButton2(
-                //       text: 'Add Schedule',
-                //       maxWidth: 163,
-                //       maxHeight: 60,
-                //       color1: Color(0xFF364FCE),
-                //       color2: Color(0xFF9DCEFF),
-                //       onPressed: () => print("z"),
-                //     ),
-                //     GradientComponent.gradientButton2(
-                //       text: 'Back To Home',
-                //       maxWidth: 163,
-                //       maxHeight: 60,
-                //       color1: Color(0xFF0A1653),
-                //       color2: Color(0xFF9DCEFF),
-                //       onPressed: () => print("z"),
-                //     ),
-                //   ],
-                // ),
               ],
             ),
           ),
