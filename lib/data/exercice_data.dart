@@ -75,7 +75,7 @@ class ExerciceData {
               'Keep your body braced throughout the entire movement.\n',
               'Inhale during the lowering phase and exhale during the pushing phase.\n',
             ],
-            muscleImageUrl: 'images/ExerciceImages/Jumping_jacks_muscles.png',
+            muscleImageUrl: 'images/ExerciceImages/pompes_muscles.png',
             muscleDescription:
                 'Push-ups mainly work the chest, arms, and shoulders. They also engage the core, back, and legs to keep the body stable, making it a full-body exercise.',
             videoDemonstartionUrl: 'images/gif/jumping_jacks.gif',
@@ -94,7 +94,7 @@ class ExerciceData {
               'Keep your lower back pressed firmly against the ground.',
               'Lower back down slowly and repeat.'
             ],
-            muscleImageUrl: 'images/ExerciceImages/Jumping_jacks_muscles.png',
+            muscleImageUrl: 'images/ExerciceImages/crunches_muscles.png',
             muscleDescription:
                 'Crunches mainly target the abdominal muscles, especially the rectus abdominis (the "six-pack" muscle), along with the obliques to a lesser extent.',
             videoDemonstartionUrl: 'images/gif/jumping_jacks.gif',

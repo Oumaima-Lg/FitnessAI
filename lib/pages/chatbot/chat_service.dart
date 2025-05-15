@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-/// This class handles communication with the GitHub-hosted GPT model.
 class ChatService {
-  static const String _endpoint = 'https://models.github.ai/inference/chat/completions';
-  static const String _model = 'openai/gpt-4.1';
+  static const String _endpoint = 'https://models.github.ai/inference/chat/completions';  // URL de l'API à laquelle on va envoyer un msg
+  static const String _model = 'openai/gpt-4.1'; // le modèle utilisé
 
-  /// Replace this with secure storage in production!
   final String token;
 
   ChatService(this.token);
@@ -15,22 +13,29 @@ class ChatService {
     final response = await http.post(
       Uri.parse(_endpoint),
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json', // => hna format des données
+        'Authorization': 'Bearer $token', // => sécurité =>  Il sert à authentifier la requête : l’API vérifie que tu es bien autorisé à utiliser le service
       },
       body: jsonEncode({
-        "messages": [
-          {"role": "system", "content": ""},
+        "messages": [ // le format utilisé par ChatGPT (chat multi-tour)
+          {"role": "system", "content": "You are a motivating fitness coach, expert in training, nutrition, and wellness. Give clear advice, tailored to the user's level, and always stay positive."},
           {"role": "user", "content": userMessage}
         ],
-        "temperature": 1,
-        "top_p": 1,
+        "temperature": 1, // contrôle de la créativité
+        "top_p": 1, // 
         "model": _model,
       }),
     );
 
+    // if (response.statusCode == 200) {
+    //   final data = jsonDecode(response.body);
+    //   return data["choices"][0]["message"]["content"];
+    // } else {
+    //   throw Exception('API Error: ${response.statusCode} - ${response.body}');
+    // }
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final decodedBody = utf8.decode(response.bodyBytes); // ✅ Corrige l'encodage
+      final data = jsonDecode(decodedBody);
       return data["choices"][0]["message"]["content"];
     } else {
       throw Exception('API Error: ${response.statusCode} - ${response.body}');

@@ -232,16 +232,12 @@ class Gym extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 20),
-                goButton(context, activity: activity),
-                // GradientButton(
-                //   title: 'Go',
-                //   icon: Icons.arrow_forward,
-                //   maxWidth: 120,
-                //   maxHeight: 42,
-                //   onPressed: () {
-                //     print('Go pressed');
-                //   },
-                // ),
+                goButton(
+                  context, 
+                  activity: activity, 
+                  titleExercice: 'gym', 
+                  quote: 'In the gym, every rep is a brick. Lay them with purpose, and you\'ll build a fortress of strength.\n Inspired by the discipline of the iron game.'
+                ),
               ],
             ),
           ),

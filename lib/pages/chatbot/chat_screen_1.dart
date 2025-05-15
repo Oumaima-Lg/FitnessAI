@@ -6,9 +6,10 @@ import 'package:flutter/material.dart';
 
 class Chat_Screen_1 extends StatelessWidget {
   const Chat_Screen_1({super.key});
-
+   
   @override
   Widget build(BuildContext context) {
+    String initialMssg = "Hello M’OI, How are you ?";
     return Scaffold(
       backgroundColor: Color(0xFF23253C),
       appBar: ChatBotAppBar(),
@@ -51,7 +52,7 @@ class Chat_Screen_1 extends StatelessWidget {
                 onPressed: () => Navigator.push(
                   context, 
                   MaterialPageRoute(
-                    builder: (context) => Chat_Screen_2(),
+                    builder: (context) => Chat_Screen_2(initialMssg: initialMssg,),
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -63,7 +64,7 @@ class Chat_Screen_1 extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween, 
                     children: [
                       Text(
-                        'Hello M’OI, How are you ?',
+                        initialMssg,
                         style: titleTextStyle(color: Color(0xFF23253C), fontWeight: FontWeight.w600, fontSize: 18),
                         textAlign: TextAlign.left,
                       ),
@@ -114,7 +115,12 @@ class ButtonQuestion extends StatelessWidget {
           width: maxWidth,
           height: maxHeight,
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () => Navigator.push(
+              context, 
+              MaterialPageRoute(
+                builder: (context) => Chat_Screen_2(initialMssg: qst,),
+              ),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,

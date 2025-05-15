@@ -1,12 +1,11 @@
 import 'package:fitness/models/activity.dart';
-import 'package:fitness/pages/go.dart';
 import 'package:flutter/material.dart';
 import '../components/personalized_widget.dart';
 import '../components/textStyle/textstyle.dart';
 
 class Hiit extends StatelessWidget {
   final Activity activity;
-
+  
   const Hiit({super.key, required this.activity});
 
   @override
@@ -29,8 +28,6 @@ class Hiit extends StatelessWidget {
               children: [
                 Image.asset(
                   activity.imageUrl!,
-                  // height: 298,
-                  // width: 447,
                   fit: BoxFit.cover,
                 ),
                 SizedBox(height: 20),
@@ -45,10 +42,6 @@ class Hiit extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Text(
-                    //   'Stand with your feet hip-width apart, hands by your sides:',
-                    //   style: normalTextStyle(),
-                    // ),
                     SizedBox(height: 8),
                     ...(activity.techniques ?? []).map((item) => Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2),
@@ -58,10 +51,6 @@ class Hiit extends StatelessWidget {
                           ),
                         )),
                     SizedBox(height: 12),
-                    // Text(
-                    //   'Point to watch: don\'t tuck your head into your shoulders (keep your shoulders away from your ears).',
-                    //   style: normalTextStyle(),
-                    // ),
                   ],
                 ),
                 SizedBox(height: 20),
@@ -98,7 +87,12 @@ class Hiit extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 20),
-                goButton(context, activity: activity),
+                goButton(
+                  context, 
+                  activity: activity, 
+                  titleExercice: 'hiit', 
+                  quote: 'HIIT is the throne, discipline is the crown. Master both, and you’ll rule your fitness kingdom.\nInspired by the spirit of Jack LaLanne.'
+                ),
               ],
             ),
           ),

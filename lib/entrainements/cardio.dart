@@ -1,4 +1,3 @@
-import 'package:fitness/pages/go.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/models/activity.dart';
 import '../components/personalized_widget.dart';
@@ -47,7 +46,12 @@ class Cardio extends StatelessWidget {
                   }),
                 ),
                 SizedBox(height: 20),
-                goButton(context, activity: activity),
+                goButton(
+                  context, 
+                  activity: activity, 
+                  titleExercice: 'cardio', 
+                  quote: 'Cardio doesn’t just build stamina — it builds character, breath by breath, beat by beat.'
+                ),
               ]
             ),
           ),
