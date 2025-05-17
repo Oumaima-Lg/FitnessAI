@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/models/userStats.dart';
 import 'package:fitness/components/gradient.dart';
+import 'package:fitness/models/workoutButton.dart';
 
 class Statistics extends StatelessWidget {
   final UserStats stats;
@@ -67,14 +68,61 @@ class Statistics extends StatelessWidget {
                         _buildImageCard("Water", "images/statistics/water_img.png", "${stats.water} \n liters"),
                         _buildImageCard("Heart", "images/statistics/heart_img.png", "${stats.heartRate} \n  bpm"),
                       ],
-                    )
-                  ],
+                    ),
+                    const SizedBox(height: 30),
+                    WorkoutElevatedButton(
+                      iconPath: 'images/statistics/training.png',
+                      title: 'Training Time',
+                      subtitle: 'You started a new workout session.\nKeep it up!',
+                      onPressed: () {
+                        print('Bouton 1 pressé');
+                      },
+                    ),
+                    const SizedBox(height: 18),
+                    WorkoutElevatedButton(
+                      iconPath: 'images/statistics/steps.png',
+                      title: 'Steps',
+                      subtitle: 'Tap to view your daily and monthly step count trends.',
+                      onPressed: () {
+                        print('Bouton 1 pressé');
+                      },
+                    ),
+                     const SizedBox(height: 18),
+                    WorkoutElevatedButton(
+                      iconPath: 'images/statistics/calories.png',
+                      title: 'Calories Burned',
+                      subtitle: 'Great job! You`ve already burned a good amount of calories today.',
+                      onPressed: () {
+                        print('Bouton 1 pressé');
+                      },
+                    ),
+                     const SizedBox(height: 18),
+                    WorkoutElevatedButton(
+                      iconPath: 'images/statistics/cup.png',
+                      title: 'Water Tracker',
+                      subtitle: 'Don`t forget to stay hydrated throughout the day.',
+                      onPressed: () {
+                        print('Bouton 1 pressé');
+                      },
+                    ),
+                     const SizedBox(height: 18),
+                    WorkoutElevatedButton(
+                      iconPath: 'images/statistics/sleep.png',
+                      title: 'Sleep Log',
+                      subtitle: 'Log your sleep details to analyze your sleep patterns.',
+                      onPressed: () {
+                        print('Bouton 1 pressé');
+                      },
+                    ),
+                  ]  
                 ),
               ),
             ),
           ),
         ],
       ),
+      
+      
     );
   }
 
