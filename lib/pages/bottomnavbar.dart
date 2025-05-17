@@ -3,9 +3,10 @@ import 'package:fitness/pages/home.dart';
 import 'package:fitness/pages/progress_photo.dart';
 import 'package:fitness/pages/profile.dart';
 import 'package:fitness/pages/page4.dart';
-import 'package:fitness/pages/page5.dart';
+import 'package:fitness/pages/statisticsPage.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:fitness/models/userStats.dart';
 
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({super.key});
@@ -21,7 +22,7 @@ class _BottomNavState extends State<BottomNavBar> {
   // late ProgressePage homePage;
   late ExercicePage exercicePage;
   late Page4 page4;
-  late Page5 page5;
+  late Statistics statistics;
   late ProfilePage profilePage;
 
   int currentTabIndex = 0;
@@ -33,9 +34,18 @@ class _BottomNavState extends State<BottomNavBar> {
     exercicePage = ExercicePage();
     profilePage = ProfilePage();
     page4 = Page4();
-    page5 = Page5();
+    statistics = Statistics(
+      stats: UserStats(
+        trainingTime: 2628,
+        steps: 2628,
+        calories: 510.43,
+        sleep: "08:00",
+        water: 2.1,
+        heartRate: 105,
+      ),
+    );
 
-    pages = [homePage, exercicePage, page4, page5, profilePage];
+    pages = [homePage, exercicePage, page4, statistics, profilePage];
     super.initState();
   }
 
