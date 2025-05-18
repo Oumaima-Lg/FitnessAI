@@ -2,8 +2,6 @@ import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/main.dart';
-import 'package:fitness/pages/bottomnavbar.dart';
-import 'package:fitness/pages/home.dart';
 import 'package:flutter/material.dart';
 
 class Congratulation extends StatelessWidget {

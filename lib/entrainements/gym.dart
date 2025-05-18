@@ -232,7 +232,7 @@ class Gym extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 20),
-                goButton(context, activity: activity),
+                goButton(context, activity: activity, image: false),
                 // GradientButton(
                 //   title: 'Go',
                 //   icon: Icons.arrow_forward,

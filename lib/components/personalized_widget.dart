@@ -1,5 +1,8 @@
+import 'package:fitness/activity%20tracker/activity_tracker.dart';
+import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/models/activity.dart';
+import 'package:fitness/models/latest_activity.dart';
 import 'package:fitness/models/step.dart';
 import 'package:fitness/pages/go.dart';
 import 'package:flutter/material.dart';
@@ -37,10 +40,10 @@ class GradientTitleText extends StatelessWidget {
   const GradientTitleText({
     super.key,
     required this.text,
-    this.alignment = Alignment.topLeft,
+    this.alignment = Alignment.center,
     this.fontSize = 20,
     this.fontWeight = FontWeight.w600,
-    this.textAlign = TextAlign.start,
+    this.textAlign = TextAlign.center,
   });
 
   @override
@@ -338,7 +341,8 @@ Widget stepDescription({required String titleStep, required String stepCount}) {
 }
 
 // Le bouton GO =>
-GradientButton goButton(BuildContext context, {required Activity activity}) {
+GradientButton goButton(BuildContext context,
+    {required Activity activity, bool image = true}) {
   return GradientButton(
     title: 'Go',
     icon: Icons.arrow_forward,
@@ -347,7 +351,143 @@ GradientButton goButton(BuildContext context, {required Activity activity}) {
     onPressed: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => GoPage(activity: activity),
+          builder: (context) => GoPage(activity: activity, image: image),
         )),
+  );
+}
+
+Widget latestActivity(
+    List<LatestActivity> latestActivities, BuildContext context, bool isHome) {
+  return Container(
+    margin: const EdgeInsets.only(top: 25),
+    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(20),
+      gradient: const LinearGradient(
+        colors: [
+          Color(0xFF2A2C4F),
+          Color(0xFF1D1B32),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      border: Border.all(
+        color: const Color(0xFFE8ACFF).withAlpha(51),
+        width: 1.5,
+      ),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Latest Activity',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 20),
+        latestActivities.isEmpty
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Text(
+                    'No recent activity',
+                    style: TextStyle(
+                      color: Colors.grey[400],
+                      fontSize: 14,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+              )
+            : Column(
+                children: [
+                  ...latestActivities.map((activity) {
+                    return Column(
+                      children: [
+                        const Divider(color: Color(0xFF3A3B5C), height: 30),
+                        _activityItem(
+                          icon: IconButton(
+                            icon: Image.asset(
+                              activity.imageUrl!,
+                              width: 55,
+                              height: 55,
+                            ),
+                            onPressed: () {},
+                          ),
+                          title: activity.nameActivity ?? 'Activité inconnue',
+                          time: '${activity.createdAt} minutes ago',
+                        ),
+                      ],
+                    );
+                  }),
+                ],
+              ),
+        const SizedBox(height: 15),
+        isHome
+            ? Center(
+                child: GradientComponent.gradientButton(
+                  text: 'Show More',
+                  maxWidth: 120,
+                  maxHeight: 35,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ActivityTracker()));
+                    // print("Show More");
+                  },
+                ),
+              )
+            : const SizedBox(),
+      ],
+    ),
+  );
+}
+
+Widget _activityItem({
+  required Widget icon,
+  required String title,
+  required String time,
+}) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.center,
+    // mainAxisSize: MainAxisSize.max,
+    children: [
+      // Icon(
+      //   icon,
+      //   color: Colors.white.withAlpha(204),
+      // ), // Couleur d'icône
+      IconButton(
+        icon: icon, // Chemin de votre image
+        onPressed: () {},
+      ),
+      const SizedBox(width: 15),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              time,
+              style: TextStyle(
+                color: Colors.white.withAlpha(127),
+                fontSize: 10,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
   );
 }
