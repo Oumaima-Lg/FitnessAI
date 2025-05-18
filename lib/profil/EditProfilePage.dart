@@ -11,11 +11,18 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final _nameController = TextEditingController(text: "Melissa Peters");
-  final _emailController = TextEditingController(text: "melpeters@gmail.com");
-  final _passwordController = TextEditingController(text: "**********");
-  final _phoneController = TextEditingController(text: "06726272733");
-  final _dobController = TextEditingController(text: "23/05/1995");
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _dobController = TextEditingController();
+
+  final String _initialName = "Melissa Peters";
+  final String _initialEmail = "melpeters@gmail.com";
+  final String _initialPassword = "**********";
+  final String _initialPhone = "06726272733";
+  final String _initialDob = "23/05/1995";
+
   String _birthDate = "23/05/1995";
   String _weight = "70";
   String _height = "183";
@@ -125,23 +132,33 @@ class _EditProfilePageState extends State<EditProfilePage> {
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
   }) {
+    String getInitialValue() {
+      if (controller == _nameController) return _initialName;
+      if (controller == _emailController) return _initialEmail;
+      if (controller == _passwordController) return _initialPassword;
+      if (controller == _phoneController) return _initialPhone;
+      if (controller == _dobController) return _initialDob;
+      return "";
+    }
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white, width: 1),
+        border: Border.all(
+          color: const Color(0xFFE8ACFF).withAlpha((255 * 0.3).toInt()),
+          width: 1,
+        ),
       ),
       child: TextField(
         controller: controller,
-        obscureText:
-            controller == _passwordController ? !_passwordVisible : obscureText,
+        obscureText: controller == _passwordController ? !_passwordVisible : obscureText,
         keyboardType: keyboardType,
         style: const TextStyle(color: Colors.white, fontSize: 16),
         decoration: InputDecoration(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           border: InputBorder.none,
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-          // Ajout du suffixIcon pour le champ mot de passe
+          hintText: getInitialValue(),
+          hintStyle: const TextStyle(color: Color(0xFFC7B0C2)), // Updated color here
           suffixIcon: controller == _passwordController
               ? IconButton(
                   icon: Icon(
@@ -164,8 +181,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-            color: Colors.white, width: 1), // Ajout de la bordure blanche
+        border: Border.all(color: const Color(0xFFE8ACFF).withAlpha((255 * 0.3).toInt()), width: 1),
       ),
       child: ButtonTheme(
         alignedDropdown: true,
@@ -209,58 +225,68 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-            color: Colors.white, width: 1), // Ajout de la bordure blanche
+        border: Border.all(color: const Color(0xFFE8ACFF).withAlpha((255 * 0.3).toInt()), width: 1),
       ),
       child: TextFormField(
         controller: _dobController,
         readOnly: true,
-        style: const TextStyle(color: Colors.white),
-        decoration: const InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        style: const TextStyle(color: Colors.white, fontSize: 16),
+        decoration: InputDecoration(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           border: InputBorder.none,
-          suffixIcon: Icon(Icons.calendar_today, color: Colors.white),
+          hintText: _initialDob,
+          hintStyle: const TextStyle(color: Color(0xFFC7B0C2)),
+          suffixIcon: const Icon(Icons.calendar_today, color: Colors.white),
         ),
         onTap: () async {
-          try {
-            List<String> parts = _birthDate.split('/');
-            DateTime initialDate = DateTime(
-              int.parse(parts[2]),
-              int.parse(parts[1]),
-              int.parse(parts[0]),
-            );
+  try {
+    List<String> parts = _birthDate.split('/');
+    DateTime initialDate = DateTime(
+      int.parse(parts[2]),
+      int.parse(parts[1]),
+      int.parse(parts[0]),
+    );
 
-            DateTime? pickedDate = await showDatePicker(
-              context: context,
-              initialDate: initialDate,
-              firstDate: DateTime(1900),
-              lastDate: DateTime.now(),
-              builder: (context, child) {
-                return Theme(
-                  data: Theme.of(context).copyWith(
-                    colorScheme: ColorScheme.dark(
-                      primary: Color(0xFF983BCB),
-                      onPrimary: Colors.white,
-                      surface: const Color(0xFF2E2F55),
-                      onSurface: Colors.white,
-                    ),
-                  ),
-                  child: child!,
-                );
-              },
-            );
-            if (pickedDate != null) {
-              setState(() {
-                _dobController.text =
-                    DateFormat('dd/MM/yyyy').format(pickedDate);
-                _birthDate = _dobController.text;
-              });
-            }
-          } catch (e) {
-            // Gestion d’erreur si le format de la date est invalide
-          }
-        },
+    DateTime? pickedDate = await showDatePicker(
+  context: context,
+  initialDate: initialDate,
+  firstDate: DateTime(1900),
+  lastDate: DateTime.now(),
+  builder: (context, child) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF983BCB),      // couleur des boutons (OK / Cancel)
+          onPrimary: Colors.white,         // texte sur boutons
+          surface: Colors.white,           // fond des boîtes de dialogue
+          onSurface: Colors.black,         // texte
+        ),
+        dialogBackgroundColor: Colors.white, // fond principal du calendrier
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Color(0xFF983BCB), // texte des boutons
+          ),
+        ),
+      ),
+      child: child!,
+    );
+  },
+);
+
+if (pickedDate != null) {
+  setState(() {
+    _birthDate = "${pickedDate.day.toString().padLeft(2, '0')}/"
+                 "${pickedDate.month.toString().padLeft(2, '0')}/"
+                 "${pickedDate.year}";
+    _dobController.text = _birthDate;
+  });
+}
+
+  } catch (e) {
+    print("Erreur lors du parsing de la date : $e");
+  }
+},
       ),
     );
-  }
+  } 
 }

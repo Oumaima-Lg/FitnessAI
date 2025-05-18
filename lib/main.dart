@@ -1,6 +1,7 @@
 import 'package:fitness/pages/bottomNavBar.dart';
 import 'package:fitness/pages/register.dart';
 import 'package:flutter/material.dart';
+import 'package:fitness/pages/completeRegister.dart';
 
 void main() {
   runApp(MyApp());

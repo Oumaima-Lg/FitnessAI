@@ -73,7 +73,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
   }
 
   Widget _buildImage(String path) {
-    return Image.asset(path, width: 32, height: 32);
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+      ),
+      child: Image.asset(
+        path,
+        width: 32,
+        height: 32,
+      ),
+    );
   }
 
   @override
@@ -156,17 +167,53 @@ class _NotificationsPageState extends State<NotificationsPage> {
         itemBuilder: (context, index) {
           final notif = _notifications[index];
           return ListTile(
-            leading: CircleAvatar(
-              child: ClipOval(
-                child: _buildImage(notif.imagePath),
-              ),
-            ),
+            leading: _buildImage(notif.imagePath),
             trailing: IconButton(
               icon: const Icon(Icons.more_vert, color: Colors.white),
               onPressed: () {
-                setState(() {
-                  _notifications.removeAt(index);
-                });
+                showMenu(
+                  color: const Color(0xFF4E457B),
+                  context: context,
+                  position: RelativeRect.fromLTRB(
+                    MediaQuery.of(context).size.width - 200, // Adjusted left position
+                    MediaQuery.of(context).viewPadding.top + 140 + (index * 88), // Adjusted top position
+                    16, // Right padding
+                    0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12), // Adjusted border radius
+                  ),
+                  items: [
+                    PopupMenuItem(
+                      height: 50, // Adjusted height
+                      value: 'Delete',
+                      child: Container(
+                        width: 180, // Adjusted width
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.delete, color: Colors.white, size: 20),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Delete this notification',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          _notifications.removeAt(index);
+                        });
+                      },
+                    ),
+                  ],
+                );
               },
             ),
             title: Text(

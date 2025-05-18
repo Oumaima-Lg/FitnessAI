@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/models/userStats.dart';
 import 'package:fitness/components/gradient.dart';
-import 'package:fitness/models/workoutButton.dart';
+import 'package:fitness/components/workoutButton.dart';
+import 'package:fitness/statistics/caloriesBurned.dart';
+import 'package:fitness/statistics/Steps.dart';
+import 'package:fitness/statistics/TrainingTime.dart';
+import 'package:fitness/statistics/sleepLog.dart';
+import 'package:fitness/statistics/waterTracker.dart';
 
 class Statistics extends StatelessWidget {
   final UserStats stats;
@@ -75,7 +80,12 @@ class Statistics extends StatelessWidget {
                       title: 'Training Time',
                       subtitle: 'You started a new workout session.\nKeep it up!',
                       onPressed: () {
-                        print('Bouton 1 pressé');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Training(),
+                          ),
+                        );
                       },
                     ),
                     const SizedBox(height: 18),
@@ -84,7 +94,12 @@ class Statistics extends StatelessWidget {
                       title: 'Steps',
                       subtitle: 'Tap to view your daily and monthly step count trends.',
                       onPressed: () {
-                        print('Bouton 1 pressé');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Steps(),
+                          ),
+                        );
                       },
                     ),
                      const SizedBox(height: 18),
@@ -93,7 +108,12 @@ class Statistics extends StatelessWidget {
                       title: 'Calories Burned',
                       subtitle: 'Great job! You`ve already burned a good amount of calories today.',
                       onPressed: () {
-                        print('Bouton 1 pressé');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Calorie(),
+                          ),
+                        );
                       },
                     ),
                      const SizedBox(height: 18),
@@ -102,7 +122,12 @@ class Statistics extends StatelessWidget {
                       title: 'Water Tracker',
                       subtitle: 'Don`t forget to stay hydrated throughout the day.',
                       onPressed: () {
-                        print('Bouton 1 pressé');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => WaterTracker(),
+                          ),
+                        );
                       },
                     ),
                      const SizedBox(height: 18),
@@ -111,7 +136,12 @@ class Statistics extends StatelessWidget {
                       title: 'Sleep Log',
                       subtitle: 'Log your sleep details to analyze your sleep patterns.',
                       onPressed: () {
-                        print('Bouton 1 pressé');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SleepLog(),
+                          ),
+                        );
                       },
                     ),
                   ]  
