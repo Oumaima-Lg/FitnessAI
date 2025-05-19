@@ -1,7 +1,9 @@
 import 'package:fitness/manager/latest_activity.dart';
 import 'package:fitness/pages/bottomNavBar.dart';
+import 'package:fitness/pages/register.dart';
 // import 'package:fitness/pages/welcome.dart';
 import 'package:flutter/material.dart';
+import 'package:fitness/pages/completeRegister.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

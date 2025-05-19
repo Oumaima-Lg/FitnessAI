@@ -113,6 +113,7 @@ class _CompleteRegisterState extends State<CompleteRegister> {
 
                     // Date de naissance
                     TextFormField(
+                      style: const TextStyle(color: Colors.white),
                       controller: _dobController,
                       readOnly: true,
                       decoration: _inputDecoration(Icons.calendar_month, 'Date of Birth'),
@@ -139,11 +140,12 @@ class _CompleteRegisterState extends State<CompleteRegister> {
 
                     // Poids
                     Row(
-                    children: [
+                    children: [ 
                       // Champ de saisie étirable
                       Expanded(
-                        child: TextFormField(
+                        child: TextFormField(  
                           controller: _weightController,
+                          style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                           inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
                           decoration: _inputDecoration(Icons.monitor_weight, 'Your Weight'),
@@ -177,6 +179,7 @@ class _CompleteRegisterState extends State<CompleteRegister> {
                       Expanded(
                         child: TextFormField(
                           controller: _heightController,
+                          style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                           inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
                           decoration: _inputDecoration(Icons.height, 'Your Height'),

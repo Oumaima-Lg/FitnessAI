@@ -6,7 +6,7 @@ import 'package:fitness/manager/latest_activity.dart';
 import 'package:fitness/models/exercice.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/models/latest_activity.dart';
-import 'package:fitness/pages/notifications.dart';
+import 'package:fitness/profil/notificationsPage.dart';
 import 'package:fitness/pages/progress_photo.dart';
 import 'package:flutter/material.dart';
 
@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => NotificationPage()));
+                            builder: (context) => NotificationsPage()));
                     // print("Notifications");
                   }),
                   _drawerItem('AI Conversation', Icons.chat, () {

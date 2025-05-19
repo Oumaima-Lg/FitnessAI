@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fitness/models/latest_activity.dart';
+import 'package:path_provider/path_provider.dart';
 
 class LatestActivityManager {
   static final LatestActivityManager _instance =

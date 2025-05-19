@@ -60,4 +60,21 @@ class GradientComponent {
       ),
     );
   }
+  // Texte avec couleur en dégradé
+  static Widget gradientText({
+    required String text,
+    required TextStyle style,
+  }) {
+    return ShaderMask(
+      shaderCallback: (bounds) {
+        return const LinearGradient(
+          colors: [Color(0xFF000000), Color(0xFF361E6F)],
+        ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height));
+      },
+      child: Text(
+        text,
+        style: style.copyWith(color: Colors.white),
+      ),
+    );
+  }
 }
