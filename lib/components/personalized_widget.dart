@@ -321,7 +321,7 @@ class StepWidget extends StatelessWidget {
 }
 
 // La description affiché avant les étapes
-Widget stepDescription({required String titleStep, required String stepCount}) {
+Widget stepDescription({required String titleStep, required String stepCount,}) {
   return Padding(
     padding: const EdgeInsets.all(20),
     child: Row(
@@ -341,8 +341,7 @@ Widget stepDescription({required String titleStep, required String stepCount}) {
 }
 
 // Le bouton GO =>
-GradientButton goButton(BuildContext context,
-    {required Activity activity, bool image = true}) {
+GradientButton goButton(BuildContext context, {required Activity activity, required String titleExercice, required String quote}) {
   return GradientButton(
     title: 'Go',
     icon: Icons.arrow_forward,
@@ -351,7 +350,7 @@ GradientButton goButton(BuildContext context,
     onPressed: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => GoPage(activity: activity, image: image),
+          builder: (context) => GoPage(activity: activity, titleExercice: titleExercice, quote: quote,),
         )),
   );
 }
@@ -490,4 +489,230 @@ Widget _activityItem({
       ),
     ],
   );
+}
+class ChatBotAppBar extends StatelessWidget implements PreferredSizeWidget{
+  const ChatBotAppBar({
+    super.key,
+  });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      backgroundColor: Color(0xFF23253C),
+      leading: IconButton(
+        icon: Icon(
+          Icons.arrow_back,
+          color: Colors.white,
+        ),
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image(
+            image: AssetImage('images/chatbot/icon_bot.png') 
+          ),
+          SizedBox(width: 35),
+          Column(
+            children: [
+              Text(
+                'M\'OI Chatbot',
+                style: titleTextStyle(),
+              ),
+              Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF1BC22E), 
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  SizedBox(width: 6),
+                  Text(
+                    'Online',
+                    style: TextStyle(
+                      color: Color(0xFF1BC22E),
+                      fontFamily: 'Nunito',
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+      actions: [
+        CircleAvatar(
+          backgroundColor: Color(0xFF23253C),
+          radius: 24,
+          child: Icon(
+            Icons.more_horiz, 
+            color: Colors.white
+          ),
+        ),
+      ],
+      bottom: PreferredSize(
+        preferredSize: Size.fromHeight(1.0),
+        child: Container(
+          color: const Color.fromARGB(255, 228, 228, 228),
+          height: 1.0,
+        ),
+      ),
+    );
+  }
+}
+
+class DurationPicker extends StatefulWidget {
+  final int maxHours;
+  final void Function(Duration) onDurationChanged;
+
+  const DurationPicker({
+    Key? key,
+    this.maxHours = 23,
+    required this.onDurationChanged,
+  }) : super(key: key);
+
+  @override
+  _DurationPickerState createState() => _DurationPickerState();
+}
+
+class _DurationPickerState extends State<DurationPicker> {
+  FixedExtentScrollController? _hourController;
+  FixedExtentScrollController? _minuteController;
+  FixedExtentScrollController? _secondController;
+
+  int selectedHour = 0;
+  int selectedMinute = 0;
+  int selectedSecond = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _hourController = FixedExtentScrollController(initialItem: selectedHour);
+    _minuteController = FixedExtentScrollController(initialItem: selectedMinute);
+    _secondController = FixedExtentScrollController(initialItem: selectedSecond);
+  }
+
+  @override
+  void dispose() {
+    _hourController?.dispose();
+    _minuteController?.dispose();
+    _secondController?.dispose();
+    super.dispose();
+  }
+
+  Widget _buildNumberWheel({
+    required FixedExtentScrollController controller,
+    required int maxValue,
+    required int selectedValue,
+    required ValueChanged<int> onSelectedItemChanged,
+  }) {
+    return Container(
+      width: 60,
+      height: 120,
+      child: ListWheelScrollView.useDelegate(
+        controller: controller,
+        itemExtent: 40,
+        perspective: 0.003,
+        physics: FixedExtentScrollPhysics(),
+        onSelectedItemChanged: onSelectedItemChanged,
+        childDelegate: ListWheelChildBuilderDelegate(
+          builder: (context, index) {
+            if (index < 0 || index > maxValue) return null;
+            final isSelected = index == selectedValue;
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    index.toString().padLeft(2, '0'),
+                    style: TextStyle(
+                      fontSize: isSelected ? 24 : 16,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? Color(0xFF983BCB) : Colors.grey.shade500,
+                    ),
+                  ),
+                  if (isSelected)
+                    Container(
+                      margin: EdgeInsets.only(top: 4),
+                      height: 2,
+                      width: 30,
+                      color: Color(0xFF983BCB),
+                    ),
+                ],
+              ),
+            );
+          },
+          childCount: maxValue + 1,
+        ),
+      ),
+    );
+  }
+
+  void _updateDuration() {
+    widget.onDurationChanged(
+      Duration(
+        hours: selectedHour,
+        minutes: selectedMinute,
+        seconds: selectedSecond,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildNumberWheel(
+          controller: _hourController!,
+          maxValue: widget.maxHours,
+          selectedValue: selectedHour,
+          onSelectedItemChanged: (val) {
+            setState(() {
+              selectedHour = val;
+              _updateDuration();
+            });
+          },
+        ),
+        Text(
+          ":",
+          style: TextStyle(color: Color(0xFF983BCB), fontSize: 24),
+        ),
+        _buildNumberWheel(
+          controller: _minuteController!,
+          maxValue: 59,
+          selectedValue: selectedMinute,
+          onSelectedItemChanged: (val) {
+            setState(() {
+              selectedMinute = val;
+              _updateDuration();
+            });
+          },
+        ),
+        Text(
+          ":",
+          style: TextStyle(color: Color(0xFF983BCB), fontSize: 24),
+        ),
+        _buildNumberWheel(
+          controller: _secondController!,
+          maxValue: 59,
+          selectedValue: selectedSecond,
+          onSelectedItemChanged: (val) {
+            setState(() {
+              selectedSecond = val;
+              _updateDuration();
+            });
+          },
+        ),
+      ],
+    );
+  }
 }

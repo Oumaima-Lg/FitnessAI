@@ -23,13 +23,9 @@ class _RecoveryState extends State<Recovery> {
       Navigator.push(
           context,
           MaterialPageRoute(
-            // builder: (context) => GoPage(activity: widget.activity),
-            builder: (context) => Congratulation(
-                imageUrl: 'congratulation_BE',
-                title: 'Congratulations, You Have Finished Your Workout !',
-                description:
-                    'Exercises is king and nutrition is queen. Combine the two and you will have a kingdom.\n-Jack Lalanne'),
-          ));
+            builder: (context) => Congratulation(imageUrl: 'congratulation_BE', title: 'Congratulations, You Have Finished Your Workout !', description: 'Exercises is king and nutrition is queen. Combine the two and you will have a kingdom.\n-Jack Lalanne'),
+          )
+      );
     }
   }
 

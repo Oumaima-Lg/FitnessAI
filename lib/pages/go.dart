@@ -1,18 +1,21 @@
 import 'dart:async';
 import 'package:fitness/components/personalized_widget.dart';
+import 'package:fitness/entrainements/congratulation.dart';
 import 'package:flutter/material.dart';
 import '../components/textStyle/textstyle.dart';
 import 'package:fitness/models/activity.dart';
 
 class GoPage extends StatefulWidget {
   final Activity activity;
-  final bool image;
-  const GoPage({super.key, required this.activity, this.image = true});
+  final String titleExercice;
+  final String quote;
+  const GoPage({super.key, required this.activity, required this.titleExercice, required this.quote});
   @override
   State<GoPage> createState() => _GoPageState();
 }
 
 class _GoPageState extends State<GoPage> {
+  Duration _selectedDuration = Duration(hours: 0, minutes: 0, seconds: 0);
   bool start = false;
   int seconds = 0;
   Timer? timer;
@@ -21,10 +24,27 @@ class _GoPageState extends State<GoPage> {
     setState(() {
       start = !start;
     });
+
     if (start) {
       timer = Timer.periodic(Duration(seconds: 1), (t) {
         setState(() {
           seconds++;
+
+          if (seconds >= _selectedDuration.inSeconds) {
+            timer?.cancel();
+            start = false;
+            
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Congratulation(
+                  imageUrl: 'congratulation_${widget.titleExercice}', 
+                  title: 'Congratulations, You Have Finished Your Workout !', 
+                  description: widget.quote,
+                ),
+              ),
+            );
+          }
         });
       });
     } else {
@@ -37,12 +57,11 @@ class _GoPageState extends State<GoPage> {
     timer?.cancel();
     super.dispose();
   }
-
   String get formattedTime {
-    final minutes =
-        (seconds ~/ 60).toString().padLeft(2, '0'); // hadi katzid 0 flbdya
+    final hours = (seconds ~/ 3600).toString().padLeft(2, '0');
+    final minutes = ((seconds % 3600) ~/ 60).toString().padLeft(2, '0');
     final secs = (seconds % 60).toString().padLeft(2, '0');
-    return "$minutes:$secs";
+    return "$hours:$minutes:$secs";
   }
 
   @override
@@ -71,12 +90,9 @@ class _GoPageState extends State<GoPage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(23),
                       child: Image(
-                        image: widget.image
-                            ? AssetImage(widget
-                                .activity.videoDemonstartionUrl!) // Asset local
-                            : NetworkImage(
-                                    widget.activity.videoDemonstartionUrl!)
-                                as ImageProvider, // Image réseau
+                        image: NetworkImage(
+                          widget.activity.videoDemonstartionUrl!
+                        ),
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
                             const Icon(Icons.error_outline, color: Colors.red),
@@ -91,20 +107,21 @@ class _GoPageState extends State<GoPage> {
               ],
             ),
           ),
+          DurationPicker(
+            maxHours: 23,
+            onDurationChanged: (duration) {
+              setState(() {
+                _selectedDuration = duration;
+              });
+            },
+          ),
           GradientButton(
             title: '',
             icon: start ? Icons.pause : Icons.play_arrow,
             maxWidth: 103,
-            maxHeight: 42,
+            maxHeight: 40,
             onPressed: startTime,
           ),
-          SizedBox(height: 10),
-          Icon(
-            Icons.watch_later_outlined,
-            color: Color(0xFF983BCB),
-            size: 54,
-          ),
-          SizedBox(height: 10),
           Stack(
             children: [
               Text(
@@ -113,14 +130,14 @@ class _GoPageState extends State<GoPage> {
                     .copyWith(
                   foreground: Paint()
                     ..style = PaintingStyle.stroke
-                    ..strokeWidth = 3
-                    ..color = Colors.black,
+                    ..strokeWidth = 2
+                    ..color = Colors.grey.shade500,
                 ),
               ),
               Text(
                 formattedTime,
                 style:
-                    titleTextStyle(fontSize: 36, fontWeight: FontWeight.w600),
+                    titleTextStyle(fontSize: 36, fontWeight: FontWeight.w600, color: Color(0xFF2E2F55)),
               ),
             ],
           ),
