@@ -78,7 +78,7 @@ class ExerciceData {
             muscleImageUrl: 'images/ExerciceImages/pompes_muscles.png',
             muscleDescription:
                 'Push-ups mainly work the chest, arms, and shoulders. They also engage the core, back, and legs to keep the body stable, making it a full-body exercise.',
-            videoDemonstartionUrl: 'images/gif/jumping_jacks.gif',
+            videoDemonstartionUrl: 'images/gif/pompes.gif',
           ),
           Activity(
             id: 'a4',
@@ -97,7 +97,7 @@ class ExerciceData {
             muscleImageUrl: 'images/ExerciceImages/crunches_muscles.png',
             muscleDescription:
                 'Crunches mainly target the abdominal muscles, especially the rectus abdominis (the "six-pack" muscle), along with the obliques to a lesser extent.',
-            videoDemonstartionUrl: 'images/gif/jumping_jacks.gif',
+            videoDemonstartionUrl: 'images/gif/crunches.gif',
           ),
           Activity(
             id: 'a5',

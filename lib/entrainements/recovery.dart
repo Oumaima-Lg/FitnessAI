@@ -1,5 +1,4 @@
 import 'package:fitness/entrainements/congratulation.dart';
-import 'package:fitness/pages/go.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/models/activity.dart';
@@ -25,7 +24,6 @@ class _RecoveryState extends State<Recovery> {
       Navigator.push(
         context,
           MaterialPageRoute(
-            // builder: (context) => GoPage(activity: widget.activity),
             builder: (context) => Congratulation(imageUrl: 'congratulation_BE', title: 'Congratulations, You Have Finished Your Workout !', description: 'Exercises is king and nutrition is queen. Combine the two and you will have a kingdom.\n-Jack Lalanne'),
           )
       );

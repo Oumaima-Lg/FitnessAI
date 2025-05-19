@@ -337,22 +337,6 @@ class _ExercicePageState extends State<ExercicePage> {
             },
           ),
         );
-        // if (activity.techniques != null && activity.techniques!.isNotEmpty) {
-        //   Navigator.push(
-        //     context,
-        //     MaterialPageRoute(builder: (context) => Hiit(activity: activity)),
-        //   );
-        // } else if (activity.steps != null && activity.steps!.isNotEmpty && activity.steps!.every((s) => s.stepImage != null && s.stepImage!.isNotEmpty)) {
-        //   Navigator.push(
-        //     context,
-        //     MaterialPageRoute(builder: (context) => Recovery(activity: activity)),
-        //   );
-        // } else {
-        //   Navigator.push(
-        //     context,
-        //     MaterialPageRoute(builder: (context) => Cardio(activity: activity,)),
-        //   );
-        // }
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Color(0xFF2E2F55),
