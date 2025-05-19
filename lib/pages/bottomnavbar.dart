@@ -1,3 +1,4 @@
+import 'package:fitness/pages/Alimentation/alim_home.dart';
 import 'package:fitness/pages/exercice_page.dart';
 import 'package:fitness/pages/home.dart';
 import 'package:fitness/pages/profile.dart';
@@ -23,6 +24,7 @@ class _BottomNavState extends State<BottomNavBar> {
   late Page4 page4;
   late Statistics statistics;
   late ProfilePage profilePage;
+  late AlimHomePage alimentationPage;
 
   int currentTabIndex = 0;
 
@@ -32,6 +34,7 @@ class _BottomNavState extends State<BottomNavBar> {
     // homePage = ProgressePage();
     exercicePage = ExercicePage();
     profilePage = ProfilePage();
+    alimentationPage = AlimHomePage();
     page4 = Page4();
     statistics = Statistics(
       stats: UserStats(
@@ -44,7 +47,7 @@ class _BottomNavState extends State<BottomNavBar> {
       ),
     );
 
-    pages = [homePage, exercicePage, page4, statistics, profilePage];
+    pages = [homePage, exercicePage, alimentationPage, statistics, profilePage];
     super.initState();
   }
 
