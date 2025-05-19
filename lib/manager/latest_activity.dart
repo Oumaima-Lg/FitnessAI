@@ -2,46 +2,37 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:fitness/models/latest_activity.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
 
 class LatestActivityManager {
-  static final LatestActivityManager _instance = LatestActivityManager._internal();
+  static final LatestActivityManager _instance =
+      LatestActivityManager._internal();
   factory LatestActivityManager() => _instance;
   LatestActivityManager._internal();
 
   List<LatestActivity> _activities = [];
-  late File _file;
+  late String _filePath;
 
   Future<void> initialize() async {
-    final directory = await getApplicationDocumentsDirectory();
-    _file = File(path.join(directory.path, 'latestActivityData.json'));
+    _filePath = 'lib/data/latestActivityData.json';
     await _ensureFileExists();
     await loadActivities();
   }
 
   Future<void> _ensureFileExists() async {
-    if (!await _file.exists()) {
-      try {
-        await _file.create(recursive: true);
-        await _file.writeAsString('[]'); // Initialise avec un tableau vide
-      } catch (e) {
-        print('Erreur lors de la création du fichier: $e');
-        // Essayer de créer le répertoire parent si nécessaire
-        final parent = Directory(path.dirname(_file.path));
-        if (!await parent.exists()) {
-          await parent.create(recursive: true);
-          await _file.create(recursive: true);
-          await _file.writeAsString('[]');
-        }
-      }
+    final file = File(_filePath);
+    if (!await file.exists()) {
+      await file.create(recursive: true);
+      await file.writeAsString('[]');
     }
   }
 
   Future<void> loadActivities() async {
     try {
-      final contents = await _file.readAsString();
+      final file = File(_filePath);
+      final contents = await file.readAsString();
       final List<dynamic> jsonList = json.decode(contents);
-      _activities = jsonList.map((json) => LatestActivity.fromJson(json)).toList();
+      _activities =
+          jsonList.map((json) => LatestActivity.fromJson(json)).toList();
       sortActivitiesByCreatedAt(descending: false);
     } catch (e) {
       print('Error loading activities: $e');
@@ -51,8 +42,10 @@ class LatestActivityManager {
 
   Future<void> saveActivities() async {
     try {
-      final jsonList = _activities.map((activity) => activity.toJson()).toList();
-      await _file.writeAsString(json.encode(jsonList));
+      final file = File(_filePath);
+      final jsonList =
+          _activities.map((activity) => activity.toJson()).toList();
+      await file.writeAsString(json.encode(jsonList));
     } catch (e) {
       print('Error saving activities: $e');
     }

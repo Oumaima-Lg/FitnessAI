@@ -4,8 +4,10 @@ import 'package:fitness/pages/home.dart';
 import 'package:fitness/pages/profile.dart';
 import 'package:fitness/pages/page4.dart';
 import 'package:fitness/pages/statisticsPage.dart';
+import 'package:fitness/pages/statisticsPage.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:fitness/models/userStats.dart';
 import 'package:fitness/models/userStats.dart';
 
 class BottomNavBar extends StatefulWidget {
