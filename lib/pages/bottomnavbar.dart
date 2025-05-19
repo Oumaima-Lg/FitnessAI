@@ -1,3 +1,4 @@
+import 'package:fitness/pages/Alimentation/alim_home.dart';
 import 'package:fitness/pages/exercice_page.dart';
 import 'package:fitness/pages/home.dart';
 import 'package:fitness/pages/profile.dart';
@@ -5,6 +6,8 @@ import 'package:fitness/pages/page4.dart';
 import 'package:fitness/pages/page5.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+
+// import 'Alimentation/alim_home.dart';
 
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({super.key});
@@ -22,6 +25,7 @@ class _BottomNavState extends State<BottomNavBar> {
   late Page4 page4;
   late Page5 page5;
   late ProfilePage profilePage;
+  late AlimHomePage alimentationPage;
 
   int currentTabIndex = 0;
 
@@ -33,8 +37,8 @@ class _BottomNavState extends State<BottomNavBar> {
     profilePage = ProfilePage();
     page4 = Page4();
     page5 = Page5();
-
-    pages = [homePage, exercicePage, page4, page5, profilePage];
+    alimentationPage = AlimHomePage();
+    pages = [homePage, exercicePage, alimentationPage, page5, profilePage];
     super.initState();
   }
 

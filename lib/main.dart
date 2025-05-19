@@ -17,6 +17,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fitness App',
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: 'Roboto',
+      ),
       home: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

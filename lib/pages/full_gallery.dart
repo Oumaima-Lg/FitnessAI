@@ -35,9 +35,7 @@ class _FullGalleryState extends State<FullGallery> {
 
       _groupPhotosByDate();
 
-      // bach nsignaler la fin du chargement des photos mn le file json ^_- wt7iyed hadik l3iba dyal loading sayidati :
       setState(() { 
-      // ^--> kanste3mlo setState sayidati to cause a rebuild of the widget and it's descendants hna fhad L7ala fach ghadi ndiro false ghadi trebuilda wila kant true twli false :).
         _isLoading = false;
       });
     } catch (e) {
@@ -99,14 +97,11 @@ class _FullGalleryState extends State<FullGallery> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final screenHeight = screenSize.height;
     final screenWidth = screenSize.width;
 
     return Scaffold(
       body: Container(
-
         /********* BG ********/
-        padding: EdgeInsets.only(bottom: 10, top: 10),
         width: double.infinity,
         height: double.infinity,
         /* background dégradé : */
@@ -123,78 +118,58 @@ class _FullGalleryState extends State<FullGallery> {
         /******************************/
 
         child: SafeArea(
-          child: Stack(
+          child: Column(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  /************************************** Header dyal la page **************************************/
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      children: [
-                        ReturnButton.returnButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                        Flexible(
-                          child: Align(
-                            // alignment: Alignment.center,
-                            child: Text(
-                              'Gallery',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: screenWidth * 0.05,
-                                fontWeight: FontWeight.bold,
-                              ),
+              /************************************** Header dyal la page **************************************/
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ReturnButton.returnButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    Text(
+                      'Gallery',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: screenWidth * 0.05,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    _buildCameraButton(),
+                  ],
+                ),
+              ),
+              /************************************** FIN Header **************************************/
+
+              const SizedBox(height: 10),
+
+              /******************************** GRILLE DYAL LES PHOTO **********************************/
+              // Ce Expanded est crucial pour éviter l'overflow
+              Expanded(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _photoGroups.isEmpty
+                        ? const Center(
+                            child: Text('Aucune photo disponible',
+                                style: TextStyle(color: Colors.white)))
+                        : Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: ListView.builder(
+                              itemCount: _photoGroups.length,
+                              itemBuilder: (context, index) {
+                                String date = _photoGroups.keys.elementAt(index);
+                                List<Photo> photos = _photoGroups[date]!;
+                                return _buildPhotoGroup(date, photos);
+                              },
                             ),
                           ),
-                        ),
-                        _buildCameraButton(),
-                      ],
-                    ),
-                  ),
-                  /************************************** FIN Header **************************************/
-
-                  const SizedBox(height: 20),
-
-                  /******************************** GRILLE DYAL LES PHOTO **********************************/
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 20, right: 20, top: 5, bottom: 5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: _isLoading
-                              ? Center(child: CircularProgressIndicator())
-                              : _photoGroups.isEmpty
-                                  ? Center(
-                                      child: Text('Aucune photo disponible',
-                                          style:
-                                              TextStyle(color: Colors.white)))
-                                  : SingleChildScrollView(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children:
-                                            _photoGroups.entries.map((entry) {
-                                          return _buildPhotoGroup(
-                                              entry.key, entry.value);
-                                        }).toList(),
-                                      ),
-                                    ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  /******************************** FIN GRILLE  **********************************/
-                ],
-              )
+              ),
+              /******************************** FIN GRILLE **********************************/
             ],
           ),
         ),
@@ -208,7 +183,7 @@ class _FullGalleryState extends State<FullGallery> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 2, bottom: 8),
+          padding: const EdgeInsets.only(left: 2, top: 10, bottom: 8),
           child: Text(
             date,
             style: const TextStyle(
@@ -231,7 +206,7 @@ class _FullGalleryState extends State<FullGallery> {
             return _buildPhotoThumbnail(photos[index].path ?? '');
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -242,16 +217,12 @@ class _FullGalleryState extends State<FullGallery> {
         // Show full size photo
       },
       child: Container(
-        constraints: BoxConstraints(
-          maxHeight: 100,
-          maxWidth: 100,
-        ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           color: Colors.transparent,
           image: DecorationImage(
             image: AssetImage(imagePath),
-            fit: BoxFit.contain,
+            fit: BoxFit.cover,
           ),
         ),
       ),
@@ -260,8 +231,8 @@ class _FullGalleryState extends State<FullGallery> {
 
   Widget _buildCameraButton() {
     return Container(
-      width: 60,
-      height: 60,
+      width: 40,
+      height: 40,
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
@@ -279,7 +250,8 @@ class _FullGalleryState extends State<FullGallery> {
         ],
       ),
       child: IconButton(
-        iconSize: 30,
+        iconSize: 20,
+        padding: EdgeInsets.zero,
         icon: const Icon(
           Icons.camera_alt,
           color: Colors.white,
@@ -289,11 +261,9 @@ class _FullGalleryState extends State<FullGallery> {
             context,
             MaterialPageRoute(builder: (context) => TakePhotoPage()),
           );
-
         },
       ),
     );
   }
-
   ///************************************** FIN widgets dyal les photo **************************************/
 }

@@ -1,10 +1,9 @@
-import 'dart:convert';
 import 'package:fitness/components/return_button.dart';
 import 'package:fitness/pages/camera_page.dart';
 import 'package:fitness/pages/full_gallery.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fitness/models/photo.dart';
+import 'package:fitness/services/progressPhotoService.dart';
 
 class ProgressePage extends StatefulWidget {
   const ProgressePage({super.key});
@@ -14,6 +13,8 @@ class ProgressePage extends StatefulWidget {
 }
 
 class _ProgressePageState extends State<ProgressePage> {
+  final ProgressPhotoService _photoService = ProgressPhotoService();
+
   List<Photo> _photos = [];
   Map<String, List<Photo>> _photoGroups = {};
   Map<String, List<Photo>> _recentPhotoGroups = {};
@@ -49,16 +50,12 @@ class _ProgressePageState extends State<ProgressePage> {
 
   Future<void> _loadPhotos() async {
     try {
-      final String response =
-          await rootBundle.loadString('lib/data/photo.json');
-      final List<dynamic> data = json.decode(response);
+      _photos = await _photoService.loadPhotos();
 
-      _photos = data.map((item) => Photo.fromJson(item)).toList();
+      _photoGroups = _photoService.groupPhotosByDate(_photos);
+      _recentPhotoGroups = _photoService.filterRecentPhotos(_photoGroups,
+          recentGroupsCount: _recentGroupsCount);
 
-      _groupPhotosByDate();
-      _filterRecentPhotos();
-
-      // bach nsignaler la fin du chargement des photos mn le file json ^_-;
       setState(() {
         _isLoading = false;
       });
@@ -67,91 +64,6 @@ class _ProgressePageState extends State<ProgressePage> {
       setState(() {
         _isLoading = false;
       });
-    }
-  }
-
-  void _groupPhotosByDate() {
-    _photoGroups = {};
-
-    for (var photo in _photos) {
-      if (photo.date != null) {
-        String dateKey = _formatDate(photo.date!);
-
-        if (!_photoGroups.containsKey(dateKey)) {
-          _photoGroups[dateKey] = [];
-        }
-
-        _photoGroups[dateKey]!.add(photo);
-      }
-    }
-  }
-
-  void _filterRecentPhotos() {
-    var sortedEntries =
-        _photoGroups.entries.toList() // kantriyew b les plus recentes dates
-          ..sort((a, b) {
-            //<-- parsing dyal les dates to avoid problems fima ba3d ;
-            try {
-              // Si le format est "DD Month"
-              final aParts = a.key.split(' ');
-              final bParts = b.key.split(' ');
-
-              if (aParts.length == 2 && bParts.length == 2) {
-                final aMonth = months.indexOf(aParts[1]);
-                final bMonth = months.indexOf(bParts[1]);
-
-                if (aMonth != -1 && bMonth != -1) {
-                  // <-- awel haja tri par moi sayidati
-                  if (aMonth != bMonth) {
-                    return bMonth - aMonth;
-                  }
-
-                  return int.parse(bParts[0]) -
-                      int.parse(aParts[0]); // <-- mnmoraha par jrs
-                }
-              }
-            } catch (e) {
-              print('Erreur lors du tri des dates: $e');
-            }
-
-            return b.key.compareTo(a.key); // tri alphabetique  wsf ^_^
-          });
-
-    _recentPhotoGroups = {};
-    for (int i = 0; i < sortedEntries.length && i < _recentGroupsCount; i++) {
-      var entry = sortedEntries[i];
-      _recentPhotoGroups[entry.key] = entry.value;
-    }
-//  ^--> had la boucle sayidati bach nakhdo les N recentes
-  }
-
-  String _formatDate(String dateString) {
-    // ila kant la date deja June 7 matalan ghadi tb9a kifma hiya
-    if (!dateString.contains('-')) {
-      return dateString;
-    }
-
-    // ila l9aha b7al hakda "YYYY-MM-DD" ghadi ndirlolha format l "DD Month"
-    try {
-      final date = DateTime.parse(dateString);
-      final months = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
-      ];
-      return '${date.day} ${months[date.month - 1]}';
-    } catch (e) {
-      print('Erreur lors du formatage de la date: $e');
-      return dateString;
     }
   }
 
@@ -266,10 +178,8 @@ class _ProgressePageState extends State<ProgressePage> {
 
     return Scaffold(
       body: Container(
-        /********* BG ********/
-        padding: EdgeInsets.only(bottom: 10, top: 10),
         width: double.infinity,
-        height: double.infinity,
+        /********* BG ********/
         /* background dégradé : */
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -281,14 +191,13 @@ class _ProgressePageState extends State<ProgressePage> {
             end: Alignment.bottomRight,
           ),
         ),
-        /******************************/
-        /********* Contenu de la page ********/
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                // Barre de titre avec bouton de retour
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -314,11 +223,12 @@ class _ProgressePageState extends State<ProgressePage> {
                   ],
                 ),
 
+                // Card d'information sur le tracking de progression
                 _buildProgressTrackingCard(screenWidth, screenHeight),
-
+                
                 const SizedBox(height: 20),
 
-                // Recent PHOTO :
+                // Entête Gallery
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -351,6 +261,7 @@ class _ProgressePageState extends State<ProgressePage> {
                 ),
 
                 const SizedBox(height: 8),
+                
                 Expanded(
                   child: _isLoading
                       ? Center(child: CircularProgressIndicator())
@@ -358,15 +269,12 @@ class _ProgressePageState extends State<ProgressePage> {
                           ? Center(
                               child: Text('Aucune photo disponible',
                                   style: TextStyle(color: Colors.white)))
-                          : SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children:
-                                    _recentPhotoGroups.entries.map((entry) {
-                                  return _buildPhotoGroup(
-                                      entry.key, entry.value);
-                                }).toList(),
-                              ),
+                          : ListView.builder(
+                              itemCount: _recentPhotoGroups.entries.length,
+                              itemBuilder: (context, index) {
+                                var entry = _recentPhotoGroups.entries.elementAt(index);
+                                return _buildPhotoGroup(entry.key, entry.value);
+                              },
                             ),
                   //      ^
                   //      |---> flewel ghadi y tafficha dak cercle katlowda z3ma ^_^, then kayverifier ila kant la liste dyal
@@ -384,9 +292,7 @@ class _ProgressePageState extends State<ProgressePage> {
         ),
       ),
 
-      /********* FIN de la page ********/
-
-      /********* Un bouton flottant ********/
+      /********* Bouton flottant pour la caméra ********/
       floatingActionButton: Padding(
         padding: EdgeInsets.only(bottom: 100, right: 10),
         child: _buildCameraButton(),
@@ -398,11 +304,12 @@ class _ProgressePageState extends State<ProgressePage> {
 
   Widget _buildProgressTrackingCard(double screenWidth, double screenHeight) {
     return Padding(
+      // padding: const EdgeInsets.only(top: 10, left: 1, right: 1),
       padding: EdgeInsets.only(
         top: screenHeight * 0.03,
-        left: screenWidth * 0.08,
-        right: screenWidth * 0.08,
-        bottom: screenHeight * 0.03,
+        left: screenWidth * 0.00,
+        right: screenWidth * 0.00,
+        bottom: screenHeight * 0.00,
       ),
       child: Container(
         constraints: BoxConstraints(
@@ -475,10 +382,9 @@ class _ProgressePageState extends State<ProgressePage> {
   }
 
   Widget _buildPhotoGroup(String date, List<Photo> photos) {
-    
     final displayedPhotos = photos.length > _maxPhotosPerGroup
         ? photos.sublist(0, _maxPhotosPerGroup)
-        : photos; 
+        : photos;
     //  ^--> hna sayidati ghadi nchofo ila kan l nombre dyal les photos f grp ktar mn li max n9et3o ghi li bghina , snn dak chi li bina ghadi tab9a la list kima hiya :)
 
     return Column(
