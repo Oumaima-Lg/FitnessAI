@@ -109,3 +109,7 @@ install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
 
 set(FLUTTER_PLUGIN_REGISTRANT "generated_plugin_registrant.cc")
 
+
+if(MSVC)
+  add_compile_options(/wd4099) # Désactive LNK4099
+endif()

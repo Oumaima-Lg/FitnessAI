@@ -1,11 +1,11 @@
 import 'package:fitness/models/activity.dart';
 import 'package:flutter/material.dart';
-import '../components/personalized_widget.dart';
-import '../components/textStyle/textstyle.dart';
+import '../../components/personalized_widget.dart';
+import '../../components/textStyle/textstyle.dart';
 
 class Hiit extends StatelessWidget {
   final Activity activity;
-  
+
   const Hiit({super.key, required this.activity});
 
   @override
@@ -87,12 +87,11 @@ class Hiit extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 20),
-                goButton(
-                  context, 
-                  activity: activity, 
-                  titleExercice: 'hiit', 
-                  quote: 'HIIT is the throne, discipline is the crown. Master both, and you’ll rule your fitness kingdom.\nInspired by the spirit of Jack LaLanne.'
-                ),
+                goButton(context,
+                    activity: activity,
+                    titleExercice: 'hiit',
+                    quote:
+                        'HIIT is the throne, discipline is the crown. Master both, and you’ll rule your fitness kingdom.\nInspired by the spirit of Jack LaLanne.'),
               ],
             ),
           ),

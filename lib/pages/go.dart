@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:fitness/components/personalized_widget.dart';
-import 'package:fitness/entrainements/congratulation.dart';
+import 'package:fitness/pages/entrainements/congratulation.dart';
 import 'package:flutter/material.dart';
 import '../components/textStyle/textstyle.dart';
 import 'package:fitness/models/activity.dart';
@@ -9,7 +9,11 @@ class GoPage extends StatefulWidget {
   final Activity activity;
   final String titleExercice;
   final String quote;
-  const GoPage({super.key, required this.activity, required this.titleExercice, required this.quote});
+  const GoPage(
+      {super.key,
+      required this.activity,
+      required this.titleExercice,
+      required this.quote});
   @override
   State<GoPage> createState() => _GoPageState();
 }
@@ -33,13 +37,13 @@ class _GoPageState extends State<GoPage> {
           if (seconds >= _selectedDuration.inSeconds) {
             timer?.cancel();
             start = false;
-            
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => Congratulation(
-                  imageUrl: 'congratulation_${widget.titleExercice}', 
-                  title: 'Congratulations, You Have Finished Your Workout !', 
+                  imageUrl: 'congratulation_${widget.titleExercice}',
+                  title: 'Congratulations, You Have Finished Your Workout !',
                   description: widget.quote,
                 ),
               ),
@@ -57,6 +61,7 @@ class _GoPageState extends State<GoPage> {
     timer?.cancel();
     super.dispose();
   }
+
   String get formattedTime {
     final hours = (seconds ~/ 3600).toString().padLeft(2, '0');
     final minutes = ((seconds % 3600) ~/ 60).toString().padLeft(2, '0');
@@ -91,8 +96,7 @@ class _GoPageState extends State<GoPage> {
                       borderRadius: BorderRadius.circular(23),
                       child: Image(
                         image: NetworkImage(
-                          widget.activity.videoDemonstartionUrl!
-                        ),
+                            widget.activity.videoDemonstartionUrl!),
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
                             const Icon(Icons.error_outline, color: Colors.red),
@@ -136,8 +140,10 @@ class _GoPageState extends State<GoPage> {
               ),
               Text(
                 formattedTime,
-                style:
-                    titleTextStyle(fontSize: 36, fontWeight: FontWeight.w600, color: Color(0xFF2E2F55)),
+                style: titleTextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF2E2F55)),
               ),
             ],
           ),

@@ -1,9 +1,9 @@
 import 'package:fitness/pages/login.dart';
 import 'package:flutter/material.dart';
-import 'package:fitness/profil/EditProfilePage.dart';
-import 'package:fitness/profil/notificationsPage.dart';
+import 'package:fitness/pages/profil/EditProfilePage.dart';
+import 'package:fitness/pages/profil/notificationsPage.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:fitness/profil/ImagePicker.dart';
+import 'package:fitness/pages/profil/ImagePicker.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 

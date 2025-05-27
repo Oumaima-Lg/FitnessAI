@@ -1,8 +1,8 @@
 import 'package:fitness/data/exercice_data.dart';
-import 'package:fitness/entrainements/cardio.dart';
-import 'package:fitness/entrainements/gym.dart';
-import 'package:fitness/entrainements/hiit.dart';
-import 'package:fitness/entrainements/recovery.dart';
+import 'package:fitness/pages/entrainements/cardio.dart';
+import 'package:fitness/pages/entrainements/gym.dart';
+import 'package:fitness/pages/entrainements/hiit.dart';
+import 'package:fitness/pages/entrainements/recovery.dart';
 import 'package:fitness/models/activity.dart';
 import 'package:fitness/models/exercice.dart';
 import 'package:flutter/material.dart';

@@ -1,7 +1,7 @@
 import 'package:fitness/models/activity.dart';
 import 'package:flutter/material.dart';
-import '../components/personalized_widget.dart';
-import '../components/textStyle/textstyle.dart';
+import '../../components/personalized_widget.dart';
+import '../../components/textStyle/textstyle.dart';
 
 class Gym extends StatelessWidget {
   final Activity activity;
@@ -232,12 +232,11 @@ class Gym extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 20),
-                goButton(
-                  context, 
-                  activity: activity, 
-                  titleExercice: 'gym', 
-                  quote: 'In the gym, every rep is a brick. Lay them with purpose, and you\'ll build a fortress of strength.\n Inspired by the discipline of the iron game.'
-                ),
+                goButton(context,
+                    activity: activity,
+                    titleExercice: 'gym',
+                    quote:
+                        'In the gym, every rep is a brick. Lay them with purpose, and you\'ll build a fortress of strength.\n Inspired by the discipline of the iron game.'),
               ],
             ),
           ),

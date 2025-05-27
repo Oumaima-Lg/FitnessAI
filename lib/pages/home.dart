@@ -1,13 +1,16 @@
-import 'package:fitness/activity%20tracker/activity_tracker.dart';
+import 'package:fitness/pages/activity%20tracker/activity_tracker.dart';
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/data/exercice_data.dart';
-import 'package:fitness/manager/latest_activity.dart';
+import 'package:fitness/services/latest_activity.dart';
 import 'package:fitness/models/exercice.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/models/latest_activity.dart';
-import 'package:fitness/profil/notificationsPage.dart';
+import 'package:fitness/pages/profil/notificationsPage.dart';
+import 'package:fitness/pages/PlanningPage.dart';
+// import 'package:fitness/pages/notifications.dart';
 import 'package:fitness/pages/progress_photo.dart';
+import 'package:fitness/pages/planning/focus.dart';
 import 'package:flutter/material.dart';
 
 // final int completedTasks;
@@ -64,6 +67,27 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       exercices = data;
     });
+  }
+
+  void navigateToPlanningPage(BuildContext context, Widget page) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF2E2F55),
+                Color(0xFF23253C),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: page,
+        ),
+      ),
+    );
   }
 
   @override
@@ -199,18 +223,9 @@ class _HomePageState extends State<HomePage> {
                     print("AI Conversation");
                   }),
                   _drawerItem('Planning', Icons.calendar_today, () {
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (context) => Planning()));
-                    print("Planning");
+                    navigateToPlanningPage(context, PlanningPage());
                   }),
-                  // Container(
-                  //   margin: const EdgeInsets.only(top: 20),
-                  //   child: _drawerItem('See more', Icons.expand_more),
-                  // ),
                   const SizedBox(height: 60),
-
                   Center(
                     child: Image.asset(
                       'images/slideBarImage.png',
@@ -392,11 +407,7 @@ class _HomePageState extends State<HomePage> {
                           maxWidth: 100,
                           maxHeight: 35,
                           onPressed: () {
-                            // Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //         builder: (context) => ExercicePage()));
-                            print("Start");
+                            navigateToPlanningPage(context, FocusScreen());
                           })),
                   const SizedBox(height: 20),
                   latestActivity(latestActivities, context, true),

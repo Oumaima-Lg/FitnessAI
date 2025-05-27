@@ -1,4 +1,4 @@
-import 'package:fitness/activity%20tracker/activity_tracker.dart';
+import 'package:fitness/pages/activity%20tracker/activity_tracker.dart';
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/models/activity.dart';
@@ -53,6 +53,45 @@ class GradientTitleText extends StatelessWidget {
       child: ShaderMask(
         shaderCallback: (bounds) => const LinearGradient(
           colors: [Color(0xFFFFA992), Color(0xFFFD0D92)],
+        ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+            fontFamily: 'Poppins',
+          ),
+          textAlign: textAlign, // Centrer le texte
+        ),
+      ),
+    );
+  }
+}
+
+class GradientTitleText2 extends StatelessWidget {
+  final String text;
+  final double fontSize;
+  final FontWeight fontWeight;
+  final Alignment alignment;
+  final TextAlign textAlign;
+
+  const GradientTitleText2({
+    super.key,
+    required this.text,
+    this.alignment = Alignment.center,
+    this.fontSize = 20,
+    this.fontWeight = FontWeight.w600,
+    this.textAlign = TextAlign.center,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: alignment,
+      child: ShaderMask(
+        shaderCallback: (bounds) => const LinearGradient(
+          colors: [Color(0xFF92A3FD), Color(0xFF9DCEFF)],
         ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
         child: Text(
           text,
@@ -321,7 +360,10 @@ class StepWidget extends StatelessWidget {
 }
 
 // La description affiché avant les étapes
-Widget stepDescription({required String titleStep, required String stepCount,}) {
+Widget stepDescription({
+  required String titleStep,
+  required String stepCount,
+}) {
   return Padding(
     padding: const EdgeInsets.all(20),
     child: Row(
@@ -341,7 +383,10 @@ Widget stepDescription({required String titleStep, required String stepCount,}) 
 }
 
 // Le bouton GO =>
-GradientButton goButton(BuildContext context, {required Activity activity, required String titleExercice, required String quote}) {
+GradientButton goButton(BuildContext context,
+    {required Activity activity,
+    required String titleExercice,
+    required String quote}) {
   return GradientButton(
     title: 'Go',
     icon: Icons.arrow_forward,
@@ -350,7 +395,11 @@ GradientButton goButton(BuildContext context, {required Activity activity, requi
     onPressed: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => GoPage(activity: activity, titleExercice: titleExercice, quote: quote,),
+          builder: (context) => GoPage(
+            activity: activity,
+            titleExercice: titleExercice,
+            quote: quote,
+          ),
         )),
   );
 }
@@ -490,7 +539,8 @@ Widget _activityItem({
     ],
   );
 }
-class ChatBotAppBar extends StatelessWidget implements PreferredSizeWidget{
+
+class ChatBotAppBar extends StatelessWidget implements PreferredSizeWidget {
   const ChatBotAppBar({
     super.key,
   });
@@ -512,9 +562,7 @@ class ChatBotAppBar extends StatelessWidget implements PreferredSizeWidget{
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image(
-            image: AssetImage('images/chatbot/icon_bot.png') 
-          ),
+          Image(image: AssetImage('images/chatbot/icon_bot.png')),
           SizedBox(width: 35),
           Column(
             children: [
@@ -528,7 +576,7 @@ class ChatBotAppBar extends StatelessWidget implements PreferredSizeWidget{
                     width: 10,
                     height: 10,
                     decoration: BoxDecoration(
-                      color: Color(0xFF1BC22E), 
+                      color: Color(0xFF1BC22E),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -552,10 +600,7 @@ class ChatBotAppBar extends StatelessWidget implements PreferredSizeWidget{
         CircleAvatar(
           backgroundColor: Color(0xFF23253C),
           radius: 24,
-          child: Icon(
-            Icons.more_horiz, 
-            color: Colors.white
-          ),
+          child: Icon(Icons.more_horiz, color: Colors.white),
         ),
       ],
       bottom: PreferredSize(
@@ -596,8 +641,10 @@ class _DurationPickerState extends State<DurationPicker> {
   void initState() {
     super.initState();
     _hourController = FixedExtentScrollController(initialItem: selectedHour);
-    _minuteController = FixedExtentScrollController(initialItem: selectedMinute);
-    _secondController = FixedExtentScrollController(initialItem: selectedSecond);
+    _minuteController =
+        FixedExtentScrollController(initialItem: selectedMinute);
+    _secondController =
+        FixedExtentScrollController(initialItem: selectedSecond);
   }
 
   @override
@@ -635,8 +682,10 @@ class _DurationPickerState extends State<DurationPicker> {
                     index.toString().padLeft(2, '0'),
                     style: TextStyle(
                       fontSize: isSelected ? 24 : 16,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      color: isSelected ? Color(0xFF983BCB) : Colors.grey.shade500,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      color:
+                          isSelected ? Color(0xFF983BCB) : Colors.grey.shade500,
                     ),
                   ),
                   if (isSelected)

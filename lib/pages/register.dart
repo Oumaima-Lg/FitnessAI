@@ -1,8 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/pages/login.dart';
+import 'package:fitness/services/database.dart';
+import 'package:fitness/services/shared_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fitness/pages/completeRegister.dart';
+import 'package:random_string/random_string.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -15,11 +19,61 @@ class _RegisterState extends State<Register> {
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
 
-  // Text controllers
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  String email = "", password = "", name = "";
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  registration() async {
+    if (nameController.text != "" && emailController.text != "") {
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
+
+        String Id = randomAlphaNumeric(10);
+        Map<String, dynamic> userInfoMap = {
+          "Name": nameController.text,
+          "Email": emailController.text,
+          "Id": Id,
+        };
+
+        await SharedpreferenceHelper().saveUserEmail(email);
+        await SharedpreferenceHelper().saveUserName(nameController.text);
+        await SharedpreferenceHelper().saveUserId(Id);
+        await DatabaseMethods().addUserDetails(userInfoMap, Id);
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Color(0xFF0A1653),
+          content: Text(
+            "Registered Successfully",
+            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          ),
+        ));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => CompleteRegister()));
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.orangeAccent,
+            content: Text(
+              "Password Provided is too Weak",
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ));
+        } // SnackBar
+        else if (e.code == 'email-already-in-use') {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: const Color.fromARGB(255, 216, 160, 160),
+            content: Text(
+              "Account Already exists",
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ));
+        } // SnackBar
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +128,7 @@ class _RegisterState extends State<Register> {
                     child: Column(
                       children: [
                         _buildTextFormField(
-                          controller: _nameController,
+                          controller: nameController,
                           hintText: 'Full Name',
                           prefixIcon: Icons.person_outline,
                           validator: (value) {
@@ -88,7 +142,7 @@ class _RegisterState extends State<Register> {
 
                         // Phone Number Field
                         _buildTextFormField(
-                          controller: _phoneController,
+                          controller: phoneController,
                           hintText: 'Phone Number',
                           prefixIcon: Icons.phone_outlined,
                           keyboardType: TextInputType.phone,
@@ -106,7 +160,7 @@ class _RegisterState extends State<Register> {
 
                         // Email Field
                         _buildTextFormField(
-                          controller: _emailController,
+                          controller: emailController,
                           hintText: 'Email',
                           prefixIcon: Icons.email_outlined,
                           keyboardType: TextInputType.emailAddress,
@@ -125,7 +179,7 @@ class _RegisterState extends State<Register> {
 
                         // Password Field
                         _buildTextFormField(
-                          controller: _passwordController,
+                          controller: passwordController,
                           hintText: 'Password',
                           prefixIcon: Icons.lock_outline,
                           obscureText: !_passwordVisible,
@@ -160,11 +214,16 @@ class _RegisterState extends State<Register> {
                           maxWidth: 220,
                           maxHeight: 50,
                           onPressed: () {
-                            // Navigate to login page
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CompleteRegister()));
+                            if (nameController.text != "" &&
+                                emailController.text != "" &&
+                                passwordController.text != "") {
+                              setState(() {
+                                name = nameController.text;
+                                email = emailController.text;
+                                password = passwordController.text;
+                              });
+                              registration();
+                            }
                           },
                         ),
                         SizedBox(height: 16),

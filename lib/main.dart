@@ -1,12 +1,16 @@
-import 'package:fitness/manager/latest_activity.dart';
-import 'package:fitness/pages/bottomNavBar.dart';
-import 'package:fitness/pages/register.dart';
-// import 'package:fitness/pages/welcome.dart';
+import 'package:fitness/services/latest_activity.dart';
+// import 'package:fitness/pages/PlanningPage.dart';
+import 'package:fitness/pages/bottomnavbar.dart';
+import 'package:fitness/pages/welcome.dart';
 import 'package:flutter/material.dart';
-import 'package:fitness/pages/completeRegister.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await LatestActivityManager().initialize();
   runApp(MyApp());
 }
@@ -33,7 +37,7 @@ class MyApp extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
-        child: BottomNavBar(),
+        child: Welcome(),
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:fitness/models/notification.dart';
-import '../components/textStyle/textstyle.dart';
+import '../../components/textStyle/textstyle.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart'; // Pour le taptic feedback
 
 class NotificationsPage extends StatefulWidget {
@@ -23,16 +23,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
   // Fonction pour ajouter une notification avec feedback
   void addNotificationWithFeedback(AppNotification notification) {
     setState(() {
-      _notifications.insert(0, notification); // Ajoute la notification en tête de liste
+      _notifications.insert(
+          0, notification); // Ajoute la notification en tête de liste
     });
 
     // Activer le taptic feedback
-    Vibrate.feedback(FeedbackType.light); // Vous pouvez choisir le type de vibration
+    Vibrate.feedback(
+        FeedbackType.light); // Vous pouvez choisir le type de vibration
   }
 
   Future<void> initialData() async {
     // Ajout de notifications de test
-    
+
     addNotificationWithFeedback(
       AppNotification(
         message: "Hey, let’s add some meals for your body goals",
@@ -46,12 +48,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
       AppNotification(
         message: "Congratulations, You have finished A..",
         imagePath: 'images/icons/workout2.png',
-         timestamp: DateTime.now().subtract(
+        timestamp: DateTime.now().subtract(
           const Duration(minutes: 20),
         ),
       ),
     );
-    
+
     addNotificationWithFeedback(
       AppNotification(
         message: "Don’t miss your lowerbody workout",
@@ -59,7 +61,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
         timestamp: DateTime.now().subtract(
           const Duration(minutes: 15),
         ),
-        
       ),
     );
     addNotificationWithFeedback(
@@ -69,7 +70,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
         timestamp: DateTime.now(),
       ),
     );
-    
   }
 
   Widget _buildImage(String path) {
@@ -100,14 +100,15 @@ class _NotificationsPageState extends State<NotificationsPage> {
         ),
         actions: [
           IconButton(
-            icon: _isMenuOpen 
-              ? Image.asset('images/icons/Close Square.png', width: 32, height: 32)
-              : Image.asset('images/icons/more.png', width: 32, height: 32),
+            icon: _isMenuOpen
+                ? Image.asset('images/icons/Close Square.png',
+                    width: 32, height: 32)
+                : Image.asset('images/icons/more.png', width: 32, height: 32),
             onPressed: () {
               setState(() {
                 _isMenuOpen = !_isMenuOpen;
               });
-              
+
               showMenu(
                 color: const Color(0xFF4E457B),
                 context: context,
@@ -122,26 +123,27 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 ),
                 items: [
                   PopupMenuItem(
-                    value: 'Delete All',
-                    child: Container(
-                      width: 141,
-                      height: 43,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.delete, color: Colors.white),
-                          Padding(padding: EdgeInsets.all(8.0),),
-
-                          const Text('Delete All', style: TextStyle(color: Colors.white)),
-                        ],
+                      value: 'Delete All',
+                      child: Container(
+                        width: 141,
+                        height: 43,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.delete, color: Colors.white),
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                            ),
+                            const Text('Delete All',
+                                style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
                       ),
-                    ),
-                    onTap: () {  
-                      setState(() {
-                        _notifications.clear();
-                      });
-                    }
-                 ),
+                      onTap: () {
+                        setState(() {
+                          _notifications.clear();
+                        });
+                      }),
                 ],
               ).then((_) {
                 // Quand le menu se ferme
@@ -154,7 +156,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         ],
       ),
       // Ajouter une nouvelle notification avec feedback
-    
+
       body: ListView.separated(
         padding: const EdgeInsets.only(top: 86),
         itemCount: _notifications.length,
@@ -175,13 +177,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   color: const Color(0xFF4E457B),
                   context: context,
                   position: RelativeRect.fromLTRB(
-                    MediaQuery.of(context).size.width - 200, // Adjusted left position
-                    MediaQuery.of(context).viewPadding.top + 140 + (index * 88), // Adjusted top position
+                    MediaQuery.of(context).size.width -
+                        200, // Adjusted left position
+                    MediaQuery.of(context).viewPadding.top +
+                        140 +
+                        (index * 88), // Adjusted top position
                     16, // Right padding
                     0,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12), // Adjusted border radius
+                    borderRadius:
+                        BorderRadius.circular(12), // Adjusted border radius
                   ),
                   items: [
                     PopupMenuItem(
@@ -192,7 +198,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            const Icon(Icons.delete, color: Colors.white, size: 20),
+                            const Icon(Icons.delete,
+                                color: Colors.white, size: 20),
                             const SizedBox(width: 12),
                             const Text(
                               'Delete this notification',
@@ -219,26 +226,27 @@ class _NotificationsPageState extends State<NotificationsPage> {
             title: Text(
               notif.message,
               style: const TextStyle(
-              color: Color(0xFFE9E3E4), 
-              fontSize: 12, 
-              fontFamily: 'Poppins', 
-              fontWeight: FontWeight.normal, 
-              height: 1.5, 
-              letterSpacing: 0, 
+                color: Color(0xFFE9E3E4),
+                fontSize: 12,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.normal,
+                height: 1.5,
+                letterSpacing: 0,
               ),
             ),
             subtitle: Text(
               timeago.format(notif.timestamp),
               style: const TextStyle(
-              color: Color(0xFFB6B4C1), 
-              fontSize: 10, 
-              fontFamily: 'Poppins', 
-              fontWeight: FontWeight.normal, 
-              height: 1.5, 
-              letterSpacing: 0, 
+                color: Color(0xFFB6B4C1),
+                fontSize: 10,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.normal,
+                height: 1.5,
+                letterSpacing: 0,
               ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           );
         },
       ),

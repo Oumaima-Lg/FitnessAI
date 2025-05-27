@@ -3,11 +3,11 @@ import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/models/userStats.dart';
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/workoutButton.dart';
-import 'package:fitness/statistics/caloriesBurned.dart';
-import 'package:fitness/statistics/Steps.dart';
-import 'package:fitness/statistics/TrainingTime.dart';
-import 'package:fitness/statistics/sleepLog.dart';
-import 'package:fitness/statistics/waterTracker.dart';
+import 'package:fitness/pages/statistics/caloriesBurned.dart';
+import 'package:fitness/pages/statistics/Steps.dart';
+import 'package:fitness/pages/statistics/TrainingTime.dart';
+import 'package:fitness/pages/statistics/sleepLog.dart';
+import 'package:fitness/pages/statistics/waterTracker.dart';
 
 class Statistics extends StatelessWidget {
   final UserStats stats;
@@ -34,130 +34,136 @@ class Statistics extends StatelessWidget {
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Statistics',
-                          style: titleTextStyle(),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: GradientComponent.gradientText(
-                        text: "For Today",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                child: Column(children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Statistics',
+                        style: titleTextStyle(),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: GradientComponent.gradientText(
+                      text: "For Today",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 16,
-                      runSpacing: 16,
-                      children: [
-                        Stack(
-                          children: [
-                            _buildCircleCard("Training Time", stats.trainingTime.toString(), ""),
-                          ],
+                  ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: [
+                      Stack(
+                        children: [
+                          _buildCircleCard("Training Time",
+                              stats.trainingTime.toString(), ""),
+                        ],
+                      ),
+                      Stack(
+                        children: [
+                          _buildCircleCard("Walk", stats.steps.toString(),
+                              "   Steps \n Completed"),
+                        ],
+                      ),
+                      _buildInfoCard("Calories", "${stats.calories}\n  Kcal"),
+                      _buildInfoCard("Sleep", "${stats.sleep} \n  hours"),
+                      _buildImageCard(
+                          "Water",
+                          "images/statistics/water_img.png",
+                          "${stats.water} \n liters"),
+                      _buildImageCard(
+                          "Heart",
+                          "images/statistics/heart_img.png",
+                          "${stats.heartRate} \n  bpm"),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+                  WorkoutElevatedButton(
+                    iconPath: 'images/statistics/training.png',
+                    title: 'Training Time',
+                    subtitle: 'You started a new workout session.\nKeep it up!',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Training(),
                         ),
-                        Stack(
-                          children: [
-                            _buildCircleCard("Walk", stats.steps.toString(), "   Steps \n Completed"),
-                          ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 18),
+                  WorkoutElevatedButton(
+                    iconPath: 'images/statistics/steps.png',
+                    title: 'Steps',
+                    subtitle:
+                        'Tap to view your daily and monthly step count trends.',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Steps(),
                         ),
-                        _buildInfoCard("Calories", "${stats.calories}\n  Kcal"),
-                        _buildInfoCard("Sleep", "${stats.sleep} \n  hours"),
-                        _buildImageCard("Water", "images/statistics/water_img.png", "${stats.water} \n liters"),
-                        _buildImageCard("Heart", "images/statistics/heart_img.png", "${stats.heartRate} \n  bpm"),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    WorkoutElevatedButton(
-                      iconPath: 'images/statistics/training.png',
-                      title: 'Training Time',
-                      subtitle: 'You started a new workout session.\nKeep it up!',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Training(),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 18),
-                    WorkoutElevatedButton(
-                      iconPath: 'images/statistics/steps.png',
-                      title: 'Steps',
-                      subtitle: 'Tap to view your daily and monthly step count trends.',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Steps(),
-                          ),
-                        );
-                      },
-                    ),
-                     const SizedBox(height: 18),
-                    WorkoutElevatedButton(
-                      iconPath: 'images/statistics/calories.png',
-                      title: 'Calories Burned',
-                      subtitle: 'Great job! You`ve already burned a good amount of calories today.',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Calorie(),
-                          ),
-                        );
-                      },
-                    ),
-                     const SizedBox(height: 18),
-                    WorkoutElevatedButton(
-                      iconPath: 'images/statistics/cup.png',
-                      title: 'Water Tracker',
-                      subtitle: 'Don`t forget to stay hydrated throughout the day.',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => WaterTracker(),
-                          ),
-                        );
-                      },
-                    ),
-                     const SizedBox(height: 18),
-                    WorkoutElevatedButton(
-                      iconPath: 'images/statistics/sleep.png',
-                      title: 'Sleep Log',
-                      subtitle: 'Log your sleep details to analyze your sleep patterns.',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SleepLog(),
-                          ),
-                        );
-                      },
-                    ),
-                  ]  
-                ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 18),
+                  WorkoutElevatedButton(
+                    iconPath: 'images/statistics/calories.png',
+                    title: 'Calories Burned',
+                    subtitle:
+                        'Great job! You`ve already burned a good amount of calories today.',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Calorie(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 18),
+                  WorkoutElevatedButton(
+                    iconPath: 'images/statistics/cup.png',
+                    title: 'Water Tracker',
+                    subtitle:
+                        'Don`t forget to stay hydrated throughout the day.',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WaterTracker(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 18),
+                  WorkoutElevatedButton(
+                    iconPath: 'images/statistics/sleep.png',
+                    title: 'Sleep Log',
+                    subtitle:
+                        'Log your sleep details to analyze your sleep patterns.',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SleepLog(),
+                        ),
+                      );
+                    },
+                  ),
+                ]),
               ),
             ),
           ),
         ],
       ),
-      
-      
     );
   }
-
-
-
 
   Widget _buildCircleCard(String title, String value, String text) {
     return Container(
@@ -172,11 +178,10 @@ class Statistics extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              fontSize: 18,
-              color: Color(0xFFE3DBDB),
-              fontWeight: FontWeight.w500,
-              fontFamily: 'Poppins'
-            ),
+                fontSize: 18,
+                color: Color(0xFFE3DBDB),
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Poppins'),
           ),
           Expanded(
             child: Stack(
@@ -194,7 +199,7 @@ class Statistics extends StatelessWidget {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (title == "Training Time") 
+                    if (title == "Training Time")
                       const Icon(
                         Icons.timer_outlined,
                         size: 24,
@@ -203,21 +208,18 @@ class Statistics extends StatelessWidget {
                     Text(
                       value,
                       style: const TextStyle(
-                        fontSize: 25,
-                        color: Color(0xFF5DCCFC),
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Poppins'
-                      ),
+                          fontSize: 25,
+                          color: Color(0xFF5DCCFC),
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Poppins'),
                     ),
                     if (text.isNotEmpty)
-                      Text(
-                        text,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Color(0xFFE3DBDB),
-                          fontSize: 12,
-                        )
-                      ),
+                      Text(text,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color(0xFFE3DBDB),
+                            fontSize: 12,
+                          )),
                   ],
                 ),
               ],
@@ -242,13 +244,12 @@ class Statistics extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            title, 
+            title,
             style: const TextStyle(
-              fontSize: 18,
-              color: Color(0xFFE3DBDB),
-              fontWeight: FontWeight.w500,
-              fontFamily: 'Poppins'
-            ),
+                fontSize: 18,
+                color: Color(0xFFE3DBDB),
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Poppins'),
           ),
           Expanded(
             child: Center(
@@ -259,19 +260,17 @@ class Statistics extends StatelessWidget {
                     TextSpan(
                       text: parts[0],
                       style: const TextStyle(
-                        fontSize: 25,
-                        color: Color(0xFF5DCCFC),
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'Poppins'
-                      ),
+                          fontSize: 25,
+                          color: Color(0xFF5DCCFC),
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Poppins'),
                     ),
                     TextSpan(
                       text: parts[1],
                       style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFFE3DBDB),
-                        fontFamily: 'Poppins'
-                      ),
+                          fontSize: 14,
+                          color: Color(0xFFE3DBDB),
+                          fontFamily: 'Poppins'),
                     ),
                   ],
                 ),
@@ -300,13 +299,12 @@ class Statistics extends StatelessWidget {
             left: 12,
             top: 12,
             child: Text(
-              title, 
-             style: const TextStyle(
-                fontSize: 18,
-                color: Color(0xFFE3DBDB),
-                fontWeight: FontWeight.w500,
-                fontFamily: 'Poppins'
-             ),
+              title,
+              style: const TextStyle(
+                  fontSize: 18,
+                  color: Color(0xFFE3DBDB),
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'Poppins'),
             ),
           ),
           Positioned(
@@ -318,19 +316,19 @@ class Statistics extends StatelessWidget {
                   TextSpan(
                     text: parts[0],
                     style: TextStyle(
-                      fontSize: 25,
-                      color: title == "Heart" ? const Color(0xFF00F2FE) : const Color(0xFFE3DBDB),
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Poppins'
-                    ),
+                        fontSize: 25,
+                        color: title == "Heart"
+                            ? const Color(0xFF00F2FE)
+                            : const Color(0xFFE3DBDB),
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Poppins'),
                   ),
                   TextSpan(
                     text: parts.length > 1 ? parts[1] : "",
                     style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFFE3DBDB),
-                      fontFamily: 'Poppins'
-                    ),
+                        fontSize: 14,
+                        color: Color(0xFFE3DBDB),
+                        fontFamily: 'Poppins'),
                   ),
                 ],
               ),

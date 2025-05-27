@@ -1,6 +1,6 @@
 import 'package:fitness/components/gradient.dart';
 import 'package:flutter/material.dart';
-import '../components/textStyle/textstyle.dart';
+import '../../components/textStyle/textstyle.dart';
 import 'package:intl/intl.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -151,14 +151,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       child: TextField(
         controller: controller,
-        obscureText: controller == _passwordController ? !_passwordVisible : obscureText,
+        obscureText:
+            controller == _passwordController ? !_passwordVisible : obscureText,
         keyboardType: keyboardType,
         style: const TextStyle(color: Colors.white, fontSize: 16),
         decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           border: InputBorder.none,
           hintText: getInitialValue(),
-          hintStyle: const TextStyle(color: Color(0xFFC7B0C2)), // Updated color here
+          hintStyle:
+              const TextStyle(color: Color(0xFFC7B0C2)), // Updated color here
           suffixIcon: controller == _passwordController
               ? IconButton(
                   icon: Icon(
@@ -181,7 +184,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE8ACFF).withAlpha((255 * 0.3).toInt()), width: 1),
+        border: Border.all(
+            color: const Color(0xFFE8ACFF).withAlpha((255 * 0.3).toInt()),
+            width: 1),
       ),
       child: ButtonTheme(
         alignedDropdown: true,
@@ -225,68 +230,72 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE8ACFF).withAlpha((255 * 0.3).toInt()), width: 1),
+        border: Border.all(
+            color: const Color(0xFFE8ACFF).withAlpha((255 * 0.3).toInt()),
+            width: 1),
       ),
       child: TextFormField(
         controller: _dobController,
         readOnly: true,
         style: const TextStyle(color: Colors.white, fontSize: 16),
         decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           border: InputBorder.none,
           hintText: _initialDob,
           hintStyle: const TextStyle(color: Color(0xFFC7B0C2)),
           suffixIcon: const Icon(Icons.calendar_today, color: Colors.white),
         ),
         onTap: () async {
-  try {
-    List<String> parts = _birthDate.split('/');
-    DateTime initialDate = DateTime(
-      int.parse(parts[2]),
-      int.parse(parts[1]),
-      int.parse(parts[0]),
-    );
+          try {
+            List<String> parts = _birthDate.split('/');
+            DateTime initialDate = DateTime(
+              int.parse(parts[2]),
+              int.parse(parts[1]),
+              int.parse(parts[0]),
+            );
 
-    DateTime? pickedDate = await showDatePicker(
-  context: context,
-  initialDate: initialDate,
-  firstDate: DateTime(1900),
-  lastDate: DateTime.now(),
-  builder: (context, child) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-        colorScheme: const ColorScheme.light(
-          primary: Color(0xFF983BCB),      // couleur des boutons (OK / Cancel)
-          onPrimary: Colors.white,         // texte sur boutons
-          surface: Colors.white,           // fond des boîtes de dialogue
-          onSurface: Colors.black,         // texte
-        ),
-        dialogBackgroundColor: Colors.white, // fond principal du calendrier
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: Color(0xFF983BCB), // texte des boutons
-          ),
-        ),
+            DateTime? pickedDate = await showDatePicker(
+              context: context,
+              initialDate: initialDate,
+              firstDate: DateTime(1900),
+              lastDate: DateTime.now(),
+              builder: (context, child) {
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: const ColorScheme.light(
+                      primary: Color(
+                          0xFF983BCB), // couleur des boutons (OK / Cancel)
+                      onPrimary: Colors.white, // texte sur boutons
+                      surface: Colors.white, // fond des boîtes de dialogue
+                      onSurface: Colors.black, // texte
+                    ),
+                    dialogBackgroundColor:
+                        Colors.white, // fond principal du calendrier
+                    textButtonTheme: TextButtonThemeData(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Color(0xFF983BCB), // texte des boutons
+                      ),
+                    ),
+                  ),
+                  child: child!,
+                );
+              },
+            );
+
+            if (pickedDate != null) {
+              setState(() {
+                _birthDate = "${pickedDate.day.toString().padLeft(2, '0')}/"
+                    "${pickedDate.month.toString().padLeft(2, '0')}/"
+                    "${pickedDate.year}";
+                _dobController.text = _birthDate;
+              });
+            }
+          } catch (e) {
+            print("Erreur lors du parsing de la date : $e");
+          }
+        },
       ),
-      child: child!,
     );
-  },
-);
-
-if (pickedDate != null) {
-  setState(() {
-    _birthDate = "${pickedDate.day.toString().padLeft(2, '0')}/"
-                 "${pickedDate.month.toString().padLeft(2, '0')}/"
-                 "${pickedDate.year}";
-    _dobController.text = _birthDate;
-  });
-}
-
-  } catch (e) {
-    print("Erreur lors du parsing de la date : $e");
   }
-},
-      ),
-    );
-  } 
 }
