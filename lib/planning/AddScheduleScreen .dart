@@ -6,7 +6,7 @@ import 'package:fitness/planning/WorkoutSavedScreen.dart';
 import 'package:flutter/material.dart';
 
 class AddScheduleScreen extends StatefulWidget {
-  const AddScheduleScreen({Key? key}) : super(key: key);
+  const AddScheduleScreen({super.key});
 
   @override
   State<AddScheduleScreen> createState() => _AddScheduleScreenState();

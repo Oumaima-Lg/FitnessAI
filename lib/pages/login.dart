@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/gradient.dart';
+import 'package:fitness/pages/bottomnavbar.dart';
 import 'package:fitness/pages/register.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,9 +16,49 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
 
-  // Text controllers
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  String email = "", password = "", name = "";
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+
+  userLogin() async {
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF2E2F55),
+                    Color(0xFF23253C),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: BottomNavBar(),
+            ),
+          ));
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            "No user Found for that Email",
+            style: TextStyle(fontSize: 18.0, color: Colors.black),
+          ),
+        ));
+      } else if (e.code == 'wrong-password') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            "Wrong Password Provided by User",
+            style: TextStyle(fontSize: 18.0, color: Colors.black),
+          ),
+        ));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +114,7 @@ class _LoginState extends State<Login> {
                       children: [
                         // Email Field
                         _buildTextFormField(
-                          controller: _emailController,
+                          controller: emailController,
                           hintText: 'Email',
                           prefixIcon: Icons.email_outlined,
                           keyboardType: TextInputType.emailAddress,
@@ -91,7 +133,7 @@ class _LoginState extends State<Login> {
 
                         // Password Field
                         _buildTextFormField(
-                          controller: _passwordController,
+                          controller: passwordController,
                           hintText: 'Password',
                           prefixIcon: Icons.lock_outline,
                           obscureText: !_passwordVisible,
@@ -125,7 +167,16 @@ class _LoginState extends State<Login> {
                           text: 'Login',
                           maxWidth: 220,
                           maxHeight: 50,
-                          onPressed: () {},
+                          onPressed: () {
+                            setState(() {
+                              if (emailController.text != "" &&
+                                  passwordController.text != "") {
+                                email = emailController.text;
+                                password = passwordController.text;
+                                userLogin();
+                              }
+                            });
+                          },
                         ),
 
                         SizedBox(height: 16),

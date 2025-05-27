@@ -2,7 +2,7 @@ import 'package:fitness/activity%20tracker/activity_tracker.dart';
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/data/exercice_data.dart';
-import 'package:fitness/manager/latest_activity.dart';
+import 'package:fitness/services/latest_activity.dart';
 import 'package:fitness/models/exercice.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/models/latest_activity.dart';
