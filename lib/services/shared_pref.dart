@@ -51,5 +51,6 @@ class SharedpreferenceHelper {
     await prefs.remove(userNameKey);
     await prefs.remove(userIdKey);
     await prefs.remove(userEmailKey);
+    await prefs.remove(userImageKey);
   }
 }

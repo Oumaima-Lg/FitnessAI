@@ -8,6 +8,15 @@ class DatabaseMethods {
         .set(userInfoMap);
   }
 
+  Future addUserWorkoutDetails(
+      Map<String, dynamic> userPlanningMap, String userId) async {
+    return await FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .collection("workoutPlanning")
+        .add(userPlanningMap);
+  }
+
 // Future getUserByUserName(String userName) async {
 //     return await FirebaseFirestore.instance
 //         .collection("users")

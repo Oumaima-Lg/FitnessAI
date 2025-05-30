@@ -3,6 +3,9 @@ import 'package:fitness/components/return_button.dart';
 import 'package:fitness/data/exercice_data.dart';
 import 'package:fitness/models/exercice.dart';
 import 'package:fitness/pages/planning/WorkoutSavedScreen.dart';
+import 'package:fitness/services/database.dart';
+import 'package:fitness/services/planning_service.dart';
+import 'package:fitness/services/shared_pref.dart';
 import 'package:flutter/material.dart';
 
 class AddScheduleScreen extends StatefulWidget {
@@ -361,14 +364,6 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
   }
 
   void _showWorkoutSelectionDialog() {
-    // final workouts = [
-    //   'HIIT Workout',
-    //   'Cardio',
-    //   'Strength Training',
-    //   'Yoga',
-    //   'Pilates'
-    // ];
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -400,15 +395,6 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
   }
 
   void _showActivitySelectionDialog() {
-    // final activities = [
-    //   'Jumping Jack',
-    //   'Push-ups',
-    //   'Squats',
-    //   'Lunges',
-    //   'Burpees',
-    //   'Plank'
-    // ];
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -439,40 +425,70 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
     );
   }
 
-  void _saveSchedule() {
-    // Ici vous pourriez sauvegarder les données dans une base de données
-    // ou les envoyer à une API
+  Future<void> _saveSchedule() async {
+    try {
+      // Récupération de l'ID utilisateur depuis SharedPreferences
+      // String? userId = await SharedpreferenceHelper().getUserId();
+      String? userId = await SharedpreferenceHelper().getUserId();
 
-    // Pour l'exemple, affichons simplement un message de confirmation
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Workout schedule saved!'),
-        backgroundColor: Color(0xFF0A1653),
-      ),
-    );
-
-    // Puis retourner à l'écran précédent
-    Future.delayed(const Duration(seconds: 1), () {
-      // Navigator.of(context).pop();
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF2E2F55),
-                  Color(0xFF23253C),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: WorkoutSavedScreen(),
+      if (userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erreur: Utilisateur non connecté'),
+            backgroundColor: Colors.red,
           ),
+        );
+        return;
+      }
+
+      Map<String, dynamic> userPlanningMap =
+          PlanningService.createUserPlanningMap(
+        selectedDate,
+        selectedTime,
+        selectedWorkout,
+        selectedActivity,
+        descriptionController,
+      );
+
+      await DatabaseMethods().addUserWorkoutDetails(userPlanningMap, userId);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Workout schedule saved successfully! hhh'),
+          backgroundColor: Color(0xFF0A1653),
         ),
       );
-    });
+
+      // Navigation vers l'écran de confirmation
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF2E2F55),
+                    Color(0xFF23253C),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: WorkoutSavedScreen(),
+            ),
+          ),
+        );
+      });
+    } catch (e) {
+      // Gestion des erreurs
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la sauvegarde: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Widget buildNumberColumn({
