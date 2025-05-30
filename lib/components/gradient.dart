@@ -95,20 +95,20 @@ class GradientComponent {
       onPressed: onPressed,
       child: Container(
         decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey, // Couleur de l'ombre
-              spreadRadius: 0, // Étendue de l'ombre
-              blurRadius: 4, // Flou de l'ombre
-              offset: const Offset(0, 1), // Position (horizontal, vertical)
-            ),
-          ],
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Colors.grey, // Couleur de l'ombre
+          //     spreadRadius: 0, // Étendue de l'ombre
+          //     blurRadius: 4, // Flou de l'ombre
+          //     offset: const Offset(0, 1), // Position (horizontal, vertical)
+          //   ),
+          // ],
           gradient: LinearGradient(
             colors: [color2, color1],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(99),
         ),
         constraints: BoxConstraints(
           maxWidth: maxWidth,
@@ -118,7 +118,7 @@ class GradientComponent {
         child: Text(
           text,
           style: TextStyle(
-            // fontSize: 18,
+            fontSize: 14,
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),

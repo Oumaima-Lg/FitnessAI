@@ -266,7 +266,7 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
 
               // Details Workout
               const Text(
-                'Details Workout',
+                'Workout Details ',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
