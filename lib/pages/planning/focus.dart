@@ -1,3 +1,4 @@
+import 'package:fitness/pages/planning/AddMealSchedule.dart';
 import 'package:fitness/pages/planning/AddScheduleScreen%20.dart';
 import 'package:flutter/material.dart';
 
@@ -58,7 +59,8 @@ class FocusScreen extends StatelessWidget {
                     'images/Healthy Eating.png', // Remplacez par l'image de Healthy Eating
                 label: 'Healthy Eating',
                 onTap: () {
-                  print("Healthy Eating Focus Selected");
+                  navigateToPlanningPage(context, AddMealSchedule());
+                  // print("Healthy Eating Focus Selected");
                 },
               ),
             ],

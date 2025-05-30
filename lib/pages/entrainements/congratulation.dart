@@ -2,6 +2,7 @@ import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/main.dart';
+import 'package:fitness/pages/home.dart';
 import 'package:flutter/material.dart';
 
 class Congratulation extends StatelessWidget {
@@ -65,14 +66,16 @@ class Congratulation extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 20),
                 child: GradientComponent.gradientButton(
-                  text: 'Back To Home',
-                  maxWidth: 315,
-                  maxHeight: 50,
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => MyApp()),
-                  ),
-                ),
+                    text: 'Back To Home',
+                    maxWidth: 315,
+                    maxHeight: 50,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => HomePage()),
+                      );
+                    }),
               ),
             ],
           ),

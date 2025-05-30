@@ -59,7 +59,7 @@ class WorkoutSavedScreen extends StatelessWidget {
 
                     // Choix de la disposition en fonction de l'espace
                     if (constraints.maxWidth > totalWidthNeeded) {
-                      return _buildRowLayout(); // Version horizontale
+                      return _buildRowLayout(context); // Version horizontale
                     } else {
                       return _buildColumnLayout(context); // Version verticale
                     }
@@ -74,28 +74,31 @@ class WorkoutSavedScreen extends StatelessWidget {
   }
 
   // Version horizontale
-  Widget _buildRowLayout() {
+  Widget _buildRowLayout(context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Flexible(
           child: GradientComponent.gradientButton2(
-              text: 'Add Schedule',
-              maxWidth: 163,
-              maxHeight: 60,
-              color1: const Color(0xFF364FCE),
-              color2: const Color(0xFF9DCEFF),
-              onPressed: () => print("")),
+            text: 'Add Schedule',
+            maxWidth: 163,
+            maxHeight: 60,
+            color1: const Color(0xFF92A3FD).withAlpha(199),
+            color2: const Color(0xFF9DCEFF).withAlpha(199),
+            onPressed: () =>
+                navigateToPlanningPage(context, AddScheduleScreen()),
+          ),
         ),
         const SizedBox(width: 16),
         Flexible(
           child: GradientComponent.gradientButton2(
-              text: 'Back To Home',
-              maxWidth: 163,
-              maxHeight: 60,
-              color1: const Color(0xFF0A1653),
-              color2: const Color(0xFF9DCEFF),
-              onPressed: () => print("")),
+            text: 'Back To Home',
+            maxWidth: 163,
+            maxHeight: 60,
+            color1: const Color(0xFF92A3FD).withAlpha(50),
+            color2: const Color(0xFF92A3FD).withAlpha(50),
+            onPressed: () => navigateToPlanningPage(context, BottomNavBar()),
+          ),
         ),
       ],
     );
@@ -110,8 +113,8 @@ class WorkoutSavedScreen extends StatelessWidget {
             text: 'Add Schedule',
             maxWidth: 163,
             maxHeight: 60,
-            color1: const Color(0xFF364FCE),
-            color2: const Color(0xFF9DCEFF),
+            color1: const Color(0xFF92A3FD).withAlpha(199),
+            color2: const Color(0xFF9DCEFF).withAlpha(199),
             onPressed: () =>
                 navigateToPlanningPage(context, AddScheduleScreen())),
         const SizedBox(height: 16),
@@ -119,8 +122,8 @@ class WorkoutSavedScreen extends StatelessWidget {
             text: 'Back To Home',
             maxWidth: 163,
             maxHeight: 60,
-            color1: const Color(0xFF0A1653),
-            color2: const Color(0xFF9DCEFF),
+            color1: const Color(0xFF92A3FD).withAlpha(50),
+            color2: const Color(0xFF92A3FD).withAlpha(50),
             onPressed: () => navigateToPlanningPage(context, BottomNavBar())),
       ],
     );

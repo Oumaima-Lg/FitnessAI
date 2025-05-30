@@ -2,6 +2,7 @@ import 'package:fitness/pages/activity%20tracker/activity_tracker.dart';
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/data/exercice_data.dart';
+import 'package:fitness/pages/chatbot/chat_bot_welcome.dart';
 import 'package:fitness/services/latest_activity.dart';
 import 'package:fitness/models/exercice.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
@@ -216,11 +217,11 @@ class _HomePageState extends State<HomePage> {
                     // print("Notifications");
                   }),
                   _drawerItem('AI Conversation', Icons.chat, () {
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (context) => AIConversation()));
-                    print("AI Conversation");
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChatBotWelcome()));
+                    // print("AI Conversation");
                   }),
                   _drawerItem('Planning', Icons.calendar_today, () {
                     navigateToPlanningPage(context, PlanningPage());

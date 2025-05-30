@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:fitness/services/meals_service.dart';
 import 'package:fitness/models/meals.dart';
 import 'package:fitness/pages/profil/ImagePicker.dart';
-import 'package:image_picker/image_picker.dart';
 
 class AlimHomePage extends StatefulWidget {
   const AlimHomePage({super.key});
@@ -124,7 +123,7 @@ class _AlimHomePageState extends State<AlimHomePage>
     }
   }
 
-  void  _showErrorDialog(String message) {
+  void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -228,13 +227,13 @@ class _AlimHomePageState extends State<AlimHomePage>
 
   void _showInfoPopup(BuildContext context) {
     File? _image;
-
+    
     final _formKey = GlobalKey<FormState>();
     String mealName = '';
     String mealCategory = 'Breakfast';
     String imageUrl = '';
     String calories = '';
-    String ingrediant= '';
+    String description = '';
     double rating = 4.0;
 
     List<String> mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
@@ -365,7 +364,7 @@ class _AlimHomePageState extends State<AlimHomePage>
 
                             // URL de l'image
                             Text(
-                              'Meal Image',
+                              'Image URL',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
@@ -373,123 +372,28 @@ class _AlimHomePageState extends State<AlimHomePage>
                               ),
                             ),
                             SizedBox(height: 8),
-                            Container(
-                              height: 120,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Color(0xFF4E457B).withAlpha(50),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.white30),
+                            TextFormField(
+                              style: TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                hintText: 'Enter image URL',
+                                hintStyle: TextStyle(color: Colors.grey),
+                                filled: true,
+                                fillColor: Color(0xFF4E457B).withAlpha(50),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: Colors.white30),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: Colors.white30),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      BorderSide(color: Color(0xFFE95CC0)),
+                                ),
                               ),
-                              child: _image == null
-                                  ? Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.image,
-                                            color: Colors.grey, size: 40),
-                                        SizedBox(height: 8),
-                                        Text(
-                                          'No image selected',
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                      ],
-                                    )
-                                  : ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.file(
-                                        _image!,
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        height: 120,
-                                      ),
-                                    ),
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton.icon(
-                                    onPressed: () async {
-                                      final ImagePicker picker = ImagePicker();
-                                      try {
-                                        final XFile? photo =
-                                            await picker.pickImage(
-                                          source: ImageSource.camera,
-                                          imageQuality: 80,
-                                          maxWidth: 800,
-                                        );
-                                        if (photo != null) {
-                                          setDialogState(() {
-                                            _image = File(photo.path);
-                                            imageUrl = photo
-                                                .path; // Pour la compatibilité
-                                          });
-                                        }
-                                      } catch (e) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content:
-                                                Text('Error taking photo: $e'),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    icon: Icon(Icons.camera_alt, size: 16),
-                                    label: Text('Camera'),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color(0xFF4E457B),
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Expanded(
-                                  child: ElevatedButton.icon(
-                                    onPressed: () async {
-                                      final ImagePicker picker = ImagePicker();
-                                      try {
-                                        final XFile? image =
-                                            await picker.pickImage(
-                                          source: ImageSource.gallery,
-                                          imageQuality: 80,
-                                          maxWidth: 800,
-                                        );
-                                        if (image != null) {
-                                          setDialogState(() {
-                                            _image = File(image.path);
-                                            imageUrl = image
-                                                .path; // Pour la compatibilité
-                                          });
-                                        }
-                                      } catch (e) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                                'Error selecting image: $e'),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    icon: Icon(Icons.photo_library, size: 16),
-                                    label: Text('Gallery'),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color(0xFF4E457B),
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              onChanged: (value) => imageUrl = value,
                             ),
 
                             SizedBox(height: 16),
@@ -542,7 +446,7 @@ class _AlimHomePageState extends State<AlimHomePage>
 
                             // Description
                             Text(
-                              'Ingrediants',
+                              'Description',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
@@ -554,7 +458,7 @@ class _AlimHomePageState extends State<AlimHomePage>
                               style: TextStyle(color: Colors.white),
                               maxLines: 3,
                               decoration: InputDecoration(
-                                hintText: 'Enter Ingrediants',
+                                hintText: 'Enter description',
                                 hintStyle: TextStyle(color: Colors.grey),
                                 filled: true,
                                 fillColor: Color(0xFF4E457B).withAlpha(50),
@@ -572,7 +476,7 @@ class _AlimHomePageState extends State<AlimHomePage>
                                       BorderSide(color: Color(0xFFE95CC0)),
                                 ),
                               ),
-                              onChanged: (value) => ingrediant = value,
+                              onChanged: (value) => description = value,
                             ),
 
                             SizedBox(height: 16),
@@ -622,7 +526,7 @@ class _AlimHomePageState extends State<AlimHomePage>
                                       mealCategory,
                                       imageUrl,
                                       calories,
-                                      ingrediant,
+                                      description,
                                       rating,
                                     );
                                     Navigator.pop(context);
@@ -715,24 +619,26 @@ class _AlimHomePageState extends State<AlimHomePage>
     double rating,
   ) async {
     try {
-      
+      // Créer un nouvel objet Meal selon votre modèle
       final newMeal = Meal(
         label: name,
         imageUrl:
             imageUrl.isEmpty ? 'https://via.placeholder.com/120' : imageUrl,
         calories: double.tryParse(calories) ?? 0.0,
         rating: rating,
-        dietLabels: [],
-        healthLabels: [],
+        dietLabels: [], // Vide pour l'instant, peut être étendu plus tard
+        healthLabels: [], // Vide pour l'instant, peut être étendu plus tard
         ingredients: description.isNotEmpty
             ? [description]
-            : [],
+            : [], // Utiliser la description comme ingrédient temporaire
         mealType: category,
       );
 
-      
+      // Ajouter le repas à la liste locale (temporaire)
+      // Vous pouvez implémenter une sauvegarde persistante plus tard
       setState(() {
         _recommendedMeals.add(newMeal);
+        // Ajouter aussi à la catégorie actuelle si elle correspond
         if (_tabs[_tabController.index].toLowerCase() ==
                 category.toLowerCase() ||
             _tabs[_tabController.index] == "Hottest") {
@@ -740,7 +646,7 @@ class _AlimHomePageState extends State<AlimHomePage>
         }
       });
 
-
+      // Afficher un message de succès
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Meal added successfully!'),
@@ -749,6 +655,7 @@ class _AlimHomePageState extends State<AlimHomePage>
         ),
       );
     } catch (e) {
+      // Afficher un message d'erreur
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error adding meal: $e'),
