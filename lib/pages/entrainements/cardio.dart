@@ -48,6 +48,7 @@ class Cardio extends StatelessWidget {
               goButton(context,
                   activity: activity,
                   titleExercice: 'cardio',
+                  isGym: false,
                   quote:
                       'Cardio doesn’t just build stamina — it builds character, breath by breath, beat by beat.'),
             ]),

@@ -385,6 +385,7 @@ Widget stepDescription({
 // Le bouton GO =>
 GradientButton goButton(BuildContext context,
     {required Activity activity,
+    required bool isGym,
     required String titleExercice,
     required String quote}) {
   return GradientButton(
@@ -399,6 +400,7 @@ GradientButton goButton(BuildContext context,
             activity: activity,
             titleExercice: titleExercice,
             quote: quote,
+            isGym: isGym,
           ),
         )),
   );

@@ -45,4 +45,11 @@ class SharedpreferenceHelper {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(userEmailKey);
   }
+
+  Future<void> clearUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(userNameKey);
+    await prefs.remove(userIdKey);
+    await prefs.remove(userEmailKey);
+  }
 }

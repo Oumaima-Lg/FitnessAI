@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/pages/login.dart';
+import 'package:fitness/services/shared_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/pages/profil/EditProfilePage.dart';
 import 'package:fitness/pages/profil/notificationsPage.dart';
@@ -17,8 +19,49 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final ImagePickerHandler _imagePickerHandler = ImagePickerHandler();
   File? _profileImage;
+
+  String? name, id, email;
+
+  gettheshredpref() async {
+    name = await SharedpreferenceHelper().getUserName();
+    id = await SharedpreferenceHelper().getUserId();
+    email = await SharedpreferenceHelper().getUserEmail();
+    setState(() {});
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      await SharedpreferenceHelper().clearUserData();
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Login()),
+        (Route<dynamic> route) => false, // Supprime toute l'historique
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur de déconnexion: ${e.toString()}')),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    gettheshredpref();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (name == null || id == null || email == null) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(child: Image.asset('images/gif/Animation.gif')),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
@@ -169,7 +212,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 14),
                       // Nom d'utilisateur
                       Text(
-                        'Mophsic',
+                        name!,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -280,10 +323,12 @@ class _ProfilePageState extends State<ProfilePage> {
                             width: double.infinity,
                             child:
                                 _buildMenuButton('Log out', Icons.logout, () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Login()));
+                              _signOut();
+                              //     await FirebaseAuth.instance.signOut();
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => Login()));
                             }),
                           ),
                         ],

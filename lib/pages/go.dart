@@ -9,11 +9,13 @@ class GoPage extends StatefulWidget {
   final Activity activity;
   final String titleExercice;
   final String quote;
+  final bool isGym;
   const GoPage(
       {super.key,
       required this.activity,
       required this.titleExercice,
-      required this.quote});
+      required this.quote,
+      required this.isGym});
   @override
   State<GoPage> createState() => _GoPageState();
 }
@@ -95,8 +97,10 @@ class _GoPageState extends State<GoPage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(23),
                       child: Image(
-                        image: NetworkImage(
-                            widget.activity.videoDemonstartionUrl!),
+                        image: widget.isGym
+                            ? NetworkImage(widget.activity.imageUrl!)
+                            : AssetImage(
+                                widget.activity.videoDemonstartionUrl!),
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
                             const Icon(Icons.error_outline, color: Colors.red),

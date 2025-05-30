@@ -90,6 +90,7 @@ class Hiit extends StatelessWidget {
                 goButton(context,
                     activity: activity,
                     titleExercice: 'hiit',
+                    isGym: false,
                     quote:
                         'HIIT is the throne, discipline is the crown. Master both, and you’ll rule your fitness kingdom.\nInspired by the spirit of Jack LaLanne.'),
               ],

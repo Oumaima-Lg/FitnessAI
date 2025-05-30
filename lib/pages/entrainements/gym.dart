@@ -235,6 +235,7 @@ class Gym extends StatelessWidget {
                 goButton(context,
                     activity: activity,
                     titleExercice: 'gym',
+                    isGym: true,
                     quote:
                         'In the gym, every rep is a brick. Lay them with purpose, and you\'ll build a fortress of strength.\n Inspired by the discipline of the iron game.'),
               ],
