@@ -31,17 +31,17 @@ class _RegisterState extends State<Register> {
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
 
-        String Id = randomAlphaNumeric(10);
+        // UTILISER L'UID DE FIREBASE AUTH COMME ID
+        String userId = userCredential.user!.uid;
+
         Map<String, dynamic> userInfoMap = {
           "Name": nameController.text,
           "Email": emailController.text,
-          "Id": Id,
+          "Phone": phoneController.text, // Ajoutez le téléphone
+          "Id": userId, // Utilisez l'UID de Firebase Auth
         };
 
-        await SharedpreferenceHelper().saveUserEmail(email);
-        await SharedpreferenceHelper().saveUserName(nameController.text);
-        await SharedpreferenceHelper().saveUserId(Id);
-        await DatabaseMethods().addUserDetails(userInfoMap, Id);
+        await DatabaseMethods().addUserDetails(userInfoMap, userId);
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Color(0xFF0A1653),

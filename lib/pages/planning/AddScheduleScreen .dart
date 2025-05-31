@@ -2,8 +2,10 @@ import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/components/return_button.dart';
 import 'package:fitness/data/exercice_data.dart';
 import 'package:fitness/models/exercice.dart';
+import 'package:fitness/models/planning.dart';
 import 'package:fitness/pages/planning/WorkoutSavedScreen.dart';
 import 'package:fitness/services/database.dart';
+import 'package:fitness/services/exercice_service.dart';
 import 'package:fitness/services/planning_service.dart';
 import 'package:fitness/services/shared_pref.dart';
 import 'package:flutter/material.dart';
@@ -441,45 +443,61 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
         return;
       }
 
-      Map<String, dynamic> userPlanningMap =
-          PlanningService.createUserPlanningMap(
-        selectedDate,
-        selectedTime,
-        selectedWorkout,
-        selectedActivity,
-        descriptionController,
+      // Générer un ID unique pour le planning
+      String planningId = DateTime.now().millisecondsSinceEpoch.toString();
+
+      String? activityIconUrl = await ExerciceService.getActivityIconUrl(
+          selectedWorkout, selectedActivity);
+
+      print('Activity Icon URL: $activityIconUrl');
+
+      // Créer le modèle planning
+      PlanningModel newPlanning = PlanningService.createPlanningModel(
+        id: planningId,
+        selectedDate: selectedDate,
+        selectedTime: selectedTime,
+        selectedWorkout: selectedWorkout,
+        selectedActivity: selectedActivity,
+        description: descriptionController.text,
+        activityIconUrl: activityIconUrl!,
+        userId: userId,
       );
 
-      await DatabaseMethods().addUserWorkoutDetails(userPlanningMap, userId);
+      // Sauvegarder le planning (Firestore + Local)
+      bool success = await PlanningService.savePlanning(newPlanning);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Workout schedule saved successfully! hhh'),
-          backgroundColor: Color(0xFF0A1653),
-        ),
-      );
-
-      // Navigation vers l'écran de confirmation
-      Future.delayed(const Duration(seconds: 1), () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF2E2F55),
-                    Color(0xFF23253C),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: WorkoutSavedScreen(),
-            ),
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Workout schedule saved successfully!'),
+            backgroundColor: Color(0xFF0A1653),
           ),
         );
-      });
+
+        // Navigation vers l'écran de confirmation
+        Future.delayed(const Duration(seconds: 1), () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF2E2F55),
+                      Color(0xFF23253C),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: WorkoutSavedScreen(),
+              ),
+            ),
+          );
+        });
+      } else {
+        throw Exception('Erreur lors de la sauvegarde');
+      }
     } catch (e) {
       // Gestion des erreurs
       ScaffoldMessenger.of(context).showSnackBar(

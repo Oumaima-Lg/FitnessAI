@@ -12,6 +12,7 @@ import 'package:fitness/pages/PlanningPage.dart';
 // import 'package:fitness/pages/notifications.dart';
 import 'package:fitness/pages/progress_photo.dart';
 import 'package:fitness/pages/planning/focus.dart';
+import 'package:fitness/services/planning_service.dart';
 import 'package:flutter/material.dart';
 
 // final int completedTasks;
@@ -35,6 +36,19 @@ class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
   List<Exercice> exercices = [];
   List<LatestActivity> latestActivities = [];
+  late int nbrCompletedActivities;
+  late int nbrActivities;
+  late double progressValue;
+  bool isLoading = false;
+
+  Future<void> _getData() async {
+    nbrActivities = await PlanningService.getPlanningTodayCount();
+    progressValue = await PlanningService.getTodayProgressPercentage();
+    nbrCompletedActivities =
+        await PlanningService.getCompletedActivitiesCountToday();
+    isLoading = true;
+    setState(() {});
+  }
 
   @override
   void dispose() {
@@ -47,6 +61,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     loadDataExercice();
     loadDataLatestActivities();
+    _getData();
   }
 
   void loadDataLatestActivities() async {
@@ -93,7 +108,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (exercices.isEmpty) {
+    if (exercices.isEmpty || isLoading == false) {
       return Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(child: Image.asset('images/gif/Animation.gif')),
@@ -335,7 +350,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             Text(
-                              '0%',
+                              '$progressValue%',
                               style: TextStyle(
                                 color: Colors.white54,
                                 fontSize: 14,
@@ -363,7 +378,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         SizedBox(height: 12),
                         Text(
-                          '0/7 Complete',
+                          '$nbrCompletedActivities/$nbrActivities Complete',
                           style: TextStyle(
                             color: Colors.grey[400],
                             fontSize: 14,

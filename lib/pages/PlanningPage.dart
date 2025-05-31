@@ -1,6 +1,8 @@
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
+import 'package:fitness/models/planning.dart';
 import 'package:fitness/pages/planning/focus.dart';
+import 'package:fitness/services/planning_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -33,17 +35,32 @@ class PlanningPage extends StatefulWidget {
 }
 
 class _PlanningPageState extends State<PlanningPage> {
-  final ScrollController _scrollController = ScrollController();
+  late ScrollController _scrollController;
   late DateTime _currentDate;
   late List<DateTime> _dates;
   final double _dayCardWidth = 72.0;
+  late int nbrActivities;
+  late List<PlanningModel> planning;
+  bool isLoading = false;
+
+  Future<void> _getData() async {
+    nbrActivities = await PlanningService.getPlanningTodayCount();
+    planning = await PlanningService.getTodayPlannings();
+    isLoading = true;
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
     _currentDate = DateTime.now();
     _generateDates();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToCurrentDate());
+
+    // Initialiser le ScrollController avec la position initiale
+    final initialOffset = 10 * _dayCardWidth;
+    _scrollController = ScrollController(initialScrollOffset: initialOffset);
+
+    _getData();
   }
 
   void _generateDates() {
@@ -51,27 +68,22 @@ class _PlanningPageState extends State<PlanningPage> {
         21, (index) => _currentDate.subtract(Duration(days: 10 - index)));
   }
 
-  void _scrollToCurrentDate() {
-    final initialOffset = 10 * _dayCardWidth;
-    _scrollController.animateTo(
-      initialOffset,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading == false) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(child: Image.asset('images/gif/Animation.gif')),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.transparent,
-      // appBar: AppBar(
-      //   backgroundColor: Colors.transparent,
-      //   centerTitle: true,
-      //   title: Text(
-      //     'Planning',
-      //     style: titleTextStyle(),
-      //   ),
-      // ),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
@@ -117,7 +129,6 @@ class _PlanningPageState extends State<PlanningPage> {
           ),
         ],
       ),
-
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -187,7 +198,7 @@ class _PlanningPageState extends State<PlanningPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
+        Padding(
           padding: EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
             children: [
@@ -200,7 +211,7 @@ class _PlanningPageState extends State<PlanningPage> {
                 ),
               ),
               Text(
-                '7 Activities',
+                '$nbrActivities ${nbrActivities == 1 ? "Activity" : "Activities"}',
                 style: TextStyle(
                     color: Color(0xFFDBC4C8),
                     fontSize: 12,
@@ -209,14 +220,6 @@ class _PlanningPageState extends State<PlanningPage> {
             ],
           ),
         ),
-        // Column(
-        //   children: const [
-        //     ActivityItem(time: '7:30 AM', activity: 'Drinking 300ml Water'),
-        //     ActivityItem(time: '11:30 AM', activity: 'Eat Snack (Fitbar)'),
-        //     ActivityItem(time: '2:30 PM', activity: 'Eat Snack (Fitbar)'),
-        //     ActivityItem(time: '3:30 PM', activity: 'Eat Snack (Fitbar)'),
-        //   ],
-        // ),
       ],
     );
   }
@@ -226,44 +229,21 @@ class _PlanningPageState extends State<PlanningPage> {
   }
 
   Widget buildSchedule() {
-    final events = [
-      {
-        'time': '8:30 AM',
-        'title': 'Drinking 300ml',
-        'icon': 'images/icons/Cardio/icon1.png'
-      },
-      {
-        'time': '11:30 AM',
-        'title': 'Eat Smack',
-        'icon': 'images/icons/Cardio/icon1.png'
-      },
-      {
-        'time': '2:30 PM',
-        'title': 'Eat Smack',
-        'icon': 'images/icons/Cardio/icon1.png'
-      },
-      {
-        'time': '3:30 PM',
-        'title': 'Eat Smack',
-        'icon': 'images/icons/Cardio/icon1.png'
-      },
-    ];
-
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: events.length,
+      itemCount: planning.length,
       separatorBuilder: (context, index) => const Divider(height: 40),
       itemBuilder: (context, index) {
-        final event = events[index];
+        final activityPlanning = planning[index];
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               flex: 1,
               child: Text(
-                event['time']!,
+                activityPlanning.formattedTime,
                 style: TextStyle(
                   color: Color(0xFFDBC4C8),
                   fontSize: 14,
@@ -282,33 +262,45 @@ class _PlanningPageState extends State<PlanningPage> {
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(16),
-                  // boxShadow: [
-                  //   BoxShadow(
-                  //     color: Color(0xFFDBC4C8),
-                  //     spreadRadius: 2,
-                  //     blurRadius: 2,
-                  //   )
-                  // ]
                 ),
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Image.asset(
-                      'images/icons/Cardio/icon1.png',
+                      activityPlanning.activityIconUrl,
                       width: 37.62,
                       height: 40.63,
                     ),
                     const SizedBox(width: 20),
                     Flexible(
-                      child: Text(
-                        event['title']!,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 12,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            activityPlanning.selectedWorkout,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            activityPlanning.selectedActivity,
+                            style: TextStyle(
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 1),
+                          Text(
+                            activityPlanning.description,
+                            style: TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
