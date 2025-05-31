@@ -283,11 +283,14 @@ class _RegisterState extends State<Register> {
                                     MaterialPageRoute(
                                         builder: (context) => Login()));
                               },
-                              child: Text(
-                                'Login',
-                                style: TextStyle(
-                                  color: Color(0xFF983BCB),
-                                  fontWeight: FontWeight.bold,
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    color: Color(0xFF983BCB),
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),

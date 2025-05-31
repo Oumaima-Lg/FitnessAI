@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:fitness/services/fire_base_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fitness/components/return_button.dart';
 import 'package:flutter/material.dart';
@@ -86,9 +87,11 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
 
   @override
   void dispose() {
-    _cameraController.dispose();
+    if (_cameraController.value.isInitialized) {
+      _cameraController.dispose();
+    }
     super.dispose();
-  }
+  } 
 
   // bayna mn smiytha bach ngelbo lcam sayidati :)
   Future<void> _switchCamera() async {
@@ -124,23 +127,41 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
     }
   }
 
+  // Future<void> _takePhoto() async {
+  //   if (!_cameraController.value.isInitialized) {
+  //     return;
+  //   }
+
+  //   try {
+  //     final XFile photo = await _cameraController.takePicture();
+
+  //     // hna najoutew logic bach nenregistrew les photos mn be3d ... to be continued ...
+
+  //     if (mounted) {
+  //       Navigator.pop(context, photo.path);
+  //     }
+  //   } catch (e) {
+  //     print('Erreur lors de la prise de photo: $e');
+  //   }
+  // }
   Future<void> _takePhoto() async {
-    if (!_cameraController.value.isInitialized) {
-      return;
-    }
+    if (!_cameraController.value.isInitialized) return;
 
     try {
       final XFile photo = await _cameraController.takePicture();
 
-      // hna najoutew logic bach nenregistrew les photos mn be3d ... to be continued ...
+      // Upload la photo dans Firebase Storage + sauvegarde Firestore
+      await uploadProgressPhoto(photo.path);
 
       if (mounted) {
-        Navigator.pop(context, photo.path);
+        Navigator.pop(context, true); // tu peux renvoyer un booléen ou autre info
       }
     } catch (e) {
       print('Erreur lors de la prise de photo: $e');
+      // Optionnel : afficher un message d'erreur à l'utilisateur
     }
   }
+
 
   ///******************************************** FIN METHODE DES ACTIONS ********************************************///
 

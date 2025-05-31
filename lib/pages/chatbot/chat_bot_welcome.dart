@@ -8,6 +8,13 @@ class ChatBotWelcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xFF23253C),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       backgroundColor: Color(0xFF23253C),
       body: Padding(
         padding: const EdgeInsets.all(8.0),

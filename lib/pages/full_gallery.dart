@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/return_button.dart';
 import 'package:fitness/pages/camera_page.dart';
 import 'package:flutter/material.dart';
@@ -27,31 +29,59 @@ class _FullGalleryState extends State<FullGallery> {
   ///*********************************** DEBUT METHODES ***********************************///
   Future<void> _loadPhotos() async {
     try {
-      final String response =
-          await rootBundle.loadString('lib/data/photo.json');
-      final List<dynamic> data = json.decode(response);
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) throw Exception('Utilisateur non connecté');
 
-      _photos = data.map((item) => Photo.fromJson(item)).toList();
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('progress_photos')
+          .orderBy('timestamp', descending: true)
+          .get();
 
+      _photos = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return Photo(
+          url: data['url'], // ici c'est l'URL de téléchargement
+          date: (data['timestamp'] as Timestamp?)?.toDate(),
+        );
+      }).toList();
       _groupPhotosByDate();
-
-      setState(() { 
+      setState(() {
         _isLoading = false;
       });
+      
     } catch (e) {
-      print('Erreur lors du chargement des photos: $e');
+      print('Erreur lors du chargement des photos Firebase: $e');
       setState(() {
         _isLoading = false;
       });
     }
   }
 
+  // void _groupPhotosByDate() {
+  //   _photoGroups = {};
+
+  //   for (var photo in _photos) {
+  //     if (photo.date != null) {
+  //       String dateKey = _formatDate(photo.date!);
+
+  //       if (!_photoGroups.containsKey(dateKey)) {
+  //         _photoGroups[dateKey] = [];
+  //       }
+
+  //       _photoGroups[dateKey]!.add(photo);
+  //     }
+  //   }
+  // }
   void _groupPhotosByDate() {
     _photoGroups = {};
 
     for (var photo in _photos) {
-      if (photo.date != null) {
-        String dateKey = _formatDate(photo.date!);
+      final dateTime = photo.date; // ici date est un DateTime ?
+
+      if (dateTime != null) {
+        String dateKey = _formatDate(dateTime);
 
         if (!_photoGroups.containsKey(dateKey)) {
           _photoGroups[dateKey] = [];
@@ -60,36 +90,67 @@ class _FullGalleryState extends State<FullGallery> {
         _photoGroups[dateKey]!.add(photo);
       }
     }
+
+    // Trier par date décroissante (en transformant la clé String en DateTime)
+    _photoGroups = Map.fromEntries(
+      _photoGroups.entries.toList()
+        ..sort((a, b) => _parseDate(b.key).compareTo(_parseDate(a.key))),
+    );
   }
 
-  String _formatDate(String dateString) {
-    // ila kant la date deja June 7 matalan ghadi tb9a kifma hiya
-    if (!dateString.contains('-')) {
-      return dateString;
-    }
-
-    // ila l9aha b7al hakda "YYYY-MM-DD" ghadi ndirlolha format l "DD Month"
+  DateTime _parseDate(String formatted) {
     try {
-      final date = DateTime.parse(dateString);
-      final months = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
-      ];
-      return '${date.day} ${months[date.month - 1]}';
-    } catch (e) {
-      print('Erreur lors du formatage de la date: $e');
-      return dateString;
-    }
+      if (formatted.contains('-')) {
+        return DateTime.parse(formatted);
+      }
+
+      // Handle formats like "7 June" or "June 7"
+      final parts = formatted.split(' ');
+      if (parts.length == 2) {
+        int day = int.tryParse(parts[0]) ?? 1;
+        int month = _monthStringToNumber(parts[1]);
+        return DateTime(2100, month, day); // Use far-future year to avoid ambiguity
+      }
+    } catch (_) {}
+
+    return DateTime(1900); // fallback for invalid date
+  }
+
+  int _monthStringToNumber(String month) {
+    const months = {
+      'January': 1,
+      'February': 2,
+      'March': 3,
+      'April': 4,
+      'May': 5,
+      'June': 6,
+      'July': 7,
+      'August': 8,
+      'September': 9,
+      'October': 10,
+      'November': 11,
+      'December': 12,
+    };
+    return months[month] ?? 1;
+  }
+
+  String _formatDate(DateTime date) {
+    final months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+
+    return '${date.day} ${months[date.month - 1]}';
   }
 
   ///*********************************** FIN METHODES ***********************************///
@@ -203,7 +264,7 @@ class _FullGalleryState extends State<FullGallery> {
           ),
           itemCount: photos.length,
           itemBuilder: (context, index) {
-            return _buildPhotoThumbnail(photos[index].path ?? '');
+            return _buildPhotoThumbnail(photos[index].url ?? '');
           },
         ),
         const SizedBox(height: 8),
@@ -214,14 +275,14 @@ class _FullGalleryState extends State<FullGallery> {
   Widget _buildPhotoThumbnail(String imagePath) {
     return GestureDetector(
       onTap: () {
-        // Show full size photo
+        // Show full size photo (tu peux améliorer ça plus tard)
       },
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           color: Colors.transparent,
           image: DecorationImage(
-            image: AssetImage(imagePath),
+            image: NetworkImage(imagePath),
             fit: BoxFit.cover,
           ),
         ),

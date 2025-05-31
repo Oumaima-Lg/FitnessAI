@@ -407,7 +407,7 @@ GradientButton goButton(BuildContext context,
 }
 
 Widget latestActivity(
-    List<LatestActivity> latestActivities, BuildContext context, bool isHome) {
+    List<LatestActivity> latestActivities, BuildContext context, bool isHome, String Function(int) timeAgo){
   return Container(
     margin: const EdgeInsets.only(top: 25),
     padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
@@ -462,13 +462,13 @@ Widget latestActivity(
                           icon: IconButton(
                             icon: Image.asset(
                               activity.imageUrl!,
-                              width: 55,
-                              height: 55,
+                              width: 100,
+                              height: 100,
                             ),
                             onPressed: () {},
                           ),
                           title: activity.nameActivity ?? 'Activité inconnue',
-                          time: '${activity.createdAt} minutes ago',
+                          time: timeAgo(activity.createdAt ?? 0),
                         ),
                       ],
                     );
@@ -505,12 +505,7 @@ Widget _activityItem({
   return Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisAlignment: MainAxisAlignment.center,
-    // mainAxisSize: MainAxisSize.max,
     children: [
-      // Icon(
-      //   icon,
-      //   color: Colors.white.withAlpha(204),
-      // ), // Couleur d'icône
       IconButton(
         icon: icon, // Chemin de votre image
         onPressed: () {},

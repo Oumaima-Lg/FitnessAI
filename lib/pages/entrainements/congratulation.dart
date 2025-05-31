@@ -67,16 +67,30 @@ class Congratulation extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 20),
                 child: GradientComponent.gradientButton(
-                    text: 'Back To Home',
-                    maxWidth: 315,
-                    maxHeight: 50,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => BottomNavBar()),
-                      );
-                    }),
+                  text: 'Back To Home',
+                  maxWidth: 315,
+                  maxHeight: 50,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Color(0xFF2E2F55),
+                                Color(0xFF23253C),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                          child: BottomNavBar(),
+                        ),
+                      ),
+                    );
+                  }
+                ),
               ),
             ],
           ),

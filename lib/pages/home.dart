@@ -3,20 +3,16 @@ import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/data/exercice_data.dart';
 import 'package:fitness/pages/chatbot/chat_bot_welcome.dart';
-import 'package:fitness/services/latest_activity.dart';
 import 'package:fitness/models/exercice.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/models/latest_activity.dart';
 import 'package:fitness/pages/profil/notificationsPage.dart';
 import 'package:fitness/pages/PlanningPage.dart';
-// import 'package:fitness/pages/notifications.dart';
 import 'package:fitness/pages/progress_photo.dart';
 import 'package:fitness/pages/planning/focus.dart';
 import 'package:flutter/material.dart';
-
-// final int completedTasks;
-// final int totalTasks;
-// value: completedTasks/totalTasks.toDouble(),
+import 'package:fitness/services/fonctions.dart';
+import 'package:fitness/services/fire_base_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,7 +22,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final activityManager = LatestActivityManager();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final PageController _pageController = PageController(
@@ -46,20 +41,13 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     loadDataExercice();
-    loadDataLatestActivities();
+    loadActivities();
   }
 
-  void loadDataLatestActivities() async {
-    await activityManager.loadActivities();
+  void loadActivities() async {
+    final activities = await loadUserLatestActivities();
     setState(() {
-      // latestActivities = activityManager.activities;
-      if (activityManager.activities.length >= 2) {
-        latestActivities = activityManager.activities.take(2).toList();
-      } else if (activityManager.activities.isNotEmpty) {
-        latestActivities = activityManager.activities.take(1).toList();
-      } else {
-        latestActivities = activityManager.activities;
-      }
+      latestActivities = activities;
     });
   }
 
@@ -214,14 +202,12 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => NotificationsPage()));
-                    // print("Notifications");
                   }),
                   _drawerItem('AI Conversation', Icons.chat, () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => ChatBotWelcome()));
-                    // print("AI Conversation");
                   }),
                   _drawerItem('Planning', Icons.calendar_today, () {
                     navigateToPlanningPage(context, PlanningPage());
@@ -411,7 +397,7 @@ class _HomePageState extends State<HomePage> {
                             navigateToPlanningPage(context, FocusScreen());
                           })),
                   const SizedBox(height: 20),
-                  latestActivity(latestActivities, context, true),
+                  latestActivity(latestActivities.take(2).toList(), context, true, timeAgo),
                   const SizedBox(height: 75),
                 ],
               ),

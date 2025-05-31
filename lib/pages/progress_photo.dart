@@ -4,6 +4,7 @@ import 'package:fitness/pages/full_gallery.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/models/photo.dart';
 import 'package:fitness/services/progressPhotoService.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProgressePage extends StatefulWidget {
   const ProgressePage({super.key});
@@ -13,7 +14,8 @@ class ProgressePage extends StatefulWidget {
 }
 
 class _ProgressePageState extends State<ProgressePage> {
-  final ProgressPhotoService _photoService = ProgressPhotoService();
+  final FirebasePhotoService _photoService = FirebasePhotoService();
+  final userId = FirebaseAuth.instance.currentUser?.uid;
 
   List<Photo> _photos = [];
   Map<String, List<Photo>> _photoGroups = {};
@@ -46,24 +48,28 @@ class _ProgressePageState extends State<ProgressePage> {
     _loadPhotos();
   }
 
-  ///*********************************** DEBUT METHODES ***********************************///
-
   Future<void> _loadPhotos() async {
-    try {
-      _photos = await _photoService.loadPhotos();
+    setState(() => _isLoading = true);
 
-      _photoGroups = _photoService.groupPhotosByDate(_photos);
-      _recentPhotoGroups = _photoService.filterRecentPhotos(_photoGroups,
-          recentGroupsCount: _recentGroupsCount);
+    try {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        throw Exception("Utilisateur non connecté");
+      }
+
+      final photos = await _photoService.loadPhotosForUser(userId);
+      final grouped = _photoService.groupPhotosByDate(photos);
+      final recent = _photoService.filterRecentPhotos(grouped, recentGroupsCount: _recentGroupsCount);
 
       setState(() {
+        _photos = photos;
+        _photoGroups = grouped;
+        _recentPhotoGroups = recent;
         _isLoading = false;
       });
     } catch (e) {
       print('Erreur lors du chargement des photos: $e');
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
@@ -225,9 +231,7 @@ class _ProgressePageState extends State<ProgressePage> {
 
                 // Card d'information sur le tracking de progression
                 _buildProgressTrackingCard(screenWidth, screenHeight),
-                
                 const SizedBox(height: 20),
-
                 // Entête Gallery
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -411,7 +415,7 @@ class _ProgressePageState extends State<ProgressePage> {
           ),
           itemCount: displayedPhotos.length,
           itemBuilder: (context, index) {
-            return _buildPhotoThumbnail(displayedPhotos[index].path ?? '');
+            return _buildPhotoThumbnail(displayedPhotos[index].url ?? '');
           },
         ),
         const SizedBox(height: 16),
@@ -419,20 +423,36 @@ class _ProgressePageState extends State<ProgressePage> {
     );
   }
 
-  Widget _buildPhotoThumbnail(String imagePath) {
+  // Widget _buildPhotoThumbnail(String imagePath) {
+  //   return GestureDetector(
+  //     onTap: () {},
+  //     child: Container(
+  //       constraints: BoxConstraints(
+  //         maxHeight: 100,
+  //         maxWidth: 100,
+  //       ),
+  //       decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.circular(14),
+  //         color: Colors.transparent,
+  //         image: DecorationImage(
+  //           image: AssetImage(imagePath),
+  //           fit: BoxFit.contain,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+  Widget _buildPhotoThumbnail(String imageUrl) {
     return GestureDetector(
       onTap: () {},
       child: Container(
-        constraints: BoxConstraints(
-          maxHeight: 100,
-          maxWidth: 100,
-        ),
+        constraints: BoxConstraints(maxHeight: 100, maxWidth: 100),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           color: Colors.transparent,
           image: DecorationImage(
-            image: AssetImage(imagePath),
-            fit: BoxFit.contain,
+            image: NetworkImage(imageUrl),
+            fit: BoxFit.cover,
           ),
         ),
       ),
@@ -519,8 +539,34 @@ class _ProgressePageState extends State<ProgressePage> {
             context,
             MaterialPageRoute(builder: (context) => TakePhotoPage()),
           );
+          await _loadPhotos(); 
         },
       ),
     );
   }
 }
+
+
+
+
+
+
+  ///*********************************** DEBUT METHODES ***********************************///
+  // Future<void> _loadPhotos() async {
+  //   try {
+  //     _photos = await _photoService.loadPhotos();
+
+  //     _photoGroups = _photoService.groupPhotosByDate(_photos);
+  //     _recentPhotoGroups = _photoService.filterRecentPhotos(_photoGroups,
+  //         recentGroupsCount: _recentGroupsCount);
+
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   } catch (e) {
+  //     print('Erreur lors du chargement des photos: $e');
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }

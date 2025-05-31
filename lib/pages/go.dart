@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/pages/entrainements/congratulation.dart';
+import 'package:fitness/services/fire_base_service.dart';
 import 'package:flutter/material.dart';
 import '../components/textStyle/textstyle.dart';
 import 'package:fitness/models/activity.dart';
@@ -32,26 +33,34 @@ class _GoPageState extends State<GoPage> {
     });
 
     if (start) {
-      timer = Timer.periodic(Duration(seconds: 1), (t) {
+      timer = Timer.periodic(Duration(seconds: 1), (t) async {
         setState(() {
           seconds++;
-
-          if (seconds >= _selectedDuration.inSeconds) {
-            timer?.cancel();
-            start = false;
-
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Congratulation(
-                  imageUrl: 'congratulation_${widget.titleExercice}',
-                  title: 'Congratulations, You Have Finished Your Workout !',
-                  description: widget.quote,
-                ),
-              ),
-            );
-          }
         });
+
+        if (seconds >= _selectedDuration.inSeconds) {
+          timer?.cancel();
+          start = false;
+
+          try {
+            await saveLatestActivity(
+              title: widget.activity.title,
+              icon: widget.activity.iconUrl,
+            );
+          } catch (e) {
+            print('Erreur sauvegarde activité : $e');
+          }
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Congratulation(
+                imageUrl: 'congratulation_${widget.titleExercice}',
+                title: 'Congratulations, You Have Finished Your Workout !',
+                description: widget.quote,
+              ),
+            ),
+          );
+        }
       });
     } else {
       timer?.cancel();

@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:fitness/services/latest_activity.dart';
 // import 'package:fitness/pages/PlanningPage.dart';
-import 'package:fitness/pages/bottomnavbar.dart';
+// import 'package:fitness/pages/bottomnavbar.dart';
 import 'package:fitness/pages/welcome.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -11,7 +11,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await LatestActivityManager().initialize();
+  // await LatestActivityManager().initialize();
   runApp(MyApp());
 }
 
