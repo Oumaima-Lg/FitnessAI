@@ -17,7 +17,7 @@ class ChatBotWelcome extends StatelessWidget {
       ),
       backgroundColor: Color(0xFF23253C),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(6),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -33,7 +33,7 @@ class ChatBotWelcome extends StatelessWidget {
                   color: Colors.white,
                 ),
               ),
-              SizedBox(height: 20,),
+              SizedBox(height: 15,),
               GradientButton(
                 title: 'Next',
                 icon: Icons.arrow_forward,

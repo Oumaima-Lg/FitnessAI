@@ -20,46 +20,122 @@ class _LoginState extends State<Login> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
 
+  // userLogin() async {
+  //   try {
+  //     await FirebaseAuth.instance
+  //         .signInWithEmailAndPassword(email: email, password: password);
+  //     Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => Container(
+  //             decoration: BoxDecoration(
+  //               gradient: LinearGradient(
+  //                 colors: [
+  //                   Color(0xFF2E2F55),
+  //                   Color(0xFF23253C),
+  //                 ],
+  //                 begin: Alignment.topLeft,
+  //                 end: Alignment.bottomRight,
+  //               ),
+  //             ),
+  //             child: BottomNavBar(),
+  //           ),
+  //         ));
+  //   } on FirebaseAuthException catch (e) {
+  //     if (e.code == 'user-not-found') {
+  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //         content: Text(
+  //           "No user Found for that Email",
+  //           style: TextStyle(fontSize: 18.0, color: Colors.black),
+  //         ),
+  //       ));
+  //     } else if (e.code == 'wrong-password') {
+  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //         content: Text(
+  //           "Wrong Password Provided by User",
+  //           style: TextStyle(fontSize: 18.0, color: Colors.black),
+  //         ),
+  //       ));
+  //     }
+  //   }
+  // }
   userLogin() async {
     try {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF2E2F55),
-                    Color(0xFF23253C),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+      
+      // Hna anaffichiw mssg de succès avant de naviguer
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.green,
+        content: Text(
+          "Login Successful",
+          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+        ),
+        duration: Duration(seconds: 1),
+      ));
+      
+      // Petit délai pour permettre au SnackBar de s'afficher
+      await Future.delayed(Duration(milliseconds: 500));
+      
+      if (mounted) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF2E2F55),
+                      Color(0xFF23253C),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
+                child: BottomNavBar(),
               ),
-              child: BottomNavBar(),
-            ),
-          ));
+            ));
+      }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
+      // S'assurer que le contexte est toujours valide
+      if (mounted) {
+        String errorMessage = "";
+        Color backgroundColor = Colors.red;
+        
+        if (e.code == 'user-not-found') {
+          errorMessage = "No user Found for that Email";
+        } else if (e.code == 'wrong-password') {
+          errorMessage = "Wrong Password Provided by User";
+        } else if (e.code == 'invalid-email') {
+          errorMessage = "Invalid email address";
+        } else if (e.code == 'user-disabled') {
+          errorMessage = "User account has been disabled";
+        } else {
+          errorMessage = "Login failed. Please try again.";
+        }
+        
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: backgroundColor,
           content: Text(
-            "No user Found for that Email",
-            style: TextStyle(fontSize: 18.0, color: Colors.black),
+            errorMessage,
+            style: TextStyle(fontSize: 18.0, color: Colors.white),
           ),
+          duration: Duration(seconds: 3),
         ));
-      } else if (e.code == 'wrong-password') {
+      }
+    } catch (e) {
+      // gestion des erreurs
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
           content: Text(
-            "Wrong Password Provided by User",
-            style: TextStyle(fontSize: 18.0, color: Colors.black),
+            "An unexpected error occurred",
+            style: TextStyle(fontSize: 18.0, color: Colors.white),
           ),
         ));
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +143,6 @@ class _LoginState extends State<Login> {
         padding: EdgeInsets.only(bottom: 10, top: 10),
         width: double.infinity,
         height: double.infinity,
-        /* background degrade : */
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -130,8 +205,6 @@ class _LoginState extends State<Login> {
                           },
                         ),
                         SizedBox(height: 16),
-
-                        // Password Field
                         _buildTextFormField(
                           controller: passwordController,
                           hintText: 'Password',
@@ -168,19 +241,16 @@ class _LoginState extends State<Login> {
                           maxWidth: 220,
                           maxHeight: 50,
                           onPressed: () {
-                            setState(() {
-                              if (emailController.text != "" &&
-                                  passwordController.text != "") {
+                            if (_formKey.currentState!.validate()) {
+                              setState(() {
                                 email = emailController.text;
                                 password = passwordController.text;
-                                userLogin();
-                              }
-                            });
-                          },
-                        ),
+                              });
+                              userLogin();
+                            }
+                          },),
 
                         SizedBox(height: 16),
-
                         // ------------ Or --------------- (dividor)
                         Row(
                           children: [
@@ -197,9 +267,7 @@ class _LoginState extends State<Login> {
                             Expanded(child: Divider(color: Colors.white24)),
                           ],
                         ),
-
                         SizedBox(height: 16),
-
                         // Social Login Options
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -218,9 +286,7 @@ class _LoginState extends State<Login> {
                             const SizedBox(width: 20),
                           ],
                         ),
-
                         SizedBox(height: 24),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

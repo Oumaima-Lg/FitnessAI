@@ -153,6 +153,12 @@ class _RegisterState extends State<Register> {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your phone number';
                             }
+                            if (value.length < 10) {
+                              return 'Phone number must be at least 10 digits';
+                            }
+                            if (value.length > 10) {
+                              return 'Phone number is too long';
+                            }
                             return null;
                           },
                         ),
@@ -213,10 +219,20 @@ class _RegisterState extends State<Register> {
                           text: 'Register',
                           maxWidth: 220,
                           maxHeight: 50,
+                          // onPressed: () {
+                          //   if (nameController.text != "" &&
+                          //       emailController.text != "" &&
+                          //       passwordController.text != "") {
+                          //     setState(() {
+                          //       name = nameController.text;
+                          //       email = emailController.text;
+                          //       password = passwordController.text;
+                          //     });
+                          //     registration();
+                          //   }
+                          // },
                           onPressed: () {
-                            if (nameController.text != "" &&
-                                emailController.text != "" &&
-                                passwordController.text != "") {
+                            if (_formKey.currentState!.validate()) {
                               setState(() {
                                 name = nameController.text;
                                 email = emailController.text;
