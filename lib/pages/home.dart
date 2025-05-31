@@ -13,6 +13,7 @@ import 'package:fitness/pages/planning/focus.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/services/fonctions.dart';
 import 'package:fitness/services/fire_base_service.dart';
+import 'dart:async';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
   List<Exercice> exercices = [];
   List<LatestActivity> latestActivities = [];
+  Timer? _refreshTimer;
 
   @override
   void dispose() {
@@ -42,6 +44,10 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     loadDataExercice();
     loadActivities();
+    // Mettre à jour l'affichage toutes les 60 secondes
+    _refreshTimer = Timer.periodic(Duration(minutes: 1), (timer) {
+      setState(() {}); // Rebuild pour mettre à jour les "x min ago"
+    });
   }
 
   void loadActivities() async {

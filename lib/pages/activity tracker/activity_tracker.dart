@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/services/fire_base_service.dart';
@@ -14,12 +15,19 @@ class ActivityTracker extends StatefulWidget {
 
 class _ActivityTrackerState extends State<ActivityTracker> {
   List<LatestActivity> latestActivities = [];
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     loadActivities();
+
+    // Mettre à jour l'affichage toutes les 60 secondes
+    _refreshTimer = Timer.periodic(Duration(minutes: 1), (timer) {
+      setState(() {}); // Rebuild pour mettre à jour les "x min ago"
+    });
   }
+
 
   void loadActivities() async {
     final activities = await loadUserLatestActivities();

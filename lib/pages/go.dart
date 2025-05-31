@@ -44,8 +44,12 @@ class _GoPageState extends State<GoPage> {
 
           try {
             await saveLatestActivity(
-              title: widget.activity.title,
-              icon: widget.activity.iconUrl,
+              title: widget.isGym
+                ? "Gym - ${widget.activity.title}"
+                : widget.activity.title,
+              icon: widget.isGym
+                ? "images/icons/gym.png"
+                : widget.activity.iconUrl,
             );
           } catch (e) {
             print('Erreur sauvegarde activité : $e');
