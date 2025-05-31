@@ -350,7 +350,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             Text(
-                              '$progressValue%',
+                              '${progressValue.toInt()}%',
                               style: TextStyle(
                                 color: Colors.white54,
                                 fontSize: 14,
@@ -369,7 +369,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         SizedBox(height: 20),
                         LinearProgressIndicator(
-                          value: 0,
+                          value: progressValue / 100,
                           backgroundColor: Color(0xFF2A2C4F),
                           valueColor:
                               AlwaysStoppedAnimation<Color>(Color(0xFF8B78FF)),
