@@ -52,6 +52,8 @@ dependencies:
   cloud_firestore: ^5.6.8
   random_string: ^2.3.1
   shared_preferences: ^2.5.3
+  timezone: ^0.10.1
+  flutter_local_notifications: ^19.2.1
 
 
 

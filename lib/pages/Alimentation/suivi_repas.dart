@@ -2,31 +2,65 @@ import 'package:fitness/components/return_button.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/pages/alimentation/meal_element.dart';
 import 'package:flutter/material.dart';
+import 'package:fitness/services/MealsPlanning_service.dart';
 
-class SuiviRepas extends StatefulWidget {
-  const SuiviRepas({super.key});
+class SuivisRepasScreen extends StatefulWidget {
+  const SuivisRepasScreen({super.key});
 
   @override
-  State<SuiviRepas> createState() => _SuiviRepasState();
+  State<SuivisRepasScreen> createState() => _SuivisRepasScreenState();
 }
 
-class _SuiviRepasState extends State<SuiviRepas> {
+class _SuivisRepasScreenState extends State<SuivisRepasScreen> {
   Set<int> clickedIndexes = {};
   final List<Meal> mealsList = meals;
+
+  final MealPlanningService _mealService = MealPlanningService();
+  List<Map<String, dynamic>> plannedMeals = [];
+  DateTime currentDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlannedMeals();
+  }
+
+  Future<void> _loadPlannedMeals() async {
+    final meals = await _mealService.getPlannedMealsForDate(currentDate);
+    setState(() {
+      plannedMeals = meals;
+    });
+  }
+
+  Map<String, List<Map<String, dynamic>>> get groupedMeals {
+    final Map<String, List<Map<String, dynamic>>> groups = {
+      'Breakfast': [],
+      'Lunch': [],
+      'Dinner': [],
+      'Snack': [],
+    };
+
+    for (var meal in plannedMeals) {
+      final type = meal['mealType'];
+      if (groups.containsKey(type)) {
+        groups[type]!.add(meal);
+      }
+    }
+
+    return groups;
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final screenHeight = screenSize.height;
-    final screenWidth = screenSize.width;
     final List<String> mealsType = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: screenHeight * 0.05, vertical: screenWidth * 0.02),
-        width: double.infinity,
-        height: double.infinity,
+        padding: EdgeInsets.symmetric(
+          horizontal: screenSize.height * 0.05,
+          vertical: screenSize.width * 0.02,
+        ),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF2E2F55), Color(0xFF23253C)],
@@ -36,40 +70,20 @@ class _SuiviRepasState extends State<SuiviRepas> {
         ),
         child: SafeArea(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              alimentationAppBar(
-                context: context,
-                title: 'Today\'s Meals',
-                rightWidget: appBarIcon(iconAppBar: Icons.center_focus_weak),
-              ),
+              _buildAppBar(context),
               const SizedBox(height: 10),
               Expanded(
                 child: ListView.builder(
                   itemCount: mealsType.length,
-                  itemBuilder: (context, index) {
-                    final isClicked = clickedIndexes.contains(index);
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: customMealButton(
-                        label: mealsType[index],
-                        isClicked: isClicked,
-                        onTap: () {
-                          setState(() {
-                            if (isClicked) {
-                              clickedIndexes.remove(index);
-                            } else {
-                              clickedIndexes.add(index);
-                            }
-                          });
-                        },
-                      ),
-                    );
-                  }
+                  itemBuilder: (context, index) => _mealSection(
+                    mealsType[index],
+                    index,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
-              summaryContainer(screenWidth),
+              _summaryContainer(screenSize.width),
             ],
           ),
         ),
@@ -77,123 +91,11 @@ class _SuiviRepasState extends State<SuiviRepas> {
     );
   }
 
-  Container summaryContainer(double screenWidth) {
-    return Container(
-      constraints: BoxConstraints(
-        minHeight: 137,
-        minWidth: screenWidth * 0.8,
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF9DCEFF).withAlpha(80),
-            Color(0xFF92A3FD).withAlpha(70)
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(22),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Daily Summary',
-                  style: normalTextStyle(),
-                ),
-                SizedBox(height: 12),
-                ReturnButton.gradientButton(
-                  'Details',
-                  onPressed: () {
-                    print('Details');
-                  },
-                ),
-              ],
-            ),
-            Image(
-              image: AssetImage('images/summary.png'),
-              height: 82,
-              width: 121,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget customMealButton({
-    required String label,
-    required bool isClicked,
-    required VoidCallback onTap,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ElevatedButton(
-          onPressed: onTap,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF2E2F55),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-            side: BorderSide(
-              color: const Color(0xFFE8ACFF).withAlpha(51),
-              width: 2,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                flex: 3,
-                child: Text(
-                  label,
-                  style: normalTextStyle(),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Flexible(
-                flex: 1,
-                child: Icon(
-                  isClicked
-                      ? Icons.expand_more
-                      : Icons.expand_less,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (isClicked)
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: mealsHistorique(),
-          ),
-      ],
-    );
-  }
-
-  Widget alimentationAppBar({
-    required BuildContext context,
-    required String title,
-    Widget? rightWidget,
-  }) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
+  // AppBar personnalisé
+  Widget _buildAppBar(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -202,25 +104,23 @@ class _SuiviRepasState extends State<SuiviRepas> {
           Expanded(
             child: Center(
               child: Text(
-                title,
+                'Today\'s Meals',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: screenWidth * 0.05,
+                  fontSize: MediaQuery.of(context).size.width * 0.05,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           ),
-          SizedBox(
-            width: 50,
-            child: rightWidget ?? const SizedBox(),
-          ),
+          _buildScannerButton(),
         ],
       ),
     );
   }
 
-  Widget appBarIcon({required IconData iconAppBar}) {
+  // Bouton scanner
+  Widget _buildScannerButton() {
     return Container(
       width: 60,
       height: 60,
@@ -241,117 +141,201 @@ class _SuiviRepasState extends State<SuiviRepas> {
         ],
       ),
       child: IconButton(
-        iconSize: 30,
-        icon: Icon(
-          iconAppBar,
-          color: Colors.white,
-        ),
-        onPressed: () {
-          print('Scanner');
-        },
+        icon: const Icon(Icons.center_focus_weak, color: Colors.white),
+        onPressed: () => print('Scanner'),
       ),
     );
   }
-  Container mealsHistorique() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFFFFFFFF).withAlpha(70),
-            Color(0xFF999999).withAlpha(60),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SizedBox(
-          height: 365, 
-          child: ListView.builder(
-            itemCount: mealsList.length,
-            itemBuilder: (context, index) {
-              final meal = mealsList[index];
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  stepElement(),
-                  SizedBox(width: 10), 
-                  Expanded( 
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          meal.mealName,
-                          style: titleTextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18,
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Row(
-                          children: meal.mealElements.map((element) {
-                            return mealElement(
-                              name: element.name,
-                              weight: element.weigth,
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
+
+  // Section de repas (bouton + historique)
+  Widget _mealSection(String label, int index) {
+    final mealsForType = groupedMeals[label] ?? [];
+    final isExpanded = clickedIndexes.contains(index);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ElevatedButton(
+            onPressed: () => _toggleSection(index),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF2E2F55),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+              side: BorderSide(
+                color: const Color(0xFFE8ACFF).withAlpha(51),
+                width: 2,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  flex: 3,
+                  child: Text(
+                    label,
+                    style: normalTextStyle(),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
-                ],
-              );
-            },
+                ),
+                Icon(
+                  isExpanded ? Icons.expand_more : Icons.expand_less,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+          ),
+          if (isExpanded) _mealHistory(mealsForType),
+        ],
+      ),
+    );
+  }
+
+  // Historique des repas
+  Widget _mealHistory(List<Map<String, dynamic>> meals) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              const Color(0xFFFFFFFF).withAlpha(70),
+              const Color(0xFF999999).withAlpha(60),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: SizedBox(
+            height: 365,
+            child: meals.isEmpty
+                ? Center(
+                    child: Text(
+                      'No meals planned for this time.',
+                      style: normalTextStyle(color: Colors.white),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: meals.length,
+                    itemBuilder: (context, index) {
+                      final meal = meals[index];
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _timelineIndicator(),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${meal['time']} - ${meal['mealType']}",
+                                  style: titleTextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Wrap(
+                                  children: meal['items'].map<Widget>((item) {
+                                    return _mealElement(
+                                      name: item['label'],
+                                      weight: "${item['quantity']} portion(s)",
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+            // child: ListView.builder(
+            //   itemCount: mealsList.length,
+            //   itemBuilder: (context, index) {
+            //     final meal = mealsList[index];
+            //     return Row(
+            //       crossAxisAlignment: CrossAxisAlignment.start,
+            //       children: [
+            //         _timelineIndicator(),
+            //         const SizedBox(width: 10),
+            //         Expanded(
+            //           child: Column(
+            //             crossAxisAlignment: CrossAxisAlignment.start,
+            //             children: [
+            //               Text(
+            //                 meal.mealName,
+            //                 style: titleTextStyle(
+            //                   fontWeight: FontWeight.w600,
+            //                   fontSize: 18,
+            //                 ),
+            //               ),
+            //               const SizedBox(height: 5),
+            //               Wrap(
+            //                 children: meal.mealElements.map((element) {
+            //                   return _mealElement(
+            //                     name: element.name,
+            //                     weight: element.weigth,
+            //                   );
+            //                 }).toList(),
+            //               ),
+            //             ],
+            //           ),
+            //         ),
+            //       ],
+            //     );
+            //   },
+            // ),
           ),
         ),
       ),
     );
   }
 
-  Column stepElement() {
+  // Indicateur de timeline
+  Widget _timelineIndicator() {
     return Column(
       children: [
-        Row(
-          children: [
-            Container(
-              width: 25,
-              height: 25,
-              decoration: BoxDecoration(
+        Container(
+          width: 25,
+          height: 25,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xFFC58BF2),
+          ),
+          child: Center(
+            child: Container(
+              width: 20,
+              height: 20,
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: Color(0xFFC58BF2),
+                color: Colors.white,
               ),
               child: Center(
                 child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
+                  width: 10,
+                  height: 10,
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(0xFFC58BF2),
-                      ),
-                    ),
+                    color: Color(0xFFC58BF2),
                   ),
                 ),
               ),
             ),
-          ],
+          ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Column(
           children: List.generate(15, (i) {
             return Container(
               width: 2,
               height: 5,
-              color: i % 2 == 0
-                ? Color(0xFFC58BF2)
-                : Colors.transparent,
+              color: i % 2 == 0 ? const Color(0xFFC58BF2) : Colors.transparent,
             );
           }),
         ),
@@ -359,36 +343,85 @@ class _SuiviRepasState extends State<SuiviRepas> {
     );
   }
 
-  Widget mealElement({required String name, required String weight}) {
-    return Center(
-      child: Container(
-        padding: EdgeInsets.all(8),
-        margin: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Color(0xFF4E457B).withAlpha(15),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: const Color(0xFFE8ACFF).withAlpha(51),
-            width: 2,
-          )
+  // Élément de repas
+  Widget _mealElement({required String name, required String weight}) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF4E457B).withAlpha(15),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFE8ACFF).withAlpha(51),
+          width: 2,
         ),
-        child: Column(
+      ),
+      child: Column(
+        children: [
+          Text(
+            name,
+            style: normalTextStyle(color: const Color(0xC4E8ACFF)),
+          ),
+          Text(
+            weight,
+            style: normalTextStyle(color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Résumé quotidien
+  Widget _summaryContainer(double screenWidth) {
+    return Container(
+      constraints: BoxConstraints(
+        minHeight: 137,
+        minWidth: screenWidth * 0.8,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF9DCEFF).withAlpha(80),
+            const Color(0xFF92A3FD).withAlpha(70)
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              name,
-              style: normalTextStyle(
-                color: Color(0xC4E8ACFF),
-              ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Daily Summary', style: normalTextStyle()),
+                const SizedBox(height: 12),
+                ReturnButton.gradientButton(
+                  'Details',
+                  onPressed: () => print('Details'),
+                ),
+              ],
             ),
-            Text(
-              weight,
-              style: normalTextStyle(
-                color: Color(0xFFFFFFFF),
-              ),
+            Image.asset(
+              'images/summary.png',
+              height: 82,
+              width: 121,
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _toggleSection(int index) {
+    setState(() {
+      clickedIndexes.contains(index)
+          ? clickedIndexes.remove(index)
+          : clickedIndexes.add(index);
+    });
   }
 }

@@ -1,6 +1,8 @@
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/components/return_button.dart';
 import 'package:fitness/models/meals.dart';
+import 'package:fitness/pages/Alimentation/suivi_repas.dart';
+import 'package:fitness/services/MealsPlanning_service.dart';
 import 'package:fitness/services/meals_service.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +31,7 @@ class AddMealSchedule extends StatefulWidget {
 class _AddMealScheduleState extends State<AddMealSchedule> {
   late TimeOfDay selectedTime;
   late DateTime selectedDate;
-  String selectedMealType = '🥣 Petit-déjeuner';
+  String selectedMealType = 'Breakfast';
   List<MealItem> addedMeals = [];
   List<Meal> searchResults = [];
   final MealService _mealService = MealService();
@@ -37,10 +39,10 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
   bool isSearching = false;
 
   final List<String> mealTypes = [
-    '🥣 Petit-déjeuner',
-    '🍛 Déjeuner',
-    '🍽 Dîner',
-    '🍌 Snack / Collation'
+    'Breakfast',
+    'Lunch',
+    'Dinner',
+    'Snack'
   ];
 
   @override
@@ -244,7 +246,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                   _buildNutritionSummary(),
                   const SizedBox(height: 16),
                   ReturnButton.gradientButton('Save',
-                  onPressed: () => _saveSchedule()),
+                      onPressed: () => _saveSchedule()),
                 ],
               ),
             ),
@@ -376,7 +378,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Type de repas',
+          'Meal Type',
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -421,7 +423,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Rechercher un aliment',
+          'Search for meals',
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -439,7 +441,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
             controller: _searchController,
             style: TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              hintText: 'Ex: salade, poulet, riz...',
+              hintText: 'Ex: salade, chicken, tea...',
               hintStyle: TextStyle(color: Colors.grey.shade400),
               prefixIcon: Icon(Icons.search, color: Color(0xFF92A3FD)),
               border: InputBorder.none,
@@ -526,11 +528,11 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
             Icon(Icons.restaurant_menu, color: Colors.grey.shade500, size: 48),
             SizedBox(height: 12),
             Text(
-              'Aucun aliment ajouté',
+              'There are no meals added yet',
               style: TextStyle(color: Colors.grey.shade400, fontSize: 16),
             ),
             Text(
-              'Recherchez et ajoutez des aliments à votre repas',
+              'Research and add meals to your schedule',
               style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
               textAlign: TextAlign.center,
             ),
@@ -543,7 +545,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Aliments ajoutés (${addedMeals.length})',
+          'Meals added (${addedMeals.length})',
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -678,7 +680,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
               Icon(Icons.analytics, color: Color(0xFF92A3FD), size: 24),
               SizedBox(width: 8),
               Text(
-                'Résumé nutritionnel',
+                'Nutrtion Summary',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -723,7 +725,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
             children: [
               Expanded(
                 child: _buildMacroCard(
-                  'Protéines',
+                  'Proteines',
                   '${totalProteins.toInt()}g',
                   Color(0xFF92A3FD),
                   Icons.fitness_center,
@@ -732,7 +734,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
               SizedBox(width: 12),
               Expanded(
                 child: _buildMacroCard(
-                  'Glucides',
+                  'Carbs',
                   '${totalCarbs.toInt()}g',
                   Color(0xFF9DCEFF),
                   Icons.grain,
@@ -741,7 +743,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
               SizedBox(width: 12),
               Expanded(
                 child: _buildMacroCard(
-                  'Lipides',
+                  'Fats',
                   '${totalFats.toInt()}g',
                   Color(0xFFFFA726),
                   Icons.opacity,
@@ -860,13 +862,42 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
     );
   }
 
-  void _saveSchedule() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Added to your meal plan!'),
-        backgroundColor: Color(0xFF0A1653),
-      ),
-    );
+  void _saveSchedule() async {
+    final mealPlanningService = MealPlanningService();
+    try {
+      await mealPlanningService.addPlannedMeal(
+        date: selectedDate,
+        time: selectedTime,
+        mealType: selectedMealType,
+        items: addedMeals,
+        totalCalories: totalCalories,
+        totalProteins: totalProteins,
+        totalCarbs: totalCarbs,
+        totalFats: totalFats,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Added to your meal plan!'),
+          backgroundColor: Color(0xFF0A1653),
+        ),
+      );
+
+      Future.delayed(Duration(seconds: 1), () {
+        Navigator.push(context,
+          MaterialPageRoute(
+            builder: (context) => SuivisRepasScreen(),
+          ),
+        );
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override

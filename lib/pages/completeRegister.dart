@@ -1,7 +1,8 @@
 import 'package:fitness/components/gradient.dart';
-import 'package:fitness/pages/login.dart';
-import 'package:fitness/services/user_service.dart';
 import 'package:fitness/models/User.dart';
+import 'package:fitness/pages/login.dart';
+import 'package:fitness/services/Auth_service.dart';
+import 'package:fitness/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -14,112 +15,37 @@ class CompleteRegister extends StatefulWidget {
 
 class _CompleteRegisterState extends State<CompleteRegister> {
   final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
+
+  final UserService _userService = UserService();
+  final AuthService _authService = AuthService();
 
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
 
   String? selectedGender;
-  final UserService _userService = UserService();
 
-
-  int calculateAge(DateTime birthDate) {
-    DateTime today = DateTime.now();
-    int age = today.year - birthDate.year;
-    if (today.month < birthDate.month ||
-        (today.month == birthDate.month && today.day < birthDate.day)) {
-      age--;
-    }
-    return age;
-  }
-
-
-  Future<void> completeProfile() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-
-    if (!_userService.isLoggedIn) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text('No user logged in. Please register again.'),
-        ),
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Login()),
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      UserModel? currentUser = _userService.currentUser;
-      
-      if (currentUser == null) {
-        throw Exception('No current user found');
+  Future<void> _completeProfile() async {
+    if (_formKey.currentState!.validate()) {
+      final user = _authService.currentUser ;
+      if (user != null) {
+        UserModel newuser = UserModel(
+          id: user.uid,
+          name: user.displayName ?? '',
+          email: user.email ?? '',
+          imageUrl: user.photoURL ?? '',
+          age: 0, // Age will be set later
+          phone: user.phoneNumber ?? '',
+          weight: double.tryParse(_weightController.text) ?? 0.0,
+          height: double.tryParse(_heightController.text) ?? 0.0,
+          address: '', // Address can be added later
+        );
+        await _userService.updateUser(newuser);
+        
+        Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => Login())
+        );
       }
-      
-      DateTime birthDate = DateTime.parse(_dobController.text);
-      int age = calculateAge(birthDate);
-
-
-      UserModel updatedUser = UserModel(
-        id: currentUser.id,
-        name: currentUser.name,
-        email: currentUser.email,
-        phone: currentUser.phone,
-        imageUrl: currentUser.imageUrl,
-        age: age,
-        weight: double.parse(_weightController.text),
-        height: double.parse(_heightController.text),
-        address: currentUser.address,
-      );
-
-
-      await _userService.updateUser(updatedUser);
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      // Afficher un message de succès
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Color(0xFF0A1653),
-          content: Text(
-            'Profile completed successfully!',
-            style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-          ),
-        ),
-      );
-
-      // Naviguer vers la page de connexion
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Login()),
-      );
-
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text(
-            'Error completing profile: ${e.toString()}',
-            style: TextStyle(fontSize: 16.0),
-          ),
-        ),
-      );
     }
   }
 
@@ -145,7 +71,7 @@ class _CompleteRegisterState extends State<CompleteRegister> {
             child: Form(
               key: _formKey,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 39),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 39),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -153,8 +79,8 @@ class _CompleteRegisterState extends State<CompleteRegister> {
 
                     Image.asset(
                       'images/register.png',
-                      width: 300,
-                      height: 200,
+                      width: 399,
+                      height: 266,
                     ),
 
                     const SizedBox(height: 40),
@@ -188,6 +114,7 @@ class _CompleteRegisterState extends State<CompleteRegister> {
 
                     const SizedBox(height: 36),
 
+                    // Genre
                     DropdownButtonFormField<String>(
                       value: selectedGender,
                       decoration: _inputDecoration(Icons.person, 'Choose Gender'),
@@ -204,7 +131,12 @@ class _CompleteRegisterState extends State<CompleteRegister> {
                           selectedGender = value;
                         });
                       },
-                      validator: null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please select your gender';
+                        }
+                        return null;
+                      },
                     ),
 
                     const SizedBox(height: 16),
@@ -238,105 +170,89 @@ class _CompleteRegisterState extends State<CompleteRegister> {
 
                     // Poids
                     Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _weightController,
-                            style: const TextStyle(color: Colors.white),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-                            decoration: _inputDecoration(Icons.monitor_weight, 'Your Weight'),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your weight';
-                              }
-                              double? weight = double.tryParse(value);
-                              if (weight == null || weight <= 0) {
-                                return 'Please enter a valid weight';
-                              }
-                              return null;
-                            },
-                          ),
+                    children: [ 
+                      // Champ de saisie étirable
+                      Expanded(
+                        child: TextFormField(  
+                          controller: _weightController,
+                          style: const TextStyle(color: Colors.white),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
+                          decoration: _inputDecoration(Icons.monitor_weight, 'Your Weight'),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your weight';
+                            }
+                            return null;
+                          },
                         ),
-                        
-                        const SizedBox(width: (20)),
+                      ),
+                      
+                      const SizedBox(width: (20)),
 
-                        Image.asset(
-                          'images/Kg.png',
-                          width: 62,
-                          height: 62,
-                        ),
-                      ],
-                    ),
+                      // Image extérieure
+                      Image.asset(
+                        'images/Kg.png', // ton chemin vers l'image
+                        width: 62,
+                        height: 62,
+                      ),
+                    ],
+                  ),
+
 
                     const SizedBox(height: 16),
 
                     // Taille
                     Row(
                       children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _heightController,
-                            style: const TextStyle(color: Colors.white),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-                            decoration: _inputDecoration(Icons.height, 'Your Height'),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your height';
-                              }
-                              double? height = double.tryParse(value);
-                              if (height == null || height <= 0) {
-                                return 'Please enter a valid height';
-                              }
-                              return null;
-                            },
-                          ),
+                      // Champ de saisie étirable
+                      Expanded(
+                        child: TextFormField(
+                          controller: _heightController,
+                          style: const TextStyle(color: Colors.white),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
+                          decoration: _inputDecoration(Icons.height, 'Your Height'),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your height';
+                            }
+                            return null;
+                          },
                         ),
-                        
-                        const SizedBox(width: (20)),
+                      ),
+                      
+                      const SizedBox(width: (20)),
 
-                        Image.asset(
-                          'images/Cm.png',
-                          width: 65,
-                          height: 65,
-                        ),
-                      ],
-                    ),
+                      // Image extérieure
+                      Image.asset(
+                        'images/Cm.png', // ton chemin vers l'image
+                        width: 65,
+                        height: 65,
+                      ),
+                    ],
+                  ),
 
                     const SizedBox(height: 52),
 
-                    // Bouton Next avec loading
-                    _isLoading
-                        ? CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Color(0xFF983BCB),
-                            ),
-                          )
-                        : GradientComponent.gradientButton(
-                            text: 'Next   >',
-                            maxWidth: 220,
-                            maxHeight: 50,
-                            onPressed: completeProfile,
-                          ),
+                    GradientComponent.gradientButton(
+                      text: 'Next   >',
+                      maxWidth: 220,
+                      maxHeight: 50,
+                      onPressed: _completeProfile,
+                      // onPressed: () {
+                      //   if (_formKey.currentState!.validate()) {
+                      //     Navigator.pushReplacement(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //         builder: (context) => const Login(),
+                      //       ),
+                      //     );
+                      //   }
+                      // },
+                    ),
 
                     const SizedBox(height: 16),
-
-                    // TextButton(
-                    //   onPressed: () {
-                    //     Navigator.pushReplacement(
-                    //       context,
-                    //       MaterialPageRoute(builder: (context) => Login()),
-                    //     );
-                    //   },
-                    //   child: Text(
-                    //     'Skip for now',
-                    //     style: TextStyle(
-                    //       color: Colors.white60,
-                    //       fontSize: 14,
-                    //     ),
-                    //   ),
-                    // ),
                   ],
                 ),
               ),

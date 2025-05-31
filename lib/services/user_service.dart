@@ -185,22 +185,22 @@ class UserService {
   }
 
   // Enregistrement utilisateur
-  Future<void> registerUser(UserModel user) async {
-    try {
-      await DatabaseMethods().addUserDetails(user.toMap(), user.id);
-      await loginUser(user);
-      print('Utilisateur enregistré: ${user.name}');
-    } catch (e) {
-      throw Exception('Erreur lors de l\'enregistrement: $e');
-    }
-  }
+  // Future<void> registerUser(UserModel user) async {
+  //   try {
+  //     await DatabaseMethods().addUserDetails(user.toMap(), user.id);
+  //     await loginUser(user);
+  //     print('Utilisateur enregistré: ${user.name}');
+  //   } catch (e) {
+  //     throw Exception('Erreur lors de l\'enregistrement: $e');
+  //   }
+  // }
 
   // Mettre à jour les informations utilisateur
   Future<void> updateUser(UserModel updatedUser) async {
     try {
       await DatabaseMethods().addUserDetails(updatedUser.toMap(), updatedUser.id);
       
-      await loginUser(updatedUser);
+      // await loginUser(updatedUser);
       
       print('Utilisateur mis à jour: ${updatedUser.name}');
     } catch (e) {

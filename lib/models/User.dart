@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class UserModel {
   final String id;
   final String name;
@@ -78,4 +80,13 @@ class UserModel {
     if (bmiValue < 30) return 'Surpoids';
     return 'Obésité';
   }
+
+  // Conversion depuis Firestore
+  factory UserModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return UserModel.fromMap(data);
+  }
+
+  // Conversion vers Firestore
+  Map<String, dynamic> toFirestore() => toMap();
 }

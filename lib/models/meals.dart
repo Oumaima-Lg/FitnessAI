@@ -8,6 +8,8 @@ class Meal {
   final List<String> ingredients;
   final String mealType;
 
+  final List<Meal> mealElements;
+
   Meal({
     required this.label,
     required this.imageUrl,
@@ -17,6 +19,7 @@ class Meal {
     required this.healthLabels,
     required this.ingredients,
     required this.mealType,
+    this.mealElements = const [],
   });
 
 

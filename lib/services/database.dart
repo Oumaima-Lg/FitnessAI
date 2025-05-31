@@ -20,10 +20,17 @@ class DatabaseMethods {
         .collection("workoutPlanning")
         .add(userPlanningMap);
   }
+  Future addUserMealPlanningDetails(
+      Map<String, dynamic> userPlanningMap, String userId) async {
+    return await FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .collection("MealsPlanning")
+        .add(userPlanningMap);
+  }
 
     Future<String?> addUserMeal(Meal meal, String userId) async {
     try {
-      // Convertir le repas en Map
       Map<String, dynamic> mealData = {
         'label': meal.label,
         'imageUrl': meal.imageUrl,
