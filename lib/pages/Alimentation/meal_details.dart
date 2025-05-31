@@ -28,6 +28,7 @@ class _mealDetailsPageState extends State<mealDetailsPage> {
     final screenWidth = screenSize.width;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Container(
         /********* BG ********/
         padding: EdgeInsets.only(bottom: 10, top: 10),

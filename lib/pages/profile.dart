@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/pages/login.dart';
-import 'package:fitness/services/shared_pref.dart';
+import 'package:fitness/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/pages/profil/EditProfilePage.dart';
 import 'package:fitness/pages/profil/notificationsPage.dart';
@@ -18,26 +18,50 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final ImagePickerHandler _imagePickerHandler = ImagePickerHandler();
+  final UserService _userService = UserService();
   File? _profileImage;
+  bool _isLoading = true;
 
-  String? name, id, email;
+  @override
+  void initState() {
+    super.initState();
+    _initializeUserData();
+  }
 
-  gettheshredpref() async {
-    name = await SharedpreferenceHelper().getUserName();
-    id = await SharedpreferenceHelper().getUserId();
-    email = await SharedpreferenceHelper().getUserEmail();
-    setState(() {});
+  Future<void> _initializeUserData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _userService.initializeUser();
+      await _userService.refreshUserData();
+      
+    } catch (e) {
+      print('Erreur lors de l\'initialisation: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur de chargement du profil')),
+        );
+      }
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _signOut() async {
     try {
+      await _userService.logoutUser();
       await FirebaseAuth.instance.signOut();
-      await SharedpreferenceHelper().clearUserData();
+      
       if (!mounted) return;
+      
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => Login()),
-        (Route<dynamic> route) => false, // Supprime toute l'historique
+        (Route<dynamic> route) => false,
       );
     } catch (e) {
       if (!mounted) return;
@@ -47,20 +71,83 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  @override
-  void initState() {
-    gettheshredpref();
-    super.initState();
+  Future<void> _deleteAccount() async {
+    bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Supprimer le compte'),
+          content: Text('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Annuler'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: Text('Supprimer'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete == true) {
+      try {
+        await _userService.logoutUser();
+        await FirebaseAuth.instance.currentUser?.delete();
+        
+        if (!mounted) return;
+        
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => Login()),
+          (Route<dynamic> route) => false,
+        );
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur lors de la suppression: ${e.toString()}')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (name == null || id == null || email == null) {
+    if (_isLoading) {
       return Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(child: Image.asset('images/gif/Animation.gif')),
       );
     }
+
+    if (!_userService.isLoggedIn) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Aucun utilisateur connecté'),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => Login()),
+                  );
+                },
+                child: Text('Se connecter'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+
+    final currentUser = _userService.currentUser!;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -72,7 +159,6 @@ class _ProfilePageState extends State<ProfilePage> {
               clipBehavior: Clip.none,
               children: [
                 Positioned(
-                  // top: 0,
                   child: Image.asset(
                     'images/Ellipse Profil.png',
                     fit: BoxFit.cover,
@@ -122,23 +208,35 @@ class _ProfilePageState extends State<ProfilePage> {
                                           height: 100,
                                           fit: BoxFit.cover,
                                         )
-                                  : Image.asset(
-                                      'images/profilGirl.png',
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        return Icon(
-                                          Icons.person,
-                                          size: 60,
-                                          color: Colors.white,
-                                        );
-                                      },
-                                    ),
+                                  : currentUser.imageUrl != null
+                                      ? Image.network(
+                                          currentUser.imageUrl!,
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image.asset(
+                                              'images/profilGirl.png',
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        )
+                                      : Image.asset(
+                                          'images/profilGirl.png',
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Icon(
+                                              Icons.person,
+                                              size: 60,
+                                              color: Colors.white,
+                                            );
+                                          },
+                                        ),
                             ),
                           ),
-                          // Icône de caméra positionnée en bas à droite
+                          // Icône de caméra
                           Positioned(
-                            bottom: -4, // ajuste si nécessaire
+                            bottom: -4,
                             right: 0,
                             child: DottedBorder(
                               color: Colors.white,
@@ -154,19 +252,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                 icon: const Icon(
                                   Icons.camera_alt,
                                   color: Colors.white,
-                                  size: 20, // taille réduite
+                                  size: 20,
                                 ),
                                 itemBuilder: (BuildContext context) => [
                                   PopupMenuItem<String>(
                                     value: 'camera',
                                     child: Row(
                                       children: const [
-                                        Icon(Icons.camera_alt,
-                                            color: Colors.white),
+                                        Icon(Icons.camera_alt, color: Colors.white),
                                         SizedBox(width: 12),
-                                        Text('Take a photo',
-                                            style:
-                                                TextStyle(color: Colors.white)),
+                                        Text('Take a photo', style: TextStyle(color: Colors.white)),
                                       ],
                                     ),
                                   ),
@@ -174,34 +269,27 @@ class _ProfilePageState extends State<ProfilePage> {
                                     value: 'gallery',
                                     child: Row(
                                       children: const [
-                                        Icon(Icons.photo_library,
-                                            color: Colors.white),
+                                        Icon(Icons.photo_library, color: Colors.white),
                                         SizedBox(width: 12),
-                                        Text('Choose from gallery',
-                                            style:
-                                                TextStyle(color: Colors.white)),
+                                        Text('Choose from gallery', style: TextStyle(color: Colors.white)),
                                       ],
                                     ),
                                   ),
                                 ],
                                 onSelected: (String value) async {
+                                  File? image;
                                   if (value == 'camera') {
-                                    final File? image =
-                                        await _imagePickerHandler.takePhoto();
-                                    if (image != null) {
-                                      setState(() {
-                                        _profileImage = image;
-                                      });
-                                    }
+                                    image = await _imagePickerHandler.takePhoto();
                                   } else if (value == 'gallery') {
-                                    final File? image =
-                                        await _imagePickerHandler
-                                            .pickFromGallery();
-                                    if (image != null) {
-                                      setState(() {
-                                        _profileImage = image;
-                                      });
-                                    }
+                                    image = await _imagePickerHandler.pickFromGallery();
+                                  }
+                                  
+                                  if (image != null) {
+                                    setState(() {
+                                      _profileImage = image;
+                                    });
+                                    
+                                    
                                   }
                                 },
                               ),
@@ -210,9 +298,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                       const SizedBox(height: 14),
-                      // Nom d'utilisateur
                       Text(
-                        name!,
+                        currentUser.name,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -220,7 +307,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      // Localisation
+                      // Email utilisateur
+                      Text(
+                        currentUser.email,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      // Localisation - utiliser l'adresse si disponible
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -230,7 +326,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           SizedBox(width: 4),
                           Text(
-                            'Beijing Haidian-District',
+                            currentUser.address ?? 'Localisation non définie',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.white.withOpacity(0.7),
@@ -251,19 +347,19 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     _buildInfoCard(
                       imageUrl: 'images/heightIcon.png',
-                      value: "165.0 CM",
+                      value: currentUser.formattedHeight,
                       label: "Height",
                       bgColor: Color.fromARGB(168, 232, 79, 138),
                     ),
                     _buildInfoCard(
                       imageUrl: 'images/weightIcon.png',
-                      value: "70.0 KG",
+                      value: currentUser.formattedWeight,
                       label: "Weight",
                       bgColor: Color.fromARGB(143, 69, 175, 194),
                     ),
                     _buildInfoCard(
                       imageUrl: 'images/ageIcon.png',
-                      value: "22.9 Year",
+                      value: currentUser.formattedAge,
                       label: "Age",
                       bgColor: Color.fromARGB(121, 247, 207, 29),
                     ),
@@ -274,26 +370,30 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 20),
             Column(
               children: [
-                SizedBox(height: 0),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28),
                   child: Center(
                     child: Container(
-                      constraints: BoxConstraints(
-                        maxWidth: 400,
-                      ),
+                      constraints: BoxConstraints(maxWidth: 400),
                       child: Column(
                         children: [
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
-                            child: _buildMenuButton(
-                                'Edit profile', Icons.person_outline, () {
+                            child: _buildMenuButton('Edit profile', Icons.person_outline, () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => EditProfilePage(),
-                                ),
+                                MaterialPageRoute(builder: (context) => EditProfilePage()),
+                              );
+                            }),
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(vertical: 4),
+                            width: double.infinity,
+                            child: _buildMenuButton('Notifications', Icons.notifications_outlined, () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => NotificationsPage()),
                               );
                             }),
                           ),
@@ -301,35 +401,16 @@ class _ProfilePageState extends State<ProfilePage> {
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
                             child: _buildMenuButton(
-                                'Notifications', Icons.notifications_outlined,
-                                () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => NotificationsPage(),
-                                ),
-                              );
-                            }),
+                              'Delete my account',
+                              Icons.delete_outline,
+                              _deleteAccount,
+                              isDestructive: true,
+                            ),
                           ),
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 4),
                             width: double.infinity,
-                            child: _buildMenuButton('Delete my account',
-                                Icons.delete_outline, () {},
-                                isDestructive: true),
-                          ),
-                          Container(
-                            margin: EdgeInsets.symmetric(vertical: 4),
-                            width: double.infinity,
-                            child:
-                                _buildMenuButton('Log out', Icons.logout, () {
-                              _signOut();
-                              //     await FirebaseAuth.instance.signOut();
-                              // Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (context) => Login()));
-                            }),
+                            child: _buildMenuButton('Log out', Icons.logout, _signOut),
                           ),
                         ],
                       ),
@@ -394,9 +475,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }) {
     return Row(
       children: [
-        Container(
-          child: Image.asset(imageUrl),
-        ),
+        Image.asset(imageUrl),
         SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,

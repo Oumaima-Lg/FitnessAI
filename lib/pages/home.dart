@@ -13,6 +13,7 @@ import 'package:fitness/pages/PlanningPage.dart';
 import 'package:fitness/pages/progress_photo.dart';
 import 'package:fitness/pages/planning/focus.dart';
 import 'package:flutter/material.dart';
+import 'package:fitness/services/user_service.dart';
 
 // final int completedTasks;
 // final int totalTasks;
@@ -27,6 +28,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final activityManager = LatestActivityManager();
+  final UserService _userService = UserService();
+  bool _isLoading = true;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final PageController _pageController = PageController(
@@ -47,6 +50,28 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     loadDataExercice();
     loadDataLatestActivities();
+    initUserData();
+  }
+
+  Future <void> initUserData() async{
+    setState(() {
+      _isLoading = true;
+    });
+
+    try{
+      await _userService.initializeUser();
+      await _userService.refreshUserData();
+    }catch(e){
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error !')),
+        );
+      }
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void loadDataLatestActivities() async {
@@ -93,12 +118,19 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (exercices.isEmpty) {
+
+    
+
+
+    if (exercices.isEmpty || !_userService.isLoggedIn) {
       return Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(child: Image.asset('images/gif/Animation.gif')),
       );
     }
+
+    final currentUser = _userService.currentUser!;
+
     return Stack(
       children: [
         Positioned(
@@ -162,17 +194,17 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Daniel Matt',
-                          style: TextStyle(
+                        Text(
+                          currentUser.name,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 5),
-                        const Text(
-                          'Mophsic',
+                        Text(
+                          '',
                           style: TextStyle(
                             color: Color(0xFFC4C4C4),
                             fontSize: 14,
@@ -180,7 +212,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          'Beijing Haidian-District',
+                          currentUser.email,
                           style: TextStyle(
                             color: Colors.white.withAlpha(178),
                             fontSize: 12,
@@ -203,10 +235,6 @@ class _HomePageState extends State<HomePage> {
                     // print("Progress Photo");
                   }),
                   _drawerItem('Coach', Icons.person, () {
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (context) => Coach()));
                     print("Coach");
                   }),
                   _drawerItem('Notifications', Icons.notifications, () {
@@ -246,7 +274,8 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Hello, Daniel Matt',
+                  Text(
+                      'Hello, ${currentUser.name}' ,
                       style: TextStyle(
                         color: Color.fromARGB(179, 255, 255, 255),
                         fontSize: 13,

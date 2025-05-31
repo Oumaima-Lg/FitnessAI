@@ -22,6 +22,7 @@ class _SuiviRepasState extends State<SuiviRepas> {
     final List<String> mealsType = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: screenHeight * 0.05, vertical: screenWidth * 0.02),
         width: double.infinity,

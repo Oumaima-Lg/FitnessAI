@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/gradient.dart';
+import 'package:fitness/models/User.dart';
 import 'package:fitness/pages/login.dart';
+import 'package:fitness/services/Auth_service.dart';
 import 'package:fitness/services/database.dart';
 import 'package:fitness/services/shared_pref.dart';
+import 'package:fitness/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fitness/pages/completeRegister.dart';
@@ -18,6 +21,9 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
+  bool _isLoading = false;
+
+  final UserService _userService = UserService();
 
   String email = "", password = "", name = "";
   final TextEditingController nameController = TextEditingController();
@@ -25,55 +31,131 @@ class _RegisterState extends State<Register> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  registration() async {
-    if (nameController.text != "" && emailController.text != "") {
-      try {
-        UserCredential userCredential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(email: email, password: password);
-
-        String Id = randomAlphaNumeric(10);
-        Map<String, dynamic> userInfoMap = {
-          "Name": nameController.text,
-          "Email": emailController.text,
-          "Id": Id,
-        };
-
-        await SharedpreferenceHelper().saveUserEmail(email);
-        await SharedpreferenceHelper().saveUserName(nameController.text);
-        await SharedpreferenceHelper().saveUserId(Id);
-        await DatabaseMethods().addUserDetails(userInfoMap, Id);
-
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Color(0xFF0A1653),
-          content: Text(
-            "Registered Successfully",
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-          ),
-        ));
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => CompleteRegister()));
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.orangeAccent,
-            content: Text(
-              "Password Provided is too Weak",
-              style: TextStyle(fontSize: 18.0),
-            ),
-          ));
-        } // SnackBar
-        else if (e.code == 'email-already-in-use') {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: const Color.fromARGB(255, 216, 160, 160),
-            content: Text(
-              "Account Already exists",
-              style: TextStyle(fontSize: 18.0),
-            ),
-          ));
-        } // SnackBar
+  Future<void> signup() async {
+    try {
+      if (await AuthService().signup(
+          email: emailController.text,
+          password: passwordController.text,
+          name: nameController.text,
+          phone: phoneController.text)) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => const CompleteRegister()));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Erreur lors de l\'inscription')),
+        );
       }
+    } on FirebaseAuthException catch (e) {
+      String message = '';
+      if (e.code == 'weak-password') {
+        message = 'The password provided is too weak.';
+      } else if (e.code == 'email-already-in-use') {
+        message = 'An account already exists with that email.';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur inattendue: $e')),
+      );
     }
   }
+
+  // registration() async {
+  //   if (!_formKey.currentState!.validate()) {
+  //     return;
+  //   }
+
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+
+  //   try {
+  //     // UserCredential userCredential = await FirebaseAuth.instance
+  //     //     .createUserWithEmailAndPassword(email: email, password: password);
+
+  //     String userId = randomAlphaNumeric(10);
+
+  //     UserModel newUser = UserModel(
+  //       id: userId,
+  //       name: nameController.text.trim(),
+  //       email: emailController.text.trim(),
+  //       phone: phoneController.text.trim().isNotEmpty
+  //           ? phoneController.text.trim()
+  //           : null,
+  //       imageUrl: null,
+  //       age: null,
+  //       weight: null,
+  //       height: null,
+  //       address: null,
+  //     );
+
+  //     await _userService.registerUser(newUser);
+
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       backgroundColor: Color(0xFF0A1653),
+  //       content: Text(
+  //         "Registered Successfully",
+  //         style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+  //       ),
+  //     ));
+
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => CompleteRegister()),
+  //     );
+  //   } on FirebaseAuthException catch (e) {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+
+  //     String errorMessage = "";
+  //     Color backgroundColor = Colors.red;
+
+  //     switch (e.code) {
+  //       case 'weak-password':
+  //         errorMessage = "Password Provided is too Weak";
+  //         backgroundColor = Colors.orangeAccent;
+  //         break;
+  //       case 'email-already-in-use':
+  //         errorMessage = "Account Already exists";
+  //         backgroundColor = const Color.fromARGB(255, 216, 160, 160);
+  //         break;
+  //       case 'invalid-email':
+  //         errorMessage = "Invalid email address";
+  //         break;
+  //       default:
+  //         errorMessage = "Registration failed: ${e.message}";
+  //     }
+
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       backgroundColor: backgroundColor,
+  //       content: Text(
+  //         errorMessage,
+  //         style: TextStyle(fontSize: 18.0),
+  //       ),
+  //     ));
+  //   } catch (e) {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       backgroundColor: Colors.red,
+  //       content: Text(
+  //         "Registration failed: ${e.toString()}",
+  //         style: TextStyle(fontSize: 18.0),
+  //       ),
+  //     ));
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -213,17 +295,21 @@ class _RegisterState extends State<Register> {
                           text: 'Register',
                           maxWidth: 220,
                           maxHeight: 50,
-                          onPressed: () {
-                            if (nameController.text != "" &&
-                                emailController.text != "" &&
-                                passwordController.text != "") {
-                              setState(() {
-                                name = nameController.text;
-                                email = emailController.text;
-                                password = passwordController.text;
-                              });
-                              registration();
-                            }
+                          // onPressed: () {
+                          //   if (nameController.text != "" &&
+                          //       emailController.text != "" &&
+                          //       passwordController.text != "") {
+                          //     setState(() {
+                          //       name = nameController.text;
+                          //       email = emailController.text;
+                          //       password = passwordController.text;
+                          //     });
+                          //     // registration();
+
+                          //   }
+                          // },
+                          onPressed: () async {
+                            await signup();
                           },
                         ),
                         SizedBox(height: 16),

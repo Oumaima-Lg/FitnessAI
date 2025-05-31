@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/models/meals.dart';
+import 'package:fitness/services/database.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,6 +22,9 @@ class MealService {
   Map<String, String> get _headers => {
         'Edamam-Account-User': 'rhouibi.ibti.fst',
       };
+
+  String? get _currentUserId => FirebaseAuth.instance.currentUser?.uid;
+  final DatabaseMethods _databaseMethods = DatabaseMethods();
 
   // Méthode pour obtenir des repas recommandés
   Future<List<Meal>> getRecommendedMeals() async {
@@ -140,8 +145,6 @@ class MealService {
     }
   }
 
-  // Ajoutez ces méthodes à votre classe MealService existante
-
   // Liste statique pour stocker les repas personnalisés en mémoire
   static List<Meal> _customMeals = [];
 
@@ -154,6 +157,151 @@ class MealService {
       await _saveCustomMealsToPrefs();
     } catch (e) {
       throw ApiException('Erreur lors de la sauvegarde du repas: $e');
+    }
+  }
+
+  Future<String?> saveCustomMealToFirebase(Meal meal) async {
+    try {
+      if (_currentUserId == null) {
+        throw ApiException('Utilisateur non connecté');
+      }
+
+      final mealId = await _databaseMethods.addUserMeal(meal, _currentUserId!);
+
+      if (mealId != null) {
+        print('Repas sauvegardé dans Firebase avec l\'ID: $mealId');
+
+        // Optionnel: Aussi sauvegarder localement pour la cache
+        await _saveToLocalCache(meal);
+
+        return mealId;
+      }
+
+      return null;
+    } catch (e) {
+      throw ApiException('Erreur lors de la sauvegarde Firebase: $e');
+    }
+  }
+
+  Future<List<Meal>> getCustomMealsFromFirebase() async {
+    try {
+      if (_currentUserId == null) {
+        throw ApiException('Utilisateur non connecté');
+      }
+
+      return await _databaseMethods.getUserCustomMeals(_currentUserId!);
+    } catch (e) {
+      throw ApiException('Erreur lors de la récupération Firebase: $e');
+    }
+  }
+
+  Future<List<Meal>> getCombinedRecommendedMeals() async {
+    try {
+      // Récupérer les repas de l'API
+      final apiMeals = await getRecommendedMeals();
+
+      // Récupérer les repas personnalisés depuis Firebase
+      List<Meal> customMeals = [];
+      if (_currentUserId != null) {
+        customMeals = await getCustomMealsFromFirebase();
+      }
+
+      // Combiner les listes (max 3 personnalisés + 7 de l'API)
+      final combined = <Meal>[];
+      combined.addAll(customMeals.take(3));
+      combined.addAll(apiMeals.take(7));
+
+      return combined;
+    } catch (e) {
+      print('Erreur dans getCombinedRecommendedMeals: $e');
+      // En cas d'erreur, retourner seulement les repas de l'API
+      try {
+        return await getRecommendedMeals();
+      } catch (apiError) {
+        throw ApiException('Impossible de charger les repas: $apiError');
+      }
+    }
+  }
+
+  Future<bool> addToFavorites(Meal meal) async {
+    try {
+      if (_currentUserId == null) {
+        throw ApiException('Utilisateur non connecté');
+      }
+
+      return await _databaseMethods.addMealToFavorites(_currentUserId!, meal);
+    } catch (e) {
+      throw ApiException('Erreur lors de l\'ajout aux favoris: $e');
+    }
+  }
+
+  Future<List<Meal>> getFavoriteMeals() async {
+    try {
+      if (_currentUserId == null) {
+        throw ApiException('Utilisateur non connecté');
+      }
+
+      return await _databaseMethods.getUserFavoriteMeals(_currentUserId!);
+    } catch (e) {
+      throw ApiException('Erreur lors de la récupération des favoris: $e');
+    }
+  }
+
+  Future<void> _saveToLocalCache(Meal meal) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      List<String> cachedMeals =
+          prefs.getStringList('cached_custom_meals') ?? [];
+
+      final mealJson = json.encode({
+        'label': meal.label,
+        'imageUrl': meal.imageUrl,
+        'calories': meal.calories,
+        'rating': meal.rating,
+        'dietLabels': meal.dietLabels,
+        'healthLabels': meal.healthLabels,
+        'ingredients': meal.ingredients,
+        'mealType': meal.mealType,
+      });
+
+      cachedMeals.add(mealJson);
+      await prefs.setStringList('cached_custom_meals', cachedMeals);
+    } catch (e) {
+      print('Erreur lors de la sauvegarde en cache: $e');
+    }
+  }
+
+  Future<List<Meal>> getCachedCustomMeals() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      List<String> cachedMeals =
+          prefs.getStringList('cached_custom_meals') ?? [];
+
+      return cachedMeals.map((mealJson) {
+        final data = json.decode(mealJson);
+        return Meal(
+          label: data['label'] ?? '',
+          imageUrl: data['imageUrl'] ?? 'https://via.placeholder.com/120',
+          calories: (data['calories'] ?? 0.0).toDouble(),
+          rating: (data['rating'] ?? 4.5).toDouble(),
+          dietLabels: List<String>.from(data['dietLabels'] ?? []),
+          healthLabels: List<String>.from(data['healthLabels'] ?? []),
+          ingredients: List<String>.from(data['ingredients'] ?? []),
+          mealType: data['mealType'] ?? 'Meal',
+        );
+      }).toList();
+    } catch (e) {
+      print('Erreur lors de la récupération du cache: $e');
+      return [];
+    }
+  }
+
+  Future<void> clearLocalCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('cached_custom_meals');
+    } catch (e) {
+      print('Erreur lors du vidage du cache: $e');
     }
   }
 
@@ -172,23 +320,23 @@ class MealService {
   }
 
   // Méthode pour combiner repas API et personnalisés
-  Future<List<Meal>> getCombinedRecommendedMeals() async {
-    try {
-      final apiMeals = await getRecommendedMeals();
-      final customMeals = await getCustomMeals();
+  // Future<List<Meal>> getCombinedRecommendedMeals() async {
+  //   try {
+  //     final apiMeals = await getRecommendedMeals();
+  //     final customMeals = await getCustomMeals();
 
-      // Mélanger les repas (max 3 personnalisés)
-      final combined = <Meal>[];
-      combined.addAll(customMeals.take(3));
-      combined
-          .addAll(apiMeals.take(7)); // Garder 7 de l'API pour un total de 10
+  //     // Mélanger les repas (max 3 personnalisés)
+  //     final combined = <Meal>[];
+  //     combined.addAll(customMeals.take(3));
+  //     combined
+  //         .addAll(apiMeals.take(7)); // Garder 7 de l'API pour un total de 10
 
-      return combined;
-    } catch (e) {
-      // En cas d'erreur, retourner seulement les repas de l'API
-      return await getRecommendedMeals();
-    }
-  }
+  //     return combined;
+  //   } catch (e) {
+  //     // En cas d'erreur, retourner seulement les repas de l'API
+  //     return await getRecommendedMeals();
+  //   }
+  // }
 
   // Sauvegarder les repas personnalisés dans SharedPreferences
   Future<void> _saveCustomMealsToPrefs() async {

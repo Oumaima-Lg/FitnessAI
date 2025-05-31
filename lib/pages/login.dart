@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/gradient.dart';
+import 'package:fitness/models/User.dart';
 import 'package:fitness/pages/bottomnavbar.dart';
 import 'package:fitness/pages/register.dart';
+import 'package:fitness/services/user_service.dart';
+import 'package:fitness/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,46 +19,177 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
 
+  final UserService _userService = UserService();
+  bool _isLoading = false;
+
   String email = "", password = "", name = "";
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
 
   userLogin() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      await FirebaseAuth.instance
+      
+      UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF2E2F55),
-                    Color(0xFF23253C),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+
+      User? firebaseUser = userCredential.user;
+
+      if (firebaseUser != null) {
+        bool initialized = await _userService.initializeUser();
+        
+        print("Firebase user authenticated: ${firebaseUser.uid}");
+        print("Firebase user email: ${firebaseUser.email}");
+
+
+        print(
+            "Tentative de récupération des données pour UID: ${firebaseUser.uid}");
+        
+
+
+        try {
+          final userData =
+              await DatabaseMethods().getUserDetails(firebaseUser.uid);
+          print("Données brutes récupérées: $userData");
+
+          if (userData != null && userData.isNotEmpty) {
+            print("Données utilisateur trouvées!");
+            print("Clés disponibles: ${userData.keys.toList()}");
+
+            UserModel user = UserModel.fromMap(userData);
+            print("UserModel créé: ${user.name}, Email: ${user.email}, ID: ${user.id}");
+
+            await _userService.loginUser(user);
+            print("Utilisateur connecté via UserService");
+
+
+            if (mounted) {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFF2E2F55),
+                            Color(0xFF23253C),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: BottomNavBar(),
+                    ),
+                  ));
+            }
+          } else {
+            print("ERREUR: userData est null ou vide");
+            print("userData == null: ${userData == null}");
+            if (userData != null) {
+              print("userData.isEmpty: ${userData.isEmpty}");
+            }
+
+            // Alternative: Essayer d'initialiser l'utilisateur directement
+            print("Tentative d'initialisation via UserService...");
+            bool initialized = await _userService.initializeUser();
+
+            if (initialized && _userService.isLoggedIn) {
+              print("Utilisateur initialisé avec succès via UserService");
+              print("Current user: ${_userService.currentUser?.name}");
+
+              if (mounted) {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFF2E2F55),
+                              Color(0xFF23253C),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: BottomNavBar(),
+                      ),
+                    ));
+              }
+            }
+          }
+        } catch (e) {
+          print("Erreur lors de la récupération des données Firestore: $e");
+          print("Type d'erreur: ${e.runtimeType}");
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                "Erreur de récupération des données: $e",
+                style: TextStyle(fontSize: 14.0, color: Colors.white),
               ),
-              child: BottomNavBar(),
-            ),
-          ));
+              backgroundColor: Colors.red,
+            ));
+          }
+        }
+      }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
+      String errorMessage = "";
+
+      switch (e.code) {
+        case 'user-not-found':
+          errorMessage = "Aucun utilisateur trouvé avec cet email";
+          break;
+        case 'wrong-password':
+          errorMessage = "Mot de passe incorrect";
+          break;
+        case 'invalid-email':
+          errorMessage = "Format d'email invalide";
+          break;
+        case 'user-disabled':
+          errorMessage = "Ce compte a été désactivé";
+          break;
+        case 'too-many-requests':
+          errorMessage = "Trop de tentatives. Réessayez plus tard";
+          break;
+        default:
+          errorMessage = "Erreur de connexion: ${e.message}";
+      }
+
+      print("Firebase Auth Exception: ${e.code} - ${e.message}");
+
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
-            "No user Found for that Email",
-            style: TextStyle(fontSize: 18.0, color: Colors.black),
+            errorMessage,
+            style: TextStyle(fontSize: 16.0, color: Colors.white),
           ),
+          backgroundColor: Colors.red,
         ));
-      } else if (e.code == 'wrong-password') {
+      }
+    } catch (e) {
+      print("Erreur générale lors de la connexion: $e");
+      print("Type d'erreur: ${e.runtimeType}");
+
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
-            "Wrong Password Provided by User",
-            style: TextStyle(fontSize: 18.0, color: Colors.black),
+            "Une erreur inattendue s'est produite: $e",
+            style: TextStyle(fontSize: 14.0, color: Colors.white),
           ),
+          backgroundColor: Colors.red,
         ));
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -67,7 +201,6 @@ class _LoginState extends State<Login> {
         padding: EdgeInsets.only(bottom: 10, top: 10),
         width: double.infinity,
         height: double.infinity,
-        /* background degrade : */
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -163,21 +296,24 @@ class _LoginState extends State<Login> {
                         SizedBox(height: 52),
 
                         // Login Button
-                        GradientComponent.gradientButton(
-                          text: 'Login',
-                          maxWidth: 220,
-                          maxHeight: 50,
-                          onPressed: () {
-                            setState(() {
-                              if (emailController.text != "" &&
-                                  passwordController.text != "") {
-                                email = emailController.text;
-                                password = passwordController.text;
-                                userLogin();
-                              }
-                            });
-                          },
-                        ),
+                        _isLoading
+                            ? CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Color(0xFF983BCB)),
+                              )
+                            : GradientComponent.gradientButton(
+                                text: 'Login',
+                                maxWidth: 220,
+                                maxHeight: 50,
+                                onPressed: () {
+                                  if (emailController.text.isNotEmpty &&
+                                      passwordController.text.isNotEmpty) {
+                                    email = emailController.text.trim();
+                                    password = passwordController.text;
+                                    userLogin();
+                                  }
+                                },
+                              ),
 
                         SizedBox(height: 16),
 
@@ -287,6 +423,30 @@ class _LoginState extends State<Login> {
         contentPadding: EdgeInsets.symmetric(vertical: 16),
       ),
       validator: validator,
+    );
+  }
+}
+
+class CustomSocialIcon extends StatelessWidget {
+  final Color borderColor;
+  final Widget child;
+
+  const CustomSocialIcon({
+    Key? key,
+    required this.borderColor,
+    required this.child,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(
+        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Center(child: child),
     );
   }
 }

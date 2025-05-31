@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:fitness/components/return_button.dart';
 import 'package:fitness/pages/Alimentation/meal_details.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/services/meals_service.dart';
@@ -124,7 +123,7 @@ class _AlimHomePageState extends State<AlimHomePage>
     }
   }
 
-  void  _showErrorDialog(String message) {
+  void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -154,6 +153,7 @@ class _AlimHomePageState extends State<AlimHomePage>
     final screenWidth = screenSize.width;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Container(
         padding: EdgeInsets.only(bottom: 10, top: 10),
         width: double.infinity,
@@ -234,7 +234,7 @@ class _AlimHomePageState extends State<AlimHomePage>
     String mealCategory = 'Breakfast';
     String imageUrl = '';
     String calories = '';
-    String ingrediant= '';
+    String ingrediant = '';
     double rating = 4.0;
 
     List<String> mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
@@ -715,7 +715,16 @@ class _AlimHomePageState extends State<AlimHomePage>
     double rating,
   ) async {
     try {
-      
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFE95CC0)),
+          ),
+        ),
+      );
+
       final newMeal = Meal(
         label: name,
         imageUrl:
@@ -724,30 +733,33 @@ class _AlimHomePageState extends State<AlimHomePage>
         rating: rating,
         dietLabels: [],
         healthLabels: [],
-        ingredients: description.isNotEmpty
-            ? [description]
-            : [],
+        ingredients: description.isNotEmpty ? [description] : [],
         mealType: category,
       );
 
-      
-      setState(() {
-        _recommendedMeals.add(newMeal);
-        if (_tabs[_tabController.index].toLowerCase() ==
-                category.toLowerCase() ||
-            _tabs[_tabController.index] == "Hottest") {
-          _categoryMeals.add(newMeal);
-        }
-      });
+      final mealId = await _mealManager.saveCustomMealToFirebase(newMeal);
+      Navigator.pop(context);
 
+      if (mealId != null) {
+        setState(() {
+          _recommendedMeals.add(newMeal);
+          if (_tabs[_tabController.index].toLowerCase() ==
+                  category.toLowerCase() ||
+              _tabs[_tabController.index] == "Hottest") {
+            _categoryMeals.add(newMeal);
+          }
+        });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Meal added successfully!'),
-          backgroundColor: Color(0xFFE95CC0),
-          duration: Duration(seconds: 2),
-        ),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Meal added successfully!'),
+            backgroundColor: Color(0xFFE95CC0),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+
+      _loadInitialData();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
