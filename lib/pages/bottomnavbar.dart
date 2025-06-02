@@ -57,7 +57,7 @@ class _BottomNavState extends State<BottomNavBar> {
       backgroundColor: Colors.transparent,
       bottomNavigationBar: CurvedNavigationBar(
         height: 60,
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color.fromARGB(0, 201, 13, 13),
         buttonBackgroundColor: Color(0xffEB62BC).withAlpha(170),
         color: Color(0xff373856),
         animationDuration: Duration(milliseconds: 500),

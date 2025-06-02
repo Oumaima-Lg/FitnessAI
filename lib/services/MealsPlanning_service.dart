@@ -72,7 +72,7 @@ class MealPlanningService {
           'id': doc.id,
           'time': data['time'],
           'mealType': data['mealType'],
-          'items': data['items'] ?? [], // Retourne directement la liste de Maps
+          'items': data['items'] ?? [],
           'totalCalories': data['totalCalories'],
           'totalProteins': data['totalProteins'],
           'totalCarbs': data['totalCarbs'],
@@ -168,4 +168,6 @@ class MealPlanningService {
       );
     }).where((item) => item != null).cast<MealItem>().toList();
   }
+
+  
 }

@@ -2,9 +2,11 @@ import 'package:fitness/services/latest_activity.dart';
 // import 'package:fitness/pages/PlanningPage.dart';
 import 'package:fitness/pages/bottomnavbar.dart';
 import 'package:fitness/pages/welcome.dart';
+import 'package:fitness/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +14,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await LatestActivityManager().initialize();
+  
   runApp(MyApp());
 }
 
@@ -21,7 +24,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      
       title: 'Fitness App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

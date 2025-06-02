@@ -148,6 +148,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
     final currentUser = _userService.currentUser!;
+    
 
     return Scaffold(
       backgroundColor: Colors.transparent,

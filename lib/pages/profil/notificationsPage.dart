@@ -8,10 +8,10 @@ class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
 
   @override
-  State<NotificationsPage> createState() => _NotificationsPageState();
+  State<NotificationsPage> createState() => NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage> {
+class NotificationsPageState extends State<NotificationsPage> {
   final List<AppNotification> _notifications = [];
   bool _isMenuOpen = false;
   @override
