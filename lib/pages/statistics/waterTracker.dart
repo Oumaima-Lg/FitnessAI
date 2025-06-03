@@ -2,9 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/pages/statistics/goalPage.dart';
+import 'package:fitness/models/userStats.dart';
+import 'package:fitness/firebase_service.dart'; 
+import 'package:fitness/components/gradient.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+String? get currentUserId => FirebaseAuth.instance.currentUser?.uid;
+
 
 class WaterTracker extends StatefulWidget {
-  const WaterTracker({super.key});
+  final UserStats stats;
+  WaterTracker({super.key, UserStats? stats})
+      : stats = stats ?? UserStats();
+  
 
   @override
   State<WaterTracker> createState() => _WaterTrackerState();
@@ -223,14 +233,33 @@ class _WaterTrackerState extends State<WaterTracker> {
                     maxWidth: 315,
                     maxHeight: 50,
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GoalTrack(
-                            waterLevel: savedGoalValue ?? finalGlassValue ?? 0,
+                      if (savedGoalValue != null || finalGlassValue != null) {
+                        if (currentUserId != null) {  // Vérifier si l'utilisateur est connecté
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GoalTrack(
+                                maxLevel: savedGoalValue ?? finalGlassValue ?? 10,
+                                stats: widget.stats,
+                              ),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please login first'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please set a goal first'),
+                            duration: Duration(seconds: 2),
                           ),
-                        ),
-                      );
+                        );
+                      }
                     },
                   ),
                 ],

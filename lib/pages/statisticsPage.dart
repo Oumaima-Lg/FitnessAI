@@ -134,7 +134,7 @@ class _StatisticsState extends State<Statistics> {
                       _buildImageCard(
                           "Water",
                           "images/statistics/water_img.png",
-                          "${widget.stats.water} \n liters"),
+                          "${widget.stats.water} \n glass"),
                       _buildImageCard(
                           "Heart",
                           "images/statistics/heart_img.png",
@@ -195,7 +195,7 @@ class _StatisticsState extends State<Statistics> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => WaterTracker(),
+                          builder: (context) => WaterTracker(stats: widget.stats),
                         ),
                       );
                     },
