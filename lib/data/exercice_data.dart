@@ -276,7 +276,7 @@ class ExerciceData {
             imageUrl: 'images/ExerciceImages/running2.png',
             description:
                 'Running is a fundamental cardiovascular exercise involving continuous, rhythmic movement where individuals propel themselves forward on foot at a pace faster than walking. It enhances cardiovascular health, strengthens muscles, improves endurance, and supports mental well-being. \n Widely practiced for fitness, sport, and recreation, running can range from light jogging to competitive racing. It requires minimal equipment, is accessible to all fitness levels, and can be done almost anywhere—from treadmills and tracks to city streets and nature trails.\n Whether for stress relief, weight loss, or athletic training, running remains a timeless and effective full-body workout.',
-            videoDemonstartionUrl: 'images/gif/breathing.gif',
+            videoDemonstartionUrl: 'images/gif/running.gif',
             steps: [
               StepItem(
                 id: 'r1',
@@ -365,7 +365,7 @@ class ExerciceData {
           Activity(
             id: 'a1',
             title: 'Breathing Exercises',
-            iconUrl: 'images/icons/HIIT/icon1.png',
+            iconUrl: 'images/icons/breathing.png',
             videoDemonstartionUrl: 'images/gif/breathing.gif',
             steps: [
               StepItem(

@@ -1,16 +1,10 @@
+import 'dart:async';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
-import 'package:fitness/services/latest_activity.dart';
+import 'package:fitness/services/fire_base_service.dart';
 import 'package:fitness/models/latest_activity.dart';
 import 'package:flutter/material.dart';
-
-// final manager = LatestActivityManager();
-// manager.addActivity(LatestActivity(
-//   nameActivity: 'Nouvelle activité',
-//   imageUrl: 'assets/images/activity.jpg',
-//   createdAt: DateTime.now().millisecondsSinceEpoch,
-// ));
-// await manager.saveActivities();
+import 'package:fitness/services/fonctions.dart';
 
 class ActivityTracker extends StatefulWidget {
   const ActivityTracker({super.key});
@@ -20,21 +14,26 @@ class ActivityTracker extends StatefulWidget {
 }
 
 class _ActivityTrackerState extends State<ActivityTracker> {
-  // final activityManager = LatestActivityManager();
   List<LatestActivity> latestActivities = [];
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
-    // loadDataLatestActivities();
+    loadActivities();
+
+    // Mettre à jour l'affichage toutes les 60 secondes
+    _refreshTimer = Timer.periodic(Duration(minutes: 1), (timer) {
+      setState(() {}); // Rebuild pour mettre à jour les "x min ago"
+    });
   }
 
-  // void loadDataLatestActivities() async {
-  //   await activityManager.loadActivities();
-  //   setState(() {
-  //     latestActivities = activityManager.activities;
-  //   });
-  // }
+  void loadActivities() async {
+    final activities = await loadUserLatestActivities();
+    setState(() {
+      latestActivities = activities;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +61,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
             ),
           ),
           body: SingleChildScrollView(
-            child: latestActivity(latestActivities, context, false),
+            child: latestActivity(latestActivities, context, false, timeAgo),
           ),
         ),
       ),

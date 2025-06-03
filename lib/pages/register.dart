@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/pages/login.dart';
+import 'package:fitness/pages/login_methods.dart';
 import 'package:fitness/services/database.dart';
 import 'package:fitness/services/shared_pref.dart';
 import 'package:flutter/material.dart';
@@ -115,6 +116,12 @@ class _RegisterState extends State<Register> {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your phone number';
                             }
+                            if (value.length < 10) {
+                              return 'Phone number must be at least 10 digits';
+                            }
+                            if (value.length > 10) {
+                              return 'Phone number is too long';
+                            }
                             return null;
                           },
                         ),
@@ -175,10 +182,20 @@ class _RegisterState extends State<Register> {
                           text: 'Register',
                           maxWidth: 220,
                           maxHeight: 50,
+                          // onPressed: () {
+                          //   if (nameController.text != "" &&
+                          //       emailController.text != "" &&
+                          //       passwordController.text != "") {
+                          //     setState(() {
+                          //       name = nameController.text;
+                          //       email = emailController.text;
+                          //       password = passwordController.text;
+                          //     });
+                          //     registration();
+                          //   }
+                          // },
                           onPressed: () {
-                            if (nameController.text != "" &&
-                                emailController.text != "" &&
-                                passwordController.text != "") {
+                            if (_formKey.currentState!.validate()) {
                               setState(() {
                                 name = nameController.text;
                                 email = emailController.text;
@@ -213,16 +230,26 @@ class _RegisterState extends State<Register> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            CustomSocialIcon(
-                              borderColor: Color(0xFF423C3D),
-                              child: Image.asset('images/google_icon.png',
-                                  width: MediaQuery.of(context).size.width),
+                            GestureDetector(
+                              onTap: () {
+                                signInWithGoogle(context);
+                              },
+                              child: CustomSocialIcon(
+                                borderColor: Color(0xFF423C3D),
+                                child: Image.asset('images/google_icon.png',
+                                    width: MediaQuery.of(context).size.width),
+                              ),
                             ),
                             const SizedBox(width: 20),
-                            CustomSocialIcon(
-                              borderColor: Color(0xFF423C3D),
-                              child: Image.asset('images/facebook_icon.png',
-                                  width: MediaQuery.of(context).size.width),
+                            GestureDetector(
+                              onTap: () {
+                                // signInWithFacebook(context);
+                              },
+                              child: CustomSocialIcon(
+                                borderColor: Color(0xFF423C3D),
+                                child: Image.asset('images/facebook_icon.png',
+                                    width: MediaQuery.of(context).size.width),
+                              ),
                             ),
                             const SizedBox(width: 20),
                           ],
@@ -245,11 +272,14 @@ class _RegisterState extends State<Register> {
                                     MaterialPageRoute(
                                         builder: (context) => Login()));
                               },
-                              child: Text(
-                                'Login',
-                                style: TextStyle(
-                                  color: Color(0xFF983BCB),
-                                  fontWeight: FontWeight.bold,
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    color: Color(0xFF983BCB),
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),

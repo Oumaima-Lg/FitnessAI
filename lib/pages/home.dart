@@ -3,13 +3,11 @@ import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/data/exercice_data.dart';
 import 'package:fitness/pages/chatbot/chat_bot_welcome.dart';
-import 'package:fitness/services/latest_activity.dart';
 import 'package:fitness/models/exercice.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/models/latest_activity.dart';
 import 'package:fitness/pages/profil/notificationsPage.dart';
 import 'package:fitness/pages/PlanningPage.dart';
-// import 'package:fitness/pages/notifications.dart';
 import 'package:fitness/pages/progress_photo.dart';
 import 'package:fitness/pages/planning/focus.dart';
 import 'package:fitness/services/planning_service.dart';
@@ -20,6 +18,9 @@ import 'package:fitness/services/user_service.dart';
 // final int completedTasks;
 // final int totalTasks;
 // value: completedTasks/totalTasks.toDouble(),
+import 'package:fitness/services/fonctions.dart';
+import 'package:fitness/services/fire_base_service.dart';
+import 'dart:async';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -64,6 +65,9 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
+  Timer? _refreshTimer;
+  List<String> takenPhotoPaths = [];
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -78,42 +82,20 @@ class _HomePageState extends State<HomePage> {
     // loadDataLatestActivities();
     // initUserData();
     _getData();
+
+    loadActivities();
+    // Mettre à jour l'affichage toutes les 60 secondes
+    _refreshTimer = Timer.periodic(Duration(minutes: 1), (timer) {
+      setState(() {}); // Rebuild pour mettre à jour les "x min ago"
+    });
   }
 
-  // Future<void> initUserData() async {
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-
-  //   try {
-  //     await _userService.initializeUser();
-  //     await _userService.refreshUserData();
-  //   } catch (e) {
-  //     if (mounted) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Error !')),
-  //       );
-  //     }
-  //   }
-
-  //   setState(() {
-  //     _isLoading = false;
-  //   });
-  // }
-
-  // void loadDataLatestActivities() async {
-  //   await activityManager.loadActivities();
-  //   setState(() {
-  //     // latestActivities = activityManager.activities;
-  //     if (activityManager.activities.length >= 2) {
-  //       latestActivities = activityManager.activities.take(2).toList();
-  //     } else if (activityManager.activities.isNotEmpty) {
-  //       latestActivities = activityManager.activities.take(1).toList();
-  //     } else {
-  //       latestActivities = activityManager.activities;
-  //     }
-  //   });
-  // }
+  void loadActivities() async {
+    final activities = await loadUserLatestActivities();
+    setState(() {
+      latestActivities = activities;
+    });
+  }
 
   void loadDataExercice() async {
     List<Exercice> data = await ExerciceData.getExercices();
@@ -257,7 +239,8 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ProgressePage()));
+                            builder: (context) => ProgressePage(
+                                takenPhotoPaths: takenPhotoPaths)));
                     // print("Progress Photo");
                   }),
                   _drawerItem('Coach', Icons.person, () {
@@ -268,14 +251,12 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => NotificationsPage()));
-                    // print("Notifications");
                   }),
                   _drawerItem('AI Conversation', Icons.chat, () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => ChatBotWelcome()));
-                    // print("AI Conversation");
                   }),
                   _drawerItem('Planning', Icons.calendar_today, () {
                     navigateToPlanningPage(context, PlanningPage());
@@ -466,7 +447,8 @@ class _HomePageState extends State<HomePage> {
                             navigateToPlanningPage(context, FocusScreen());
                           })),
                   const SizedBox(height: 20),
-                  latestActivity(latestActivities, context, true),
+                  latestActivity(latestActivities.take(2).toList(), context,
+                      true, timeAgo),
                   const SizedBox(height: 75),
                 ],
               ),

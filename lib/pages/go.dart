@@ -3,6 +3,7 @@ import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/models/planning.dart';
 import 'package:fitness/pages/entrainements/congratulation.dart';
 import 'package:fitness/services/planning_service.dart';
+import 'package:fitness/services/fire_base_service.dart';
 import 'package:flutter/material.dart';
 import '../components/textStyle/textstyle.dart';
 import 'package:fitness/models/activity.dart';
@@ -35,22 +36,33 @@ class _GoPageState extends State<GoPage> {
 
     if (start) {
       timer = Timer.periodic(Duration(seconds: 1), (t) async {
-        // First, update the seconds synchronously
         setState(() {
           seconds++;
         });
 
         // Then handle the completion logic asynchronously outside of setState
+
+        // Perform async operations after setState
+
         if (seconds >= _selectedDuration.inSeconds) {
           timer?.cancel();
-          setState(() {
-            start = false;
-          });
+          start = false;
 
-          // Perform async operations after setState
           await PlanningService.markActivityAsCompleted(
               widget.titleExercice, widget.activity.title);
 
+          try {
+            await saveLatestActivity(
+              title: widget.isGym
+                  ? "Gym - ${widget.activity.title}"
+                  : widget.activity.title,
+              icon: widget.isGym
+                  ? "images/icons/Gym.png"
+                  : widget.activity.iconUrl,
+            );
+          } catch (e) {
+            print('Erreur sauvegarde activité : $e');
+          }
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(

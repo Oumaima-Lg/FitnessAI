@@ -1,4 +1,5 @@
 import 'package:fitness/pages/entrainements/congratulation.dart';
+import 'package:fitness/services/fire_base_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/models/activity.dart';
@@ -14,21 +15,32 @@ class Recovery extends StatefulWidget {
 class _RecoveryState extends State<Recovery> {
   int indexCurrentStep = 0;
 
-  void nexStep() {
+  Future<void> nexStep() async {
     if (indexCurrentStep < widget.activity.steps!.length - 1) {
       setState(() {
         indexCurrentStep++;
       });
     } else {
+      try {
+        await saveLatestActivity(
+          title: widget.activity.title,
+          icon: widget.activity.iconUrl,
+        );
+      } catch (e) {
+        print("Erreur lors de l'enregistrement de l'activité : $e");
+      }
+
       Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Congratulation(
-                imageUrl: 'congratulation_BE',
-                title: 'Congratulations, You Have Finished Your Workout !',
-                description:
-                    'Exercises is king and nutrition is queen. Combine the two and you will have a kingdom.\n-Jack Lalanne'),
-          ));
+        context,
+        MaterialPageRoute(
+          builder: (context) => Congratulation(
+            imageUrl: 'congratulation_BE',
+            title: 'Congratulations, You Have Finished Your Workout !',
+            description:
+                'Exercises is king and nutrition is queen. Combine the two and you will have a kingdom.\n-Jack Lalanne',
+          ),
+        ),
+      );
     }
   }
 

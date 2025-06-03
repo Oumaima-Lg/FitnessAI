@@ -8,9 +8,16 @@ class ChatBotWelcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xFF23253C),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       backgroundColor: Color(0xFF23253C),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(6),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -26,7 +33,7 @@ class ChatBotWelcome extends StatelessWidget {
                   color: Colors.white,
                 ),
               ),
-              SizedBox(height: 20,),
+              SizedBox(height: 15,),
               GradientButton(
                 title: 'Next',
                 icon: Icons.arrow_forward,

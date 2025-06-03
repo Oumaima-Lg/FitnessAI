@@ -1,0 +1,2 @@
+C:/Users/Lenovo/Documents/CI_GI_S4/Developpement Mobile/Fitness_Project_/FitnessAI/android/app/.cxx/Debug/3s2z4172/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/Lenovo/Documents/CI_GI_S4/Developpement Mobile/Fitness_Project_/FitnessAI/android/app/.cxx/Debug/3s2z4172/arm64-v8a/CMakeFiles/rebuild_cache.dir

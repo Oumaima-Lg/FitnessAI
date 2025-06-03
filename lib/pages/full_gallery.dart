@@ -1,9 +1,13 @@
 import 'dart:convert';
 import 'package:fitness/components/return_button.dart';
 import 'package:fitness/pages/camera_page.dart';
+import 'package:fitness/services/progressPhotoService.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fitness/models/photo.dart';
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:path_provider/path_provider.dart';
 
 class FullGallery extends StatefulWidget {
   const FullGallery({super.key});
@@ -13,87 +17,152 @@ class FullGallery extends StatefulWidget {
 }
 
 class _FullGalleryState extends State<FullGallery> {
-
   List<Photo> _photos = [];
   Map<String, List<Photo>> _photoGroups = {};
   bool _isLoading = true;
 
+  final service = ProgressPhotoService();
+
+  final months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+
   @override
   void initState() {
     super.initState();
-    _loadPhotos();
+    _loadPhotosFromFirebase();
   }
-
   ///*********************************** DEBUT METHODES ***********************************///
-  Future<void> _loadPhotos() async {
+  Future<void> _loadPhotosFromFirebase() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      final String response =
-          await rootBundle.loadString('lib/data/photo.json');
-      final List<dynamic> data = json.decode(response);
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+      // njibo les imgs mn Firebase
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('progress_photos')
+          .orderBy('timestamp', descending: true)
+          .get();
 
-      _photos = data.map((item) => Photo.fromJson(item)).toList();
+      List<Photo> loadedPhotos = [];
 
-      _groupPhotosByDate();
-
-      setState(() { 
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final String localPath = data['localPath'] ?? data['path'] ?? '';
+        
+        // kanverifiw wesh le fichier kayn f localPath
+        if (localPath.isNotEmpty) {
+          final File file = File(localPath);
+          if (await file.exists()) {
+            loadedPhotos.add(Photo(
+              id: doc.id,
+              path: localPath,
+              pose: data['pose'] ?? '',
+              poseIndex: data['poseIndex'] ?? 0,
+              timestamp: data['timestamp'] as Timestamp?,
+              month: data['month'] ?? '',
+            ));
+          } else {
+            await doc.reference.delete();
+            print('Photo supprimée car fichier introuvable: $localPath');
+          }
+        }
+      }
+      setState(() {
+        _photos = loadedPhotos;
+        _photoGroups = _groupPhotosByDate(_photos);
         _isLoading = false;
       });
+
     } catch (e) {
       print('Erreur lors du chargement des photos: $e');
       setState(() {
         _isLoading = false;
       });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors du chargement des photos: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
-  void _groupPhotosByDate() {
-    _photoGroups = {};
-
-    for (var photo in _photos) {
-      if (photo.date != null) {
-        String dateKey = _formatDate(photo.date!);
-
-        if (!_photoGroups.containsKey(dateKey)) {
-          _photoGroups[dateKey] = [];
+  // an grouipw gee3 les imgs par date 
+  Map<String, List<Photo>> _groupPhotosByDate(List<Photo> photos) {
+    Map<String, List<Photo>> groups = {};
+    
+    for (Photo photo in photos) {
+      String groupKey;
+      
+      if (photo.month != null && photo.month!.isNotEmpty) {
+        final parts = photo.month!.split('-');
+        if (parts.length == 2) {
+          final year = parts[0];
+          final monthIndex = int.tryParse(parts[1]) ?? 1;
+          final monthName = months[monthIndex - 1];
+          groupKey = '$monthName $year';
+        } else {
+          groupKey = photo.month!;
         }
-
-        _photoGroups[dateKey]!.add(photo);
+      } else if (photo.timestamp != null) {
+        // Fallback sur le timestamp
+        final date = photo.timestamp!.toDate();
+        final monthName = months[date.month - 1];
+        groupKey = '$monthName ${date.year}';
+      } else {
+        // Dernière option: date actuelle
+        final now = DateTime.now();
+        final monthName = months[now.month - 1];
+        groupKey = '$monthName ${now.year}';
       }
+      
+      if (!groups.containsKey(groupKey)) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey]!.add(photo);
     }
+    
+    // hna antrier les grps par date 
+    final sortedGroups = Map<String, List<Photo>>.fromEntries(
+      groups.entries.toList()..sort((a, b) {
+        // hna gher bash kanhowlo noms de mois en dates pour le tri
+        final aDate = _parseMonthYear(a.key);
+        final bDate = _parseMonthYear(b.key);
+        return bDate.compareTo(aDate);
+      }),
+    );
+    
+    return sortedGroups;
   }
 
-  String _formatDate(String dateString) {
-    // ila kant la date deja June 7 matalan ghadi tb9a kifma hiya
-    if (!dateString.contains('-')) {
-      return dateString;
+  DateTime _parseMonthYear(String monthYear) {
+    final parts = monthYear.split(' ');
+    if (parts.length == 2) {
+      final monthName = parts[0];
+      final year = int.tryParse(parts[1]) ?? DateTime.now().year;
+      final monthIndex = months.indexOf(monthName) + 1;
+      return DateTime(year, monthIndex);
     }
+    return DateTime.now();
+  }
 
-    // ila l9aha b7al hakda "YYYY-MM-DD" ghadi ndirlolha format l "DD Month"
-    try {
-      final date = DateTime.parse(dateString);
-      final months = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
-      ];
-      return '${date.day} ${months[date.month - 1]}';
-    } catch (e) {
-      print('Erreur lors du formatage de la date: $e');
-      return dateString;
-    }
+  // refresh l photos
+  Future<void> _refreshPhotos() async {
+    await _loadPhotosFromFirebase();
   }
 
   ///*********************************** FIN METHODES ***********************************///
-
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -145,27 +214,53 @@ class _FullGalleryState extends State<FullGallery> {
                 ),
               ),
               /************************************** FIN Header **************************************/
-
               const SizedBox(height: 10),
-
               /******************************** GRILLE DYAL LES PHOTO **********************************/
-              // Ce Expanded est crucial pour éviter l'overflow
               Expanded(
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _photoGroups.isEmpty
-                        ? const Center(
-                            child: Text('Aucune photo disponible',
-                                style: TextStyle(color: Colors.white)))
-                        : Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: ListView.builder(
-                              itemCount: _photoGroups.length,
-                              itemBuilder: (context, index) {
-                                String date = _photoGroups.keys.elementAt(index);
-                                List<Photo> photos = _photoGroups[date]!;
-                                return _buildPhotoGroup(date, photos);
-                              },
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.photo_camera_outlined,
+                                  size: 64,
+                                  color: Colors.white.withAlpha(128),
+                                ),
+                                SizedBox(height: 16),
+                                Text(
+                                  'No photos yet',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Capture your progress by taking photos regularly.',
+                                  style: TextStyle(
+                                    color: Colors.white.withAlpha(180),
+                                    fontSize: 14,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          )
+                        : RefreshIndicator(
+                            onRefresh: _refreshPhotos,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: ListView.builder(
+                                itemCount: _photoGroups.length,
+                                itemBuilder: (context, index) {
+                                  String date = _photoGroups.keys.elementAt(index);
+                                  List<Photo> photos = _photoGroups[date]!;
+                                  return _buildPhotoGroup(date, photos);
+                                },
+                              ),
                             ),
                           ),
               ),
@@ -184,12 +279,24 @@ class _FullGalleryState extends State<FullGallery> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 2, top: 10, bottom: 8),
-          child: Text(
-            date,
-            style: const TextStyle(
-              color: Color(0xFFB55F75),
-              fontSize: 12,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                date,
+                style: const TextStyle(
+                  color: Color(0xFFB55F75),
+                  fontSize: 12,
+                ),
+              ),
+              Text(
+                '${photos.length} photo${photos.length > 1 ? 's' : ''}',
+                style: TextStyle(
+                  color: Colors.white.withAlpha(180),
+                  fontSize: 10,
+                ),
+              ),
+            ],
           ),
         ),
         GridView.builder(
@@ -203,31 +310,47 @@ class _FullGalleryState extends State<FullGallery> {
           ),
           itemCount: photos.length,
           itemBuilder: (context, index) {
-            return _buildPhotoThumbnail(photos[index].path ?? '');
+            return service.buildPhotoThumbnail(photos[index]);
           },
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 16),
       ],
     );
   }
 
-  Widget _buildPhotoThumbnail(String imagePath) {
-    return GestureDetector(
-      onTap: () {
-        // Show full size photo
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: Colors.transparent,
-          image: DecorationImage(
-            image: AssetImage(imagePath),
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildPhotoThumbnail(Photo photo) {
+  //   final file = File(photo.path ?? '');
+  //   return GestureDetector(
+  //     onTap: () {
+  //       print('Photo tappée: ${photo.path}');
+  //     },
+  //     child: Container(
+  //       constraints: BoxConstraints(
+  //         maxHeight: 100,
+  //         maxWidth: 100,
+  //       ),
+  //       decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.circular(14),
+  //         color: Colors.grey.withAlpha(50),
+  //         image: DecorationImage(
+  //           image: file.existsSync() 
+  //               ? FileImage(file) 
+  //               : AssetImage('images/placeholder.png') as ImageProvider,
+  //           fit: BoxFit.cover,
+  //         ),
+  //       ),
+  //       child: !file.existsSync() 
+  //           ? Center(
+  //               child: Icon(
+  //                 Icons.broken_image,
+  //                 color: Colors.white.withAlpha(128),
+  //                 size: 24,
+  //               ),
+  //             )
+  //           : null,
+  //     ),
+  //   );
+  // }
 
   Widget _buildCameraButton() {
     return Container(
@@ -257,10 +380,18 @@ class _FullGalleryState extends State<FullGallery> {
           color: Colors.white,
         ),
         onPressed: () async {
-          await Navigator.push(
+          final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => TakePhotoPage()),
+            MaterialPageRoute(
+              builder: (context) => TakePhotoPage(
+                onPhotosCompleted: (List<String> paths) {
+                },
+              ),
+            ),
           );
+          if (result != null) {
+            await _refreshPhotos();
+          }
         },
       ),
     );

@@ -1,29 +1,32 @@
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/return_button.dart';
 import 'package:fitness/pages/camera_page.dart';
 import 'package:fitness/pages/full_gallery.dart';
+import 'package:fitness/services/progressPhotoService.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/models/photo.dart';
-import 'package:fitness/services/progressPhotoService.dart';
 
 class ProgressePage extends StatefulWidget {
-  const ProgressePage({super.key});
+  final List<String> takenPhotoPaths;
+
+  const ProgressePage({super.key, required this.takenPhotoPaths});
 
   @override
   State<ProgressePage> createState() => _ProgressePageState();
 }
 
 class _ProgressePageState extends State<ProgressePage> {
-  final ProgressPhotoService _photoService = ProgressPhotoService();
-
-  List<Photo> _photos = [];
-  Map<String, List<Photo>> _photoGroups = {};
+  List<Photo> _photos = []; // hna ge3 les imgs li kaynin f firebase
+  Map<String, List<Photo>> _photoGroups = {}; // hna regroupina b date
   Map<String, List<Photo>> _recentPhotoGroups = {};
   bool _isLoading = true;
 
-  final int _recentGroupsCount =
-      2; // <-- hna ndiro ch7al bghina mn grp dyal les pic bghina ytafficha
-  final int _maxPhotosPerGroup =
-      8; // <-- hna ndiro ch7al bghina mn pic f grp dyal les pic bghina ytafficha sayidati
+  final int _recentGroupsCount = 2;
+  final int _maxPhotosPerGroup = 30;
+
+  final service = ProgressPhotoService();
 
   final months = [
     'January',
@@ -43,20 +46,63 @@ class _ProgressePageState extends State<ProgressePage> {
   @override
   void initState() {
     super.initState();
-    _loadPhotos();
+    _loadPhotosFromFirebase();
   }
 
   ///*********************************** DEBUT METHODES ***********************************///
 
-  Future<void> _loadPhotos() async {
-    try {
-      _photos = await _photoService.loadPhotos();
+  Future<void> _loadPhotosFromFirebase() async {
+    setState(() {
+      _isLoading = true;
+    });
 
-      _photoGroups = _photoService.groupPhotosByDate(_photos);
-      _recentPhotoGroups = _photoService.filterRecentPhotos(_photoGroups,
-          recentGroupsCount: _recentGroupsCount);
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Charger les photos depuis Firestore
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('progress_photos')
+          .orderBy('timestamp', descending: true)
+          .get();
+
+      List<Photo> loadedPhotos = [];
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final String localPath = data['localPath'] ?? data['path'] ?? '';
+
+        // Vérifier si le fichier existe localement
+        if (localPath.isNotEmpty) {
+          final File file = File(localPath);
+          if (await file.exists()) {
+            loadedPhotos.add(Photo(
+              id: doc.id,
+              path: localPath,
+              pose: data['pose'] ?? '',
+              poseIndex: data['poseIndex'] ?? 0,
+              timestamp: data['timestamp'] as Timestamp?,
+              month: data['month'] ?? '',
+            ));
+          } else {
+            // Si le fichier n'existe pas localement, le supprimer de Firestore
+            await doc.reference.delete();
+            print('Photo supprimée car fichier introuvable: $localPath');
+          }
+        }
+      }
 
       setState(() {
+        _photos = loadedPhotos;
+        _photoGroups = _groupPhotosByDate(_photos);
+        _recentPhotoGroups = _filterRecentPhotos(_photoGroups);
         _isLoading = false;
       });
     } catch (e) {
@@ -64,9 +110,91 @@ class _ProgressePageState extends State<ProgressePage> {
       setState(() {
         _isLoading = false;
       });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text('Erreur lors du chargement des photos: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
+  // Grouper les photos par date (mois-année)
+  Map<String, List<Photo>> _groupPhotosByDate(List<Photo> photos) {
+    Map<String, List<Photo>> groups = {};
+
+    for (Photo photo in photos) {
+      String groupKey;
+
+      if (photo.month != null && photo.month!.isNotEmpty) {
+        // Utiliser le mois stocké dans Firestore
+        final parts = photo.month!.split('-');
+        if (parts.length == 2) {
+          final year = parts[0];
+          final monthIndex = int.tryParse(parts[1]) ?? 1;
+          final monthName = months[monthIndex - 1];
+          groupKey = '$monthName $year';
+        } else {
+          groupKey = photo.month!;
+        }
+      } else if (photo.timestamp != null) {
+        // Fallback sur le timestamp
+        final date = photo.timestamp!.toDate();
+        final monthName = months[date.month - 1];
+        groupKey = '$monthName ${date.year}';
+      } else {
+        // date actuelle
+        final now = DateTime.now();
+        final monthName = months[now.month - 1];
+        groupKey = '$monthName ${now.year}';
+      }
+
+      if (!groups.containsKey(groupKey)) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey]!.add(photo);
+    }
+
+    // Trier les groupes par date (plus récent en premier)
+    final sortedGroups = Map<String, List<Photo>>.fromEntries(
+      groups.entries.toList()
+        ..sort((a, b) {
+          // Convertir les noms de mois en dates pour le tri
+          final aDate = _parseMonthYear(a.key);
+          final bDate = _parseMonthYear(b.key);
+          return bDate.compareTo(aDate);
+        }),
+    );
+
+    return sortedGroups;
+  }
+
+  DateTime _parseMonthYear(String monthYear) {
+    final parts = monthYear.split(' ');
+    if (parts.length == 2) {
+      final monthName = parts[0];
+      final year = int.tryParse(parts[1]) ?? DateTime.now().year;
+      final monthIndex = months.indexOf(monthName) + 1;
+      return DateTime(year, monthIndex);
+    }
+    return DateTime.now();
+  }
+
+  // gher tsawer deyal akhir 2 mois
+  Map<String, List<Photo>> _filterRecentPhotos(
+      Map<String, List<Photo>> photoGroups) {
+    final entries = photoGroups.entries.take(_recentGroupsCount).toList();
+    return Map<String, List<Photo>>.fromEntries(entries);
+  }
+
+  // hna bash itel3o lina tsawer li alah tzado kandiro refresh
+  Future<void> _refreshPhotos() async {
+    await _loadPhotosFromFirebase();
+  }
+
+  // hna bash itel3o lina popup li kayn fih infos 3la tracking de progression
   void _showInfoPopup(BuildContext context) {
     showDialog(
         context: context,
@@ -171,7 +299,6 @@ class _ProgressePageState extends State<ProgressePage> {
 
   @override
   Widget build(BuildContext context) {
-    // les dimensions de l'écran 3la 9bel lresponsivite w dak chi sayidati :
     final screenSize = MediaQuery.of(context).size;
     final screenHeight = screenSize.height;
     final screenWidth = screenSize.width;
@@ -179,8 +306,6 @@ class _ProgressePageState extends State<ProgressePage> {
     return Scaffold(
       body: Container(
         width: double.infinity,
-        /********* BG ********/
-        /* background dégradé : */
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -197,7 +322,6 @@ class _ProgressePageState extends State<ProgressePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Barre de titre avec bouton de retour
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -219,16 +343,16 @@ class _ProgressePageState extends State<ProgressePage> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 50),
+                    // Bouton refresh
+                    IconButton(
+                      icon: Icon(Icons.refresh, color: Colors.white),
+                      onPressed: _refreshPhotos,
+                    ),
                   ],
                 ),
-
-                // Card d'information sur le tracking de progression
                 _buildProgressTrackingCard(screenWidth, screenHeight),
-
                 const SizedBox(height: 20),
-
-                // Entête Gallery
+                // Gallery
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -241,13 +365,15 @@ class _ProgressePageState extends State<ProgressePage> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => FullGallery(),
                           ),
                         );
+                        // bash ndiro refresh f galery
+                        _refreshPhotos();
                       },
                       child: const Text(
                         'See more',
@@ -259,30 +385,53 @@ class _ProgressePageState extends State<ProgressePage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 8),
-
                 Expanded(
                   child: _isLoading
                       ? Center(child: CircularProgressIndicator())
                       : _recentPhotoGroups.isEmpty
                           ? Center(
-                              child: Text('Aucune photo disponible',
-                                  style: TextStyle(color: Colors.white)))
-                          : ListView.builder(
-                              itemCount: _recentPhotoGroups.entries.length,
-                              itemBuilder: (context, index) {
-                                var entry =
-                                    _recentPhotoGroups.entries.elementAt(index);
-                                return _buildPhotoGroup(entry.key, entry.value);
-                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.photo_camera_outlined,
+                                    size: 64,
+                                    color: Colors.white.withAlpha(128),
+                                  ),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'No photos yet',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Take a photo to start tracking your progress',
+                                    style: TextStyle(
+                                      color: Colors.white.withAlpha(180),
+                                      fontSize: 14,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : RefreshIndicator(
+                              onRefresh: _refreshPhotos,
+                              child: ListView.builder(
+                                itemCount: _recentPhotoGroups.entries.length,
+                                itemBuilder: (context, index) {
+                                  var entry = _recentPhotoGroups.entries
+                                      .elementAt(index);
+                                  return _buildPhotoGroup(
+                                      entry.key, entry.value);
+                                },
+                              ),
                             ),
-                  //      ^
-                  //      |---> flewel ghadi y tafficha dak cercle katlowda z3ma ^_^, then kayverifier ila kant la liste dyal
-                  //      |     les photos khawya ghadi y afficher aucune photo .. f center dyal section , if l contraire ghadi y afficher
-                  //      |     la gride dyal les photo récente ^_-;
                 ),
-
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   child: _buildComparePhotoButton(),
@@ -292,20 +441,16 @@ class _ProgressePageState extends State<ProgressePage> {
           ),
         ),
       ),
-
-      /********* Bouton flottant pour la caméra ********/
       floatingActionButton: Padding(
         padding: EdgeInsets.only(bottom: 100, right: 10),
         child: _buildCameraButton(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      /********* FIN DU BOUTON ********/
     );
   }
 
   Widget _buildProgressTrackingCard(double screenWidth, double screenHeight) {
     return Padding(
-      // padding: const EdgeInsets.only(top: 10, left: 1, right: 1),
       padding: EdgeInsets.only(
         top: screenHeight * 0.03,
         left: screenWidth * 0.00,
@@ -386,19 +531,31 @@ class _ProgressePageState extends State<ProgressePage> {
     final displayedPhotos = photos.length > _maxPhotosPerGroup
         ? photos.sublist(0, _maxPhotosPerGroup)
         : photos;
-    //  ^--> hna sayidati ghadi nchofo ila kan l nombre dyal les photos f grp ktar mn li max n9et3o ghi li bghina , snn dak chi li bina ghadi tab9a la list kima hiya :)
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 2, bottom: 8),
-          child: Text(
-            date,
-            style: const TextStyle(
-              color: Color(0xFFB55F75),
-              fontSize: 12,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                date,
+                style: const TextStyle(
+                  color: Color(0xFFB55F75),
+                  fontSize: 12,
+                ),
+              ),
+              if (photos.length > _maxPhotosPerGroup)
+                Text(
+                  '${photos.length} photos',
+                  style: TextStyle(
+                    color: Colors.white.withAlpha(180),
+                    fontSize: 10,
+                  ),
+                ),
+            ],
           ),
         ),
         GridView.builder(
@@ -412,7 +569,7 @@ class _ProgressePageState extends State<ProgressePage> {
           ),
           itemCount: displayedPhotos.length,
           itemBuilder: (context, index) {
-            return _buildPhotoThumbnail(displayedPhotos[index].path ?? '');
+            return service.buildPhotoThumbnail(displayedPhotos[index]);
           },
         ),
         const SizedBox(height: 16),
@@ -420,25 +577,39 @@ class _ProgressePageState extends State<ProgressePage> {
     );
   }
 
-  Widget _buildPhotoThumbnail(String imagePath) {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        constraints: BoxConstraints(
-          maxHeight: 100,
-          maxWidth: 100,
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: Colors.transparent,
-          image: DecorationImage(
-            image: AssetImage(imagePath),
-            fit: BoxFit.contain,
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildPhotoThumbnail(Photo photo) {
+  //   final file = File(photo.path ?? '');
+  //   return GestureDetector(
+  //     onTap: () {
+  //       print('Photo tappée: ${photo.path}');
+  //     },
+  //     child: Container(
+  //       constraints: BoxConstraints(
+  //         maxHeight: 100,
+  //         maxWidth: 100,
+  //       ),
+  //       decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.circular(14),
+  //         color: Colors.grey.withAlpha(50),
+  //         image: DecorationImage(
+  //           image: file.existsSync()
+  //               ? FileImage(file)
+  //               : AssetImage('images/placeholder.png') as ImageProvider,
+  //           fit: BoxFit.cover,
+  //         ),
+  //       ),
+  //       child: !file.existsSync()
+  //           ? Center(
+  //               child: Icon(
+  //                 Icons.broken_image,
+  //                 color: Colors.white.withAlpha(128),
+  //                 size: 24,
+  //               ),
+  //             )
+  //           : null,
+  //     ),
+  //   );
+  // }
 
   Widget _buildComparePhotoButton() {
     return Container(
@@ -485,38 +656,24 @@ class _ProgressePageState extends State<ProgressePage> {
   }
 
   Widget _buildCameraButton() {
-    return Container(
-      width: 60,
-      height: 60,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [Color(0xFFC58BF2), Color(0xFFEEA4CE)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Color.fromARGB(92, 238, 164, 206),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: Offset(4, 1),
+    return FloatingActionButton(
+      onPressed: () async {
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TakePhotoPage(
+              onPhotosCompleted: (List<String> takenPhotoPaths) async {
+                print('Photos prises: $takenPhotoPaths');
+              },
+            ),
           ),
-        ],
-      ),
-      child: IconButton(
-        iconSize: 30,
-        icon: const Icon(
-          Icons.camera_alt,
-          color: Colors.white,
-        ),
-        onPressed: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => TakePhotoPage()),
-          );
-        },
-      ),
+        );
+        if (result != null) {
+          await _refreshPhotos();
+        }
+      },
+      backgroundColor: Color(0xFF6273BD),
+      child: Icon(Icons.camera_alt, color: Colors.white),
     );
   }
 }

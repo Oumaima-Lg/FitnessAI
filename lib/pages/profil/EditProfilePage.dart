@@ -185,11 +185,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         // _buildDatePicker(),
         const SizedBox(height: 16),
         _buildLabel("Weight"),
-        _buildDropdown(weight!, List.generate(200, (i) => (0 + i).toString()),
+        _buildDropdown(weight!, List.generate(500, (i) => (0 + i).toString()),
             suffix: "kg"),
         const SizedBox(height: 16),
         _buildLabel("Height"),
-        _buildDropdown(height!, List.generate(200, (i) => (0 + i).toString()),
+        _buildDropdown(height!, List.generate(500, (i) => (0 + i).toString()),
             suffix: "cm"),
       ],
     );

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/models/planning.dart';
 import 'package:fitness/pages/bottomnavbar.dart';
+import 'package:fitness/pages/login_methods.dart';
 import 'package:fitness/pages/register.dart';
 import 'package:fitness/services/Auth_service.dart';
 import 'package:fitness/services/database.dart';
@@ -99,26 +100,35 @@ class _LoginState extends State<Login> {
         ));
       }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
+      // S'assurer que le contexte est toujours valide
+      if (mounted) {
+        String errorMessage = "";
+        Color backgroundColor = Colors.red;
+
+        if (e.code == 'user-not-found') {
+          errorMessage = "No user Found for that Email";
+        } else if (e.code == 'wrong-password') {
+          errorMessage = "Wrong Password Provided by User";
+        } else if (e.code == 'invalid-email') {
+          errorMessage = "Invalid email address";
+        } else if (e.code == 'user-disabled') {
+          errorMessage = "User account has been disabled";
+        } else {
+          errorMessage = "Login failed. Please try again.";
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: backgroundColor,
           content: Text(
-            "No user Found for that Email",
-            style: TextStyle(fontSize: 18.0, color: Colors.black),
+            errorMessage,
+            style: TextStyle(fontSize: 18.0, color: Colors.white),
           ),
-        ));
-      } else if (e.code == 'wrong-password') {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            "Wrong Password Provided by User",
-            style: TextStyle(
-                fontSize: 18.0,
-                color: const Color.fromARGB(255, 136, 135, 135)),
-          ),
+          duration: Duration(seconds: 3),
         ));
       }
-    } catch (e) {
+    } catch (ee) {
       // Gestion des autres erreurs
-      print(e.toString());
+      print(ee.toString());
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
           "Erreur lors de la récupération des données",
@@ -173,7 +183,6 @@ class _LoginState extends State<Login> {
         padding: EdgeInsets.only(bottom: 10, top: 10),
         width: double.infinity,
         height: double.infinity,
-        /* background degrade : */
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -236,8 +245,6 @@ class _LoginState extends State<Login> {
                           },
                         ),
                         SizedBox(height: 16),
-
-                        // Password Field
                         _buildTextFormField(
                           controller: passwordController,
                           hintText: 'Password',
@@ -274,19 +281,17 @@ class _LoginState extends State<Login> {
                           maxWidth: 220,
                           maxHeight: 50,
                           onPressed: () {
-                            setState(() {
-                              if (emailController.text != "" &&
-                                  passwordController.text != "") {
+                            if (_formKey.currentState!.validate()) {
+                              setState(() {
                                 email = emailController.text;
                                 password = passwordController.text;
-                                userLogin();
-                              }
-                            });
+                              });
+                              userLogin();
+                            }
                           },
                         ),
 
                         SizedBox(height: 16),
-
                         // ------------ Or --------------- (dividor)
                         Row(
                           children: [
@@ -303,30 +308,36 @@ class _LoginState extends State<Login> {
                             Expanded(child: Divider(color: Colors.white24)),
                           ],
                         ),
-
                         SizedBox(height: 16),
-
                         // Social Login Options
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            CustomSocialIcon(
-                              borderColor: Colors.white24,
-                              child: Image.asset('images/google_icon.png',
-                                  width: MediaQuery.of(context).size.width),
+                            GestureDetector(
+                              onTap: () {
+                                signInWithGoogle(context);
+                              },
+                              child: CustomSocialIcon(
+                                borderColor: Colors.white24,
+                                child: Image.asset('images/google_icon.png',
+                                    width: MediaQuery.of(context).size.width),
+                              ),
                             ),
                             const SizedBox(width: 20),
-                            CustomSocialIcon(
-                              borderColor: Colors.white24,
-                              child: Image.asset('images/facebook_icon.png',
-                                  width: MediaQuery.of(context).size.width),
+                            GestureDetector(
+                              onTap: () {
+                                // signInWithFacebook(context);
+                              },
+                              child: CustomSocialIcon(
+                                borderColor: Colors.white24,
+                                child: Image.asset('images/facebook_icon.png',
+                                    width: MediaQuery.of(context).size.width),
+                              ),
                             ),
                             const SizedBox(width: 20),
                           ],
                         ),
-
                         SizedBox(height: 24),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -341,11 +352,14 @@ class _LoginState extends State<Login> {
                                     MaterialPageRoute(
                                         builder: (context) => Register()));
                               },
-                              child: Text(
-                                'Register',
-                                style: TextStyle(
-                                  color: Color(0xFF983BCB),
-                                  fontWeight: FontWeight.bold,
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Text(
+                                  'Register',
+                                  style: TextStyle(
+                                    color: Color(0xFF983BCB),
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),

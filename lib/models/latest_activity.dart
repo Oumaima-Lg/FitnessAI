@@ -1,5 +1,5 @@
 class LatestActivity {
-  int? id;
+  String? id;
   String? nameActivity;
   String? imageUrl;
   int? createdAt;
