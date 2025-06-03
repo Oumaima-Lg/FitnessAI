@@ -150,215 +150,217 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF2A2D4A),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              // Header with back button
-              Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border:
-                          Border.all(color: Color(0xFFE8ACFF).withAlpha(178)),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new,
-                          color: Colors.white, size: 16),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 86),
-                  const Text(
-                    'Add Schedule',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 50),
-
-              // Date selection
-              GestureDetector(
-                onTap: _selectDate,
-                child: Row(
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                // Header with back button
+                Row(
                   children: [
-                    const Icon(Icons.calendar_today,
-                        color: Color.fromARGB(255, 235, 173, 156), size: 14),
-                    const SizedBox(width: 8),
-                    GradientTitleText(
-                      text: _formatDate(selectedDate),
-                      fontSize: 14,
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border:
+                            Border.all(color: Color(0xFFE8ACFF).withAlpha(178)),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back_ios_new,
+                            color: Colors.white, size: 16),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 86),
+                    const Text(
+                      'Add Schedule',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 30),
+                const SizedBox(height: 50),
 
-              // Time label
-              const Text(
-                'Time',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 4),
-
-              // Time picker
-              GestureDetector(
-                onTap: _selectTime,
-                child: Container(
-                  padding: EdgeInsets.only(bottom: 10),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: Colors.grey.shade700),
-                    ),
-                  ),
+                // Date selection
+                GestureDetector(
+                  onTap: _selectDate,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Hour picker
-                      buildNumberColumn(
-                        current: selectedTime.hour % 12 == 0
-                            ? 12
-                            : selectedTime.hour % 12,
-                        prev: selectedTime.hour % 12 == 1
-                            ? 12
-                            : (selectedTime.hour % 12) - 1,
-                        next: selectedTime.hour % 12 == 12
-                            ? 1
-                            : (selectedTime.hour % 12) + 1,
-                      ),
-                      const Text(":",
-                          style: TextStyle(
-                              color: Color(0xFF92A3FD), fontSize: 20)),
-                      // Minute picker
-                      buildNumberColumn(
-                        current: selectedTime.minute,
-                        prev: selectedTime.minute == 0
-                            ? 59
-                            : selectedTime.minute - 1,
-                        next: selectedTime.minute == 59
-                            ? 0
-                            : selectedTime.minute + 1,
-                        showAsDoubleDigit: true,
-                      ),
-                      const SizedBox(width: 16),
-                      // AM/PM picker
-                      Text(
-                        selectedTime.period == DayPeriod.am ? "AM" : "PM",
-                        style: TextStyle(
-                          color: Color(0xFF92A3FD),
-                          fontSize: 16,
-                        ),
+                      const Icon(Icons.calendar_today,
+                          color: Color.fromARGB(255, 235, 173, 156), size: 14),
+                      const SizedBox(width: 8),
+                      GradientTitleText(
+                        text: _formatDate(selectedDate),
+                        fontSize: 14,
                       ),
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 30),
+                const SizedBox(height: 30),
 
-              // Details Workout
-              const Text(
-                'Workout Details ',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                // Time label
+                const Text(
+                  'Time',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 4),
 
-              // Choose Workout button
-              buildSelectionCard(
-                icon: Icons.fitness_center,
-                title: 'Choose Workout',
-                value: selectedWorkout,
-                valueColor: Colors.red,
-                onTap: () {
-                  // Ouvrir une boîte de dialogue pour sélectionner un workout
-                  _showWorkoutSelectionDialog();
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Activity button
-              buildSelectionCard(
-                icon: Icons.directions_run,
-                title: 'Activity',
-                value: selectedActivity,
-                valueColor: Colors.red,
-                onTap: () {
-                  // Ouvrir une boîte de dialogue pour sélectionner une activité
-                  _showActivitySelectionDialog();
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Description
-              Container(
-                decoration: BoxDecoration(
-                  color: Color(0xFF92A3FD).withAlpha(51),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                // Time picker
+                GestureDetector(
+                  onTap: _selectTime,
+                  child: Container(
+                    padding: EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey.shade700),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.description_outlined,
-                            color: Colors.white, size: 20),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Description',
+                        // Hour picker
+                        buildNumberColumn(
+                          current: selectedTime.hour % 12 == 0
+                              ? 12
+                              : selectedTime.hour % 12,
+                          prev: selectedTime.hour % 12 == 1
+                              ? 12
+                              : (selectedTime.hour % 12) - 1,
+                          next: selectedTime.hour % 12 == 12
+                              ? 1
+                              : (selectedTime.hour % 12) + 1,
+                        ),
+                        const Text(":",
+                            style: TextStyle(
+                                color: Color(0xFF92A3FD), fontSize: 20)),
+                        // Minute picker
+                        buildNumberColumn(
+                          current: selectedTime.minute,
+                          prev: selectedTime.minute == 0
+                              ? 59
+                              : selectedTime.minute - 1,
+                          next: selectedTime.minute == 59
+                              ? 0
+                              : selectedTime.minute + 1,
+                          showAsDoubleDigit: true,
+                        ),
+                        const SizedBox(width: 16),
+                        // AM/PM picker
+                        Text(
+                          selectedTime.period == DayPeriod.am ? "AM" : "PM",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Color(0xFF92A3FD),
                             fontSize: 16,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: descriptionController,
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey.shade600),
-                        ),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey.shade600),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey.shade400),
-                        ),
-                        hintText: 'Enter description...',
-                        hintStyle: TextStyle(color: Colors.grey.shade400),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      maxLines: 2,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 40,
-              ),
+                const SizedBox(height: 30),
 
-              ReturnButton.gradientButton('Save',
-                  onPressed: () => _saveSchedule()),
-            ],
+                // Details Workout
+                const Text(
+                  'Workout Details ',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Choose Workout button
+                buildSelectionCard(
+                  icon: Icons.fitness_center,
+                  title: 'Choose Workout',
+                  value: selectedWorkout,
+                  valueColor: Colors.red,
+                  onTap: () {
+                    // Ouvrir une boîte de dialogue pour sélectionner un workout
+                    _showWorkoutSelectionDialog();
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Activity button
+                buildSelectionCard(
+                  icon: Icons.directions_run,
+                  title: 'Activity',
+                  value: selectedActivity,
+                  valueColor: Colors.red,
+                  onTap: () {
+                    // Ouvrir une boîte de dialogue pour sélectionner une activité
+                    _showActivitySelectionDialog();
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Description
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xFF92A3FD).withAlpha(51),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.description_outlined,
+                              color: Colors.white, size: 20),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Description',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: descriptionController,
+                        decoration: InputDecoration(
+                          border: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey.shade600),
+                          ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey.shade600),
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey.shade400),
+                          ),
+                          hintText: 'Enter description...',
+                          hintStyle: TextStyle(color: Colors.grey.shade400),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                        maxLines: 2,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 40,
+                ),
+
+                ReturnButton.gradientButton('Save',
+                    onPressed: () => _saveSchedule()),
+              ],
+            ),
           ),
         ),
       ),

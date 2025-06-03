@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fitness/components/gradient.dart';
 import 'package:fitness/pages/login.dart';
 import 'package:fitness/services/shared_pref.dart';
 import 'package:flutter/material.dart';
@@ -299,16 +300,17 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: _buildMenuButton(
                                 'Edit profile', Icons.person_outline, () {
                               Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EditProfilePage(
-                                      name: name!,
-                                      email: email!,
-                                      phone: phone!,
-                                      weight: weight!,
-                                      height: height!),
-                                ),
-                              );
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          GradientComponent.switchBetweenPages(
+                                            EditProfilePage(
+                                                name: name!,
+                                                email: email!,
+                                                phone: phone!,
+                                                weight: weight!,
+                                                height: height!),
+                                          )));
                             }),
                           ),
                           Container(

@@ -225,7 +225,7 @@ class _ProgressePageState extends State<ProgressePage> {
 
                 // Card d'information sur le tracking de progression
                 _buildProgressTrackingCard(screenWidth, screenHeight),
-                
+
                 const SizedBox(height: 20),
 
                 // Entête Gallery
@@ -261,7 +261,7 @@ class _ProgressePageState extends State<ProgressePage> {
                 ),
 
                 const SizedBox(height: 8),
-                
+
                 Expanded(
                   child: _isLoading
                       ? Center(child: CircularProgressIndicator())
@@ -272,7 +272,8 @@ class _ProgressePageState extends State<ProgressePage> {
                           : ListView.builder(
                               itemCount: _recentPhotoGroups.entries.length,
                               itemBuilder: (context, index) {
-                                var entry = _recentPhotoGroups.entries.elementAt(index);
+                                var entry =
+                                    _recentPhotoGroups.entries.elementAt(index);
                                 return _buildPhotoGroup(entry.key, entry.value);
                               },
                             ),
@@ -457,31 +458,26 @@ class _ProgressePageState extends State<ProgressePage> {
       ),
       child: Row(
         children: [
-          Expanded(
-            flex: 2,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text(
-                  'Compare my Photo',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                'Compare my Photo',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
                 ),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: ReturnButton.gradientButton(
-                    'Compare',
-                    onPressed: () {
-                      // Action when button is pressed
-                    },
-                  ),
-                )
-              ],
-            ),
+              ),
+              const SizedBox(width: 10),
+              ReturnButton.gradientButton(
+                'Compare',
+                onPressed: () {
+                  // Action when button is pressed
+                },
+              )
+            ],
           ),
         ],
       ),

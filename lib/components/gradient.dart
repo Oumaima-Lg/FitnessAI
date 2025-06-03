@@ -126,4 +126,20 @@ class GradientComponent {
       ),
     );
   }
+
+  static Widget switchBetweenPages(Widget page) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF2E2F55),
+            Color(0xFF23253C),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: page,
+    );
+  }
 }

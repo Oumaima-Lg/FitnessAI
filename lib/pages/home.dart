@@ -13,6 +13,7 @@ import 'package:fitness/pages/PlanningPage.dart';
 import 'package:fitness/pages/progress_photo.dart';
 import 'package:fitness/pages/planning/focus.dart';
 import 'package:fitness/services/planning_service.dart';
+import 'package:fitness/services/shared_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/services/user_service.dart';
 
@@ -53,6 +54,16 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
+  String? name, id, email, phone, address, weight, height, age, imageURL;
+
+  gettheshredpref() async {
+    name = await SharedpreferenceHelper().getUserName();
+
+    email = await SharedpreferenceHelper().getUserEmail();
+
+    setState(() {});
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -63,6 +74,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     loadDataExercice();
+    gettheshredpref();
     // loadDataLatestActivities();
     // initUserData();
     _getData();
@@ -208,7 +220,7 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Text(
                           // currentUser.name
-                          'Test',
+                          name!,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -226,7 +238,7 @@ class _HomePageState extends State<HomePage> {
                         const SizedBox(height: 5),
                         Text(
                           //currentUser.email
-                          'email',
+                          email!,
                           style: TextStyle(
                             color: Colors.white.withAlpha(178),
                             fontSize: 12,
@@ -289,7 +301,7 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Text('Hello, ${currentUser.name}',
-                  Text('Hello, rt}',
+                  Text('Hello, $name',
                       style: TextStyle(
                         color: Color.fromARGB(179, 255, 255, 255),
                         fontSize: 13,

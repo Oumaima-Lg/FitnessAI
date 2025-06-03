@@ -849,7 +849,7 @@ class _AlimHomePageState extends State<AlimHomePage>
               : _recommendedMeals.isEmpty
                   ? Center(
                       child: Text(
-                        "Aucun repas recommandé disponible",
+                        "Empty recommended meals",
                         style: TextStyle(color: Colors.white),
                       ),
                     )
@@ -869,8 +869,8 @@ class _AlimHomePageState extends State<AlimHomePage>
   }
 
   Widget _buildMealCard([Meal? meal]) {
-    final String mealName = meal?.label ?? "Olive Salad";
-    final String imageUrl = meal?.imageUrl ?? 'https://via.placeholder.com/120';
+    final String mealName = meal?.label ?? "NONE";
+    final String imageUrl = meal?.imageUrl ?? 'https://example.com/';
     final String calories =
         meal != null ? "${meal.calories.toInt() ~/ 100} Kcal" : "17 Kcal";
     final double rating = meal?.rating ?? 4.5;
@@ -883,7 +883,8 @@ class _AlimHomePageState extends State<AlimHomePage>
           child: Container(
             width: 150,
             decoration: BoxDecoration(
-              color: const Color(0xFFCAD4DB).withAlpha(97),
+              // color: const Color(0xFFCAD4DB).withAlpha(97),
+              color: Color(0xFF383A5A),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Padding(
@@ -895,7 +896,8 @@ class _AlimHomePageState extends State<AlimHomePage>
                   Text(
                     mealName,
                     style: TextStyle(
-                      color: Color.fromARGB(255, 15, 15, 26),
+                      // color: Color.fromARGB(255, 15, 15, 26),
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),
@@ -913,7 +915,8 @@ class _AlimHomePageState extends State<AlimHomePage>
                       Text(
                         calories,
                         style: TextStyle(
-                          color: Color.fromARGB(255, 15, 15, 26),
+                          // color: Color.fromARGB(255, 15, 15, 26),
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),

@@ -1,7 +1,9 @@
+import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/personalized_widget.dart';
 import 'package:fitness/components/return_button.dart';
 import 'package:fitness/models/meals.dart';
 import 'package:fitness/pages/Alimentation/suivi_repas.dart';
+import 'package:fitness/pages/planning/WorkoutSavedScreen.dart';
 import 'package:fitness/services/MealsPlanning_service.dart';
 import 'package:fitness/services/meals_service.dart';
 import 'package:flutter/material.dart';
@@ -38,12 +40,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
   final TextEditingController _searchController = TextEditingController();
   bool isSearching = false;
 
-  final List<String> mealTypes = [
-    'Breakfast',
-    'Lunch',
-    'Dinner',
-    'Snack'
-  ];
+  final List<String> mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
   @override
   void initState() {
@@ -884,9 +881,11 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
       );
 
       Future.delayed(Duration(seconds: 1), () {
-        Navigator.push(context,
+        Navigator.push(
+          context,
           MaterialPageRoute(
-            builder: (context) => SuivisRepasScreen(),
+            builder: (context) =>
+                GradientComponent.switchBetweenPages(WorkoutSavedScreen()),
           ),
         );
       });

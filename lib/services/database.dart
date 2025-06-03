@@ -27,6 +27,22 @@ class DatabaseMethods {
     }
   }
 
+  Future<bool> updateUserDetails(
+      String userId, Map<String, dynamic> updatedData) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .update(updatedData);
+
+      print("user data mis à jour avec succès dans Firestore");
+      return true;
+    } catch (e) {
+      print("Erreur lors de la mise à jour du user data dans Firestore: $e");
+      return false;
+    }
+  }
+
   Future addUserWorkoutDetails(
       Map<String, dynamic> userPlanningMap, String userId) async {
     return await FirebaseFirestore.instance

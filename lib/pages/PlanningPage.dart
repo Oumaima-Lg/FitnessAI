@@ -1,6 +1,9 @@
+import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/personalized_widget.dart';
+import 'package:fitness/components/return_button.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
 import 'package:fitness/models/planning.dart';
+import 'package:fitness/pages/Alimentation/suivi_repas.dart';
 import 'package:fitness/pages/planning/focus.dart';
 import 'package:fitness/services/planning_service.dart';
 import 'package:flutter/material.dart';
@@ -144,9 +147,68 @@ class _PlanningPageState extends State<PlanningPage> {
               _buildActivitiesList(),
               const SizedBox(height: 25),
               buildSchedule(),
+              // const SizedBox(height: 25),
+              // _buildshowplanningMealButton(),
             ],
           ),
         ),
+      ),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: 20),
+        child: _buildshowplanningMealButton(),
+      ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.miniCenterDocked,
+    );
+  }
+
+  Widget _buildshowplanningMealButton() {
+    return Container(
+      width: 315,
+      height: 57,
+      padding: const EdgeInsets.only(left: 30, top: 12, bottom: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF9DCEFF).withAlpha(50),
+            Color(0xFF92A3FD).withAlpha(60)
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                'Today\'s nutrition',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(width: 10),
+              ReturnButton.gradientButton(
+                'Show',
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              GradientComponent.switchBetweenPages(
+                                  SuivisRepasScreen())));
+                }
+                // Action when button is pressed
+                ,
+              )
+            ],
+          ),
+        ],
       ),
     );
   }
