@@ -1,13 +1,21 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/gradient.dart';
-import 'package:fitness/models/User.dart';
 import 'package:fitness/pages/login.dart';
-import 'package:fitness/services/Auth_service.dart';
-import 'package:fitness/services/user_service.dart';
+import 'package:fitness/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class CompleteRegister extends StatefulWidget {
-  const CompleteRegister({super.key});
+  const CompleteRegister(
+      {super.key,
+      required this.email,
+      required this.password,
+      required this.name,
+      required this.phone});
+  final String email;
+  final String password;
+  final String name;
+  final String phone;
 
   @override
   State<CompleteRegister> createState() => _CompleteRegisterState();
@@ -16,35 +24,62 @@ class CompleteRegister extends StatefulWidget {
 class _CompleteRegisterState extends State<CompleteRegister> {
   final _formKey = GlobalKey<FormState>();
 
-  final UserService _userService = UserService();
-  final AuthService _authService = AuthService();
-
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
 
   String? selectedGender;
 
-  Future<void> _completeProfile() async {
-    if (_formKey.currentState!.validate()) {
-      final user = _authService.currentUser ;
-      if (user != null) {
-        UserModel newuser = UserModel(
-          id: user.uid,
-          name: user.displayName ?? '',
-          email: user.email ?? '',
-          imageUrl: user.photoURL ?? '',
-          age: 0, // Age will be set later
-          phone: user.phoneNumber ?? '',
-          weight: double.tryParse(_weightController.text) ?? 0.0,
-          height: double.tryParse(_heightController.text) ?? 0.0,
-          address: '', // Address can be added later
-        );
-        await _userService.updateUser(newuser);
-        
-        Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => Login())
-        );
+  registration() async {
+    if (widget.name != "" && widget.email != "") {
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+                email: widget.email, password: widget.password);
+
+        // UTILISER L'UID DE FIREBASE AUTH COMME ID
+        String userId = userCredential.user!.uid;
+
+        Map<String, dynamic> userInfoMap = {
+          "Name": widget.name,
+          "Email": widget.email,
+          "Phone": widget.phone,
+          "weight": _weightController.text,
+          "height": _heightController.text,
+          "age": _dobController.text,
+          "Id": userId, // Utilisez l'UID de Firebase Auth
+        };
+
+        await DatabaseMethods().addUserDetails(userInfoMap, userId);
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Color(0xFF0A1653),
+          content: Text(
+            "Registered Successfully",
+            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          ),
+        ));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Login()));
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.orangeAccent,
+            content: Text(
+              "Password Provided is too Weak",
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ));
+        } // SnackBar
+        else if (e.code == 'email-already-in-use') {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: const Color.fromARGB(255, 216, 160, 160),
+            content: Text(
+              "Account Already exists",
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ));
+        } // SnackBar
       }
     }
   }
@@ -71,7 +106,8 @@ class _CompleteRegisterState extends State<CompleteRegister> {
             child: Form(
               key: _formKey,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 39),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 9, vertical: 39),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -117,7 +153,8 @@ class _CompleteRegisterState extends State<CompleteRegister> {
                     // Genre
                     DropdownButtonFormField<String>(
                       value: selectedGender,
-                      decoration: _inputDecoration(Icons.person, 'Choose Gender'),
+                      decoration:
+                          _inputDecoration(Icons.person, 'Choose Gender'),
                       dropdownColor: const Color(0xFF161818),
                       style: const TextStyle(color: Colors.white),
                       items: ['Male', 'Female'].map((String value) {
@@ -146,7 +183,8 @@ class _CompleteRegisterState extends State<CompleteRegister> {
                       style: const TextStyle(color: Colors.white),
                       controller: _dobController,
                       readOnly: true,
-                      decoration: _inputDecoration(Icons.calendar_month, 'Date of Birth'),
+                      decoration: _inputDecoration(
+                          Icons.calendar_month, 'Date of Birth'),
                       onTap: () async {
                         DateTime? picked = await showDatePicker(
                           context: context,
@@ -155,7 +193,8 @@ class _CompleteRegisterState extends State<CompleteRegister> {
                           lastDate: DateTime.now(),
                         );
                         if (picked != null) {
-                          _dobController.text = "${picked.toLocal()}".split(' ')[0];
+                          _dobController.text =
+                              "${picked.toLocal()}".split(' ')[0];
                         }
                       },
                       validator: (value) {
@@ -170,68 +209,75 @@ class _CompleteRegisterState extends State<CompleteRegister> {
 
                     // Poids
                     Row(
-                    children: [ 
-                      // Champ de saisie étirable
-                      Expanded(
-                        child: TextFormField(  
-                          controller: _weightController,
-                          style: const TextStyle(color: Colors.white),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-                          decoration: _inputDecoration(Icons.monitor_weight, 'Your Weight'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your weight';
-                            }
-                            return null;
-                          },
+                      children: [
+                        // Champ de saisie étirable
+                        Expanded(
+                          child: TextFormField(
+                            controller: _weightController,
+                            style: const TextStyle(color: Colors.white),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9.]'))
+                            ],
+                            decoration: _inputDecoration(
+                                Icons.monitor_weight, 'Your Weight'),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your weight';
+                              }
+                              return null;
+                            },
+                          ),
                         ),
-                      ),
-                      
-                      const SizedBox(width: (20)),
 
-                      // Image extérieure
-                      Image.asset(
-                        'images/Kg.png', // ton chemin vers l'image
-                        width: 62,
-                        height: 62,
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: (20)),
 
+                        // Image extérieure
+                        Image.asset(
+                          'images/Kg.png', // ton chemin vers l'image
+                          width: 62,
+                          height: 62,
+                        ),
+                      ],
+                    ),
 
                     const SizedBox(height: 16),
 
                     // Taille
                     Row(
                       children: [
-                      // Champ de saisie étirable
-                      Expanded(
-                        child: TextFormField(
-                          controller: _heightController,
-                          style: const TextStyle(color: Colors.white),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-                          decoration: _inputDecoration(Icons.height, 'Your Height'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your height';
-                            }
-                            return null;
-                          },
+                        // Champ de saisie étirable
+                        Expanded(
+                          child: TextFormField(
+                            controller: _heightController,
+                            style: const TextStyle(color: Colors.white),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9.]'))
+                            ],
+                            decoration:
+                                _inputDecoration(Icons.height, 'Your Height'),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your height';
+                              }
+                              return null;
+                            },
+                          ),
                         ),
-                      ),
-                      
-                      const SizedBox(width: (20)),
 
-                      // Image extérieure
-                      Image.asset(
-                        'images/Cm.png', // ton chemin vers l'image
-                        width: 65,
-                        height: 65,
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: (20)),
+
+                        // Image extérieure
+                        Image.asset(
+                          'images/Cm.png', // ton chemin vers l'image
+                          width: 65,
+                          height: 65,
+                        ),
+                      ],
+                    ),
 
                     const SizedBox(height: 52),
 
@@ -239,17 +285,11 @@ class _CompleteRegisterState extends State<CompleteRegister> {
                       text: 'Next   >',
                       maxWidth: 220,
                       maxHeight: 50,
-                      onPressed: _completeProfile,
-                      // onPressed: () {
-                      //   if (_formKey.currentState!.validate()) {
-                      //     Navigator.pushReplacement(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (context) => const Login(),
-                      //       ),
-                      //     );
-                      //   }
-                      // },
+                      onPressed: () {
+                        // if (_formKey.currentState!.validate()) {
+                        registration();
+                        // }
+                      },
                     ),
 
                     const SizedBox(height: 16),

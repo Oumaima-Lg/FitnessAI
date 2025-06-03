@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/gradient.dart';
+import 'package:fitness/models/planning.dart';
 import 'package:fitness/pages/bottomnavbar.dart';
 import 'package:fitness/pages/register.dart';
 import 'package:fitness/services/Auth_service.dart';
+import 'package:fitness/services/database.dart';
+import 'package:fitness/services/shared_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -23,24 +27,105 @@ class _LoginState extends State<Login> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
 
-   Future<void> _userLogin() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        final user = await _authService.signInWithEmailAndPassword(
-          emailController.text,
-          passwordController.text,
-        );
-        
-        if (user != null) {
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) => BottomNavBar()
-          ));
-        }
-      } catch (e) {
+  userLogin() async {
+    try {
+      // Connexion de l'utilisateur
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+
+      print("User logged in: ${userCredential.user?.email}");
+
+      // Récupération de l'ID utilisateur
+      String userId = userCredential.user!.uid;
+      print(userId);
+
+      // Instance des classes helper
+      DatabaseMethods databaseMethods = DatabaseMethods();
+      SharedpreferenceHelper sharedPrefHelper = SharedpreferenceHelper();
+
+      // Récupération des données utilisateur depuis Firestore
+      Map<String, dynamic>? userData =
+          await databaseMethods.getUserDetails(userId);
+
+      List<Map<String, dynamic>> planningsData =
+          await databaseMethods.getUserWorkoutDetails(userId);
+      List<PlanningModel> plannings =
+          planningsData.map((e) => PlanningModel.fromMap(e)).toList();
+
+      if (userData != null) {
+        // Sauvegarde des données localement
+        print("User ID: $userId");
+        print("User Data: $userData");
+
+        await sharedPrefHelper.saveUserId(userId);
+
+        await sharedPrefHelper.saveUserName(userData['Name'] ?? '');
+        await sharedPrefHelper.saveUserEmail(userData['Email'] ?? '');
+        await sharedPrefHelper.saveUserAge(userData['age'] ?? 0);
+        await sharedPrefHelper.saveUserPhone(userData['Phone'] ?? '');
+        await sharedPrefHelper.saveUserWeight(userData['weight'] ?? 0.0);
+        await sharedPrefHelper.saveUserHeight(userData['height'] ?? 0.0);
+        await sharedPrefHelper.saveUserAddress(userData['Address'] ?? '');
+        await sharedPrefHelper.saveUserImageURL(userData['Image'] ?? '');
+        await sharedPrefHelper.savePlanningList(plannings);
+
+        // await sharedPrefHelper.saveUserImage(userData['Image'] ?? '');
+
+        // Navigation vers la page principale
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF2E2F55),
+                      Color(0xFF23253C),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: BottomNavBar(),
+              ),
+            ));
+      } else {
+        // Afficher un message si l'utilisateur n'existe pas dans Firestore
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(e.toString()),
+          content: Text(
+            "Données utilisateur non trouvées",
+            style: TextStyle(fontSize: 18.0, color: Colors.black),
+          ),
         ));
       }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            "No user Found for that Email",
+            style: TextStyle(fontSize: 18.0, color: Colors.black),
+          ),
+        ));
+      } else if (e.code == 'wrong-password') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            "Wrong Password Provided by User",
+            style: TextStyle(
+                fontSize: 18.0,
+                color: const Color.fromARGB(255, 136, 135, 135)),
+          ),
+        ));
+      }
+    } catch (e) {
+      // Gestion des autres erreurs
+      print(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          "Erreur lors de la récupération des données",
+          style: TextStyle(
+              fontSize: 18.0, color: const Color.fromARGB(255, 230, 204, 204)),
+        ),
+      ));
     }
     // try {
     //   await FirebaseAuth.instance
@@ -194,7 +279,7 @@ class _LoginState extends State<Login> {
                                   passwordController.text != "") {
                                 email = emailController.text;
                                 password = passwordController.text;
-                                _userLogin();
+                                userLogin();
                               }
                             });
                           },

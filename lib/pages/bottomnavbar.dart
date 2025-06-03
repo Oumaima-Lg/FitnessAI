@@ -2,7 +2,6 @@ import 'package:fitness/pages/Alimentation/alim_home.dart';
 import 'package:fitness/pages/exercice_page.dart';
 import 'package:fitness/pages/home.dart';
 import 'package:fitness/pages/profile.dart';
-import 'package:fitness/pages/page4.dart';
 import 'package:fitness/pages/statisticsPage.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -21,7 +20,6 @@ class _BottomNavState extends State<BottomNavBar> {
   late HomePage homePage;
   // late ProgressePage homePage;
   late ExercicePage exercicePage;
-  late Page4 page4;
   late Statistics statistics;
   late ProfilePage profilePage;
   late AlimHomePage alimentationPage;
@@ -35,7 +33,6 @@ class _BottomNavState extends State<BottomNavBar> {
     exercicePage = ExercicePage();
     profilePage = ProfilePage();
     alimentationPage = AlimHomePage();
-    page4 = Page4();
     statistics = Statistics(
       stats: UserStats(
         trainingTime: 2628,

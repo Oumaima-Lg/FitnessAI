@@ -20,21 +20,21 @@ class ActivityTracker extends StatefulWidget {
 }
 
 class _ActivityTrackerState extends State<ActivityTracker> {
-  final activityManager = LatestActivityManager();
+  // final activityManager = LatestActivityManager();
   List<LatestActivity> latestActivities = [];
 
   @override
   void initState() {
     super.initState();
-    loadDataLatestActivities();
+    // loadDataLatestActivities();
   }
 
-  void loadDataLatestActivities() async {
-    await activityManager.loadActivities();
-    setState(() {
-      latestActivities = activityManager.activities;
-    });
-  }
+  // void loadDataLatestActivities() async {
+  //   await activityManager.loadActivities();
+  //   setState(() {
+  //     latestActivities = activityManager.activities;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {

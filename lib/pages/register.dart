@@ -1,14 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/gradient.dart';
-import 'package:fitness/models/User.dart';
 import 'package:fitness/pages/login.dart';
-import 'package:fitness/services/Auth_service.dart';
 import 'package:fitness/services/database.dart';
 import 'package:fitness/services/shared_pref.dart';
-import 'package:fitness/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fitness/pages/completeRegister.dart';
+import 'package:random_string/random_string.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -21,88 +19,22 @@ class _RegisterState extends State<Register> {
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
 
-  final AuthService _authService = AuthService();
-  final UserService _userService = UserService();
-  
   String email = "", password = "", name = "";
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  Future<void> _registration() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        final user = await _authService.createUserWithEmailAndPassword(
-          emailController.text,
-          passwordController.text,
-        );
-        
-        if (user != null) {
-          final newUser = UserModel(
-            id: user.uid,
-            name: nameController.text,
-            email: emailController.text,
-          );
-          
-          await _userService.updateUser(newUser);
-          Navigator.push(context, 
-            MaterialPageRoute(builder: (context) => CompleteRegister())
-          );
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(e.toString()),
-        ));
-      }
-    }
-    // if (nameController.text != "" && emailController.text != "") {
-    //   try {
-    //     UserCredential userCredential = await FirebaseAuth.instance
-    //         .createUserWithEmailAndPassword(email: email, password: password);
-
-    //     String Id = userCredential.user!.uid;
-    //     Map<String, dynamic> userInfoMap = {
-    //       "Name": nameController.text,
-    //       "Email": emailController.text,
-    //       "Id": Id,
-    //     };
-
-    //     await SharedpreferenceHelper().saveUserEmail(email);
-    //     await SharedpreferenceHelper().saveUserName(nameController.text);
-    //     await SharedpreferenceHelper().saveUserId(Id);
-    //     await DatabaseMethods().addUserDetails(userInfoMap, Id);
-
-    //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //       backgroundColor: Color(0xFF0A1653),
-    //       content: Text(
-    //         "Registered Successfully",
-    //         style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-    //       ),
-    //     ));
-    //     Navigator.push(context,
-    //         MaterialPageRoute(builder: (context) => CompleteRegister()));
-    //   } on FirebaseAuthException catch (e) {
-    //     if (e.code == 'weak-password') {
-    //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //         backgroundColor: Colors.orangeAccent,
-    //         content: Text(
-    //           "Password Provided is too Weak",
-    //           style: TextStyle(fontSize: 18.0),
-    //         ),
-    //       ));
-    //     } // SnackBar
-    //     else if (e.code == 'email-already-in-use') {
-    //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //         backgroundColor: const Color.fromARGB(255, 216, 160, 160),
-    //         content: Text(
-    //           "Account Already exists",
-    //           style: TextStyle(fontSize: 18.0),
-    //         ),
-    //       ));
-    //     } // SnackBar
-    //   }
-    // }
+  registration() async {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => CompleteRegister(
+                  email: emailController.text,
+                  password: passwordController.text,
+                  name: nameController.text,
+                  phone: phoneController.text,
+                )));
   }
 
   @override
@@ -252,7 +184,7 @@ class _RegisterState extends State<Register> {
                                 email = emailController.text;
                                 password = passwordController.text;
                               });
-                              _registration();
+                              registration();
                             }
                           },
                         ),

@@ -4,7 +4,19 @@ import '../../components/textStyle/textstyle.dart';
 import 'package:intl/intl.dart';
 
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({super.key});
+  const EditProfilePage(
+      {super.key,
+      required this.name,
+      required this.email,
+      required this.phone,
+      required this.weight,
+      required this.height});
+
+  final String name;
+  final String email;
+  final String phone;
+  final String weight;
+  final String height;
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();

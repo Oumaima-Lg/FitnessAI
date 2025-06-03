@@ -12,6 +12,7 @@ import 'package:fitness/pages/PlanningPage.dart';
 // import 'package:fitness/pages/notifications.dart';
 import 'package:fitness/pages/progress_photo.dart';
 import 'package:fitness/pages/planning/focus.dart';
+import 'package:fitness/services/planning_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/services/user_service.dart';
 
@@ -27,8 +28,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final activityManager = LatestActivityManager();
-  final UserService _userService = UserService();
+  // final activityManager = LatestActivityManager();
+  // final UserService _userService = UserService();
   bool _isLoading = true;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -38,6 +39,19 @@ class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
   List<Exercice> exercices = [];
   List<LatestActivity> latestActivities = [];
+  late int nbrCompletedActivities;
+  late int nbrActivities;
+  late double progressValue;
+  bool isLoading = false;
+
+  Future<void> _getData() async {
+    nbrActivities = await PlanningService.getPlanningTodayCount();
+    progressValue = await PlanningService.getTodayProgressPercentage();
+    nbrCompletedActivities =
+        await PlanningService.getCompletedActivitiesCountToday();
+    isLoading = true;
+    setState(() {});
+  }
 
   @override
   void dispose() {
@@ -49,44 +63,45 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     loadDataExercice();
-    loadDataLatestActivities();
-    initUserData();
+    // loadDataLatestActivities();
+    // initUserData();
+    _getData();
   }
 
-  Future <void> initUserData() async{
-    setState(() {
-      _isLoading = true;
-    });
+  // Future<void> initUserData() async {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
 
-    try{
-      await _userService.initializeUser();
-      await _userService.refreshUserData();
-    }catch(e){
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error !')),
-        );
-      }
-    }
+  //   try {
+  //     await _userService.initializeUser();
+  //     await _userService.refreshUserData();
+  //   } catch (e) {
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Error !')),
+  //       );
+  //     }
+  //   }
 
-    setState(() {
-      _isLoading = false;
-    });
-  }
+  //   setState(() {
+  //     _isLoading = false;
+  //   });
+  // }
 
-  void loadDataLatestActivities() async {
-    await activityManager.loadActivities();
-    setState(() {
-      // latestActivities = activityManager.activities;
-      if (activityManager.activities.length >= 2) {
-        latestActivities = activityManager.activities.take(2).toList();
-      } else if (activityManager.activities.isNotEmpty) {
-        latestActivities = activityManager.activities.take(1).toList();
-      } else {
-        latestActivities = activityManager.activities;
-      }
-    });
-  }
+  // void loadDataLatestActivities() async {
+  //   await activityManager.loadActivities();
+  //   setState(() {
+  //     // latestActivities = activityManager.activities;
+  //     if (activityManager.activities.length >= 2) {
+  //       latestActivities = activityManager.activities.take(2).toList();
+  //     } else if (activityManager.activities.isNotEmpty) {
+  //       latestActivities = activityManager.activities.take(1).toList();
+  //     } else {
+  //       latestActivities = activityManager.activities;
+  //     }
+  //   });
+  // }
 
   void loadDataExercice() async {
     List<Exercice> data = await ExerciceData.getExercices();
@@ -118,18 +133,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
-    
-
-
-    if (exercices.isEmpty || !_userService.isLoggedIn) {
+    if (exercices.isEmpty || isLoading == false) {
+      // || !_userService.isLoggedIn
       return Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(child: Image.asset('images/gif/Animation.gif')),
       );
     }
 
-    final currentUser = _userService.currentUser!;
+    // final currentUser = _userService.currentUser!;
 
     return Stack(
       children: [
@@ -195,7 +207,8 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          currentUser.name,
+                          // currentUser.name
+                          'Test',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -212,7 +225,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          currentUser.email,
+                          //currentUser.email
+                          'email',
                           style: TextStyle(
                             color: Colors.white.withAlpha(178),
                             fontSize: 12,
@@ -274,8 +288,8 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                      'Hello, ${currentUser.name}' ,
+                  // Text('Hello, ${currentUser.name}',
+                  Text('Hello, rt}',
                       style: TextStyle(
                         color: Color.fromARGB(179, 255, 255, 255),
                         fontSize: 13,
@@ -364,7 +378,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             Text(
-                              '0%',
+                              '${progressValue.toInt()}%',
                               style: TextStyle(
                                 color: Colors.white54,
                                 fontSize: 14,
@@ -383,7 +397,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         SizedBox(height: 20),
                         LinearProgressIndicator(
-                          value: 0,
+                          value: progressValue / 100,
                           backgroundColor: Color(0xFF2A2C4F),
                           valueColor:
                               AlwaysStoppedAnimation<Color>(Color(0xFF8B78FF)),
@@ -392,7 +406,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         SizedBox(height: 12),
                         Text(
-                          '0/7 Complete',
+                          '$nbrCompletedActivities/$nbrActivities Complete',
                           style: TextStyle(
                             color: Colors.grey[400],
                             fontSize: 14,
