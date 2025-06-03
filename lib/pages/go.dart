@@ -4,6 +4,10 @@ import 'package:fitness/pages/entrainements/congratulation.dart';
 import 'package:flutter/material.dart';
 import '../components/textStyle/textstyle.dart';
 import 'package:fitness/models/activity.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
+import 'package:fitness/pages/statistics/calorieCalculator.dart';
 
 class GoPage extends StatefulWidget {
   final Activity activity;
@@ -23,7 +27,60 @@ class _GoPageState extends State<GoPage> {
   bool start = false;
   int seconds = 0;
   Timer? timer;
+ final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final User? _user = FirebaseAuth.instance.currentUser;
 
+Future<void> _saveWorkoutData() async {
+  if (_user == null) return;
+  
+  final today = DateTime.now();
+  final dateKey = DateFormat('yyyy-MM-dd').format(today);
+  
+  // Create workout data without serverTimestamp
+  final workoutData = {
+    'activity_id': widget.activity.id,
+    'duration': seconds,
+    'timestamp': DateTime.now().toIso8601String(),
+    'activity_name': widget.activity.title,
+    'target_muscle': widget.activity.target,
+  };
+
+  // Sauvegarder le workout
+  final docRef = _firestore
+      .collection('user_workouts')
+      .doc(_user.uid)
+      .collection('daily_sessions')
+      .doc(dateKey);
+  
+  await docRef.set({
+    'workouts': FieldValue.arrayUnion([workoutData]),
+    'user_id': _user.uid,
+    'date': dateKey,
+    'last_update': FieldValue.serverTimestamp(),
+  }, SetOptions(merge: true));
+
+  // Calculer et sauvegarder les calories
+  final calories = await CalorieCalculator.calculateTotalCaloriesBurned(_user.uid);
+  
+  print('\n=== Workout Summary ===');
+  print('Activity: ${widget.activity.title}');
+  print('Duration: $seconds seconds');
+  print('Calories burned this session: ${calories.toStringAsFixed(1)} Kcal');
+  print('Total calories burned today: ${calories.toStringAsFixed(1)} Kcal');
+  print('=====================\n');
+
+  // Ajouter ces informations dans le message de félicitation
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => Congratulation(
+        imageUrl: 'congratulation_${widget.titleExercice}',
+        title: 'Congratulations, You Have Finished Your Workout!',
+        description: '${widget.quote}\n\nCalories burned: ${calories.toStringAsFixed(1)} Kcal',
+      ),
+    ),
+  );
+}
   void startTime() {
     setState(() {
       start = !start;
@@ -37,7 +94,8 @@ class _GoPageState extends State<GoPage> {
           if (seconds >= _selectedDuration.inSeconds) {
             timer?.cancel();
             start = false;
-
+            _saveWorkoutData().then((_) {
+              // Navigate to Congratulation page after saving workout data
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -45,14 +103,16 @@ class _GoPageState extends State<GoPage> {
                   imageUrl: 'congratulation_${widget.titleExercice}',
                   title: 'Congratulations, You Have Finished Your Workout !',
                   description: widget.quote,
+                         ),
                 ),
-              ),
-            );
+              );
+            });
           }
         });
       });
     } else {
       timer?.cancel();
+      if (seconds > 0) _saveWorkoutData();
     }
   }
 
@@ -151,4 +211,16 @@ class _GoPageState extends State<GoPage> {
       ),
     );
   }
+ Future<Map<String, dynamic>> getWorkoutsByDate(DateTime date) async {
+  final dateKey = DateFormat('yyyy-MM-dd').format(date);
+  final doc = await _firestore
+      .collection('user_workouts')
+      .doc(_user!.uid)
+      .collection('daily_sessions')
+      .doc(dateKey)
+      .get();
+
+  return doc.data() ?? {};
+} 
+
 }
