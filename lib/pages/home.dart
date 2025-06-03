@@ -32,7 +32,8 @@ class _HomePageState extends State<HomePage> {
   List<Exercice> exercices = [];
   List<LatestActivity> latestActivities = [];
   Timer? _refreshTimer;
-
+  List<String> takenPhotoPaths = [];
+  
   @override
   void dispose() {
     _pageController.dispose();
@@ -193,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ProgressePage()));
+                           builder: (context) => ProgressePage(takenPhotoPaths: takenPhotoPaths)));
                     // print("Progress Photo");
                   }),
                   _drawerItem('Coach', Icons.person, () {

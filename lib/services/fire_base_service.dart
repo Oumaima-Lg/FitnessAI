@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitness/models/latest_activity.dart';
+import 'package:path/path.dart';
 
 Future<void> saveLatestActivity({
   required String title,
@@ -45,38 +46,28 @@ Future<List<LatestActivity>> loadUserLatestActivities() async {
   }).toList();
 }
 
-Future<String?> uploadProgressPhoto(String filePath) async {
-  final uid = FirebaseAuth.instance.currentUser?.uid;
-  if (uid == null) throw Exception("Utilisateur non connecté");
+Future<void> uploadProgressPhoto(String path, {required String pose}) async {
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+  final fileName = '${DateTime.now().millisecondsSinceEpoch}_$pose.jpg';
 
-  try {
-    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    final storageRef = FirebaseStorage.instance
-        .ref()
-        .child('progress_photos')
-        .child(uid)
-        .child('$fileName.jpg');
+  final ref = FirebaseStorage.instance
+      .ref()
+      .child('progress_photos')
+      .child(userId)
+      .child(pose)
+      .child(fileName);
 
-    // Upload du fichier
-    await storageRef.putFile(File(filePath));
+  await ref.putFile(File(path));
 
-    // Récupérer le lien de téléchargement
-    final downloadUrl = await storageRef.getDownloadURL();
+  final downloadUrl = await ref.getDownloadURL();
 
-    // Enregistrement dans Firestore
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('progress_photos')
-        .add({
-      'url': downloadUrl,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
-
-    return downloadUrl;
-  } catch (e) {
-    print('Erreur uploadProgressPhoto: $e');
-    return null;
-  }
+  await FirebaseFirestore.instance
+      .collection('users')
+      .doc(userId)
+      .collection('progress_photos')
+      .add({
+    'url': downloadUrl,
+    'pose': pose,
+    'timestamp': FieldValue.serverTimestamp(),
+  });
 }
-

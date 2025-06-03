@@ -48,7 +48,7 @@ class _GoPageState extends State<GoPage> {
                 ? "Gym - ${widget.activity.title}"
                 : widget.activity.title,
               icon: widget.isGym
-                ? "images/icons/gym.png"
+                ? "images/icons/Gym.png"
                 : widget.activity.iconUrl,
             );
           } catch (e) {

@@ -526,11 +526,11 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
             Icon(Icons.restaurant_menu, color: Colors.grey.shade500, size: 48),
             SizedBox(height: 12),
             Text(
-              'Aucun aliment ajouté',
+              'No meals added yet',
               style: TextStyle(color: Colors.grey.shade400, fontSize: 16),
             ),
             Text(
-              'Recherchez et ajoutez des aliments à votre repas',
+              'Search for meals to add them to your schedule.',
               style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
               textAlign: TextAlign.center,
             ),

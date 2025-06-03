@@ -837,7 +837,7 @@ class _AlimHomePageState extends State<AlimHomePage>
               : _recommendedMeals.isEmpty
                   ? Center(
                       child: Text(
-                        "Aucun repas recommandé disponible",
+                        "No recommended meals available",
                         style: TextStyle(color: Colors.white),
                       ),
                     )
@@ -1024,8 +1024,8 @@ class _AlimHomePageState extends State<AlimHomePage>
           ? Center(
               child: Text(
                 _isSearching
-                    ? "Aucun résultat trouvé pour '$_searchQuery'"
-                    : "Aucun repas disponible dans cette catégorie",
+                    ? "No results found for '$_searchQuery'"
+                    : "No meals available in this category.",
                 style: TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
               ),

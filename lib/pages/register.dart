@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/pages/login.dart';
+import 'package:fitness/pages/login_methods.dart';
 import 'package:fitness/services/database.dart';
 import 'package:fitness/services/shared_pref.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +56,7 @@ class _RegisterState extends State<Register> {
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.orangeAccent,
+            backgroundColor: Color(0xFF2E2F55),
             content: Text(
               "Password Provided is too Weak",
               style: TextStyle(fontSize: 18.0),
@@ -64,7 +65,7 @@ class _RegisterState extends State<Register> {
         } // SnackBar
         else if (e.code == 'email-already-in-use') {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: const Color.fromARGB(255, 216, 160, 160),
+            backgroundColor: Color(0xFF2E2F55),
             content: Text(
               "Account Already exists",
               style: TextStyle(fontSize: 18.0),
@@ -74,7 +75,6 @@ class _RegisterState extends State<Register> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -267,16 +267,26 @@ class _RegisterState extends State<Register> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            CustomSocialIcon(
-                              borderColor: Color(0xFF423C3D),
-                              child: Image.asset('images/google_icon.png',
-                                  width: MediaQuery.of(context).size.width),
+                            GestureDetector(
+                              onTap: () {
+                                signInWithGoogle(context);
+                              },
+                              child: CustomSocialIcon(
+                                borderColor: Color(0xFF423C3D),
+                                child: Image.asset('images/google_icon.png',
+                                    width: MediaQuery.of(context).size.width),
+                              ),
                             ),
                             const SizedBox(width: 20),
-                            CustomSocialIcon(
-                              borderColor: Color(0xFF423C3D),
-                              child: Image.asset('images/facebook_icon.png',
-                                  width: MediaQuery.of(context).size.width),
+                            GestureDetector(
+                              onTap: () {
+                                // signInWithFacebook(context);
+                              },
+                              child: CustomSocialIcon(
+                                borderColor: Color(0xFF423C3D),
+                                child: Image.asset('images/facebook_icon.png',
+                                    width: MediaQuery.of(context).size.width),
+                              ),
                             ),
                             const SizedBox(width: 20),
                           ],

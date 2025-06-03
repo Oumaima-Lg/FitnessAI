@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/pages/bottomnavbar.dart';
+import 'package:fitness/pages/login_methods.dart';
 import 'package:fitness/pages/register.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,45 +21,6 @@ class _LoginState extends State<Login> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
 
-  // userLogin() async {
-  //   try {
-  //     await FirebaseAuth.instance
-  //         .signInWithEmailAndPassword(email: email, password: password);
-  //     Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //           builder: (context) => Container(
-  //             decoration: BoxDecoration(
-  //               gradient: LinearGradient(
-  //                 colors: [
-  //                   Color(0xFF2E2F55),
-  //                   Color(0xFF23253C),
-  //                 ],
-  //                 begin: Alignment.topLeft,
-  //                 end: Alignment.bottomRight,
-  //               ),
-  //             ),
-  //             child: BottomNavBar(),
-  //           ),
-  //         ));
-  //   } on FirebaseAuthException catch (e) {
-  //     if (e.code == 'user-not-found') {
-  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //         content: Text(
-  //           "No user Found for that Email",
-  //           style: TextStyle(fontSize: 18.0, color: Colors.black),
-  //         ),
-  //       ));
-  //     } else if (e.code == 'wrong-password') {
-  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //         content: Text(
-  //           "Wrong Password Provided by User",
-  //           style: TextStyle(fontSize: 18.0, color: Colors.black),
-  //         ),
-  //       ));
-  //     }
-  //   }
-  // }
   userLogin() async {
     try {
       await FirebaseAuth.instance
@@ -66,7 +28,7 @@ class _LoginState extends State<Login> {
       
       // Hna anaffichiw mssg de succès avant de naviguer
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Colors.green,
+        backgroundColor: Color(0xFF2E2F55),
         content: Text(
           "Login Successful",
           style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
@@ -272,16 +234,26 @@ class _LoginState extends State<Login> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            CustomSocialIcon(
-                              borderColor: Colors.white24,
-                              child: Image.asset('images/google_icon.png',
-                                  width: MediaQuery.of(context).size.width),
+                            GestureDetector(
+                              onTap: () {
+                                signInWithGoogle(context);
+                              },
+                              child: CustomSocialIcon(
+                                borderColor: Colors.white24,
+                                child: Image.asset('images/google_icon.png',
+                                    width: MediaQuery.of(context).size.width),
+                              ),
                             ),
                             const SizedBox(width: 20),
-                            CustomSocialIcon(
-                              borderColor: Colors.white24,
-                              child: Image.asset('images/facebook_icon.png',
-                                  width: MediaQuery.of(context).size.width),
+                            GestureDetector(
+                              onTap: (){
+                                // signInWithFacebook(context);
+                              },
+                              child: CustomSocialIcon(
+                                borderColor: Colors.white24,
+                                child: Image.asset('images/facebook_icon.png',
+                                    width: MediaQuery.of(context).size.width),
+                              ),
                             ),
                             const SizedBox(width: 20),
                           ],

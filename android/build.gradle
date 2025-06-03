@@ -1,18 +1,44 @@
 
 
-plugins {
-  // ...
+// plugins {
+//   // ...
 
-  // Add the dependency for the Google services Gradle plugin
-  id 'com.google.gms.google-services' version '4.3.15' apply false
-//   + id 'com.google.gms.google-services' version '4.3.15' apply false
+//   // Add the dependency for the Google services Gradle plugin
+//   id 'com.google.gms.google-services' version '4.3.15' apply false
+// //   + id 'com.google.gms.google-services' version '4.3.15' apply false
 
+// }
+
+buildscript {
+    ext.kotlin_version = '2.1.0'
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Add the classpath for the Android Gradle plugin here
+        classpath 'com.android.tools.build:gradle:8.2.1'
+
+        classpath 'com.google.gms:google-services:4.3.15'
+    }
 }
 
 allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+
+    subprojects {
+        afterEvaluate { project ->
+            if (project.hasProperty('android')) {
+                project.android {
+                    if (namespace == null) {
+                        namespace project.group
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -11,7 +11,7 @@ class ActivityService {
     final response = await http.get(
       url,
       headers: {
-        'X-RapidAPI-Key': '343199d5b5mshc3098cffd6d261bp1ba214jsn5509d86c8d76',
+        'X-RapidAPI-Key': 'faebe86a44mshfa5070c27d73bd4p13e1e9jsn017ffde9ff90',
         'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com',
       },
     );

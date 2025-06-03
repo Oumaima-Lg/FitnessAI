@@ -1,12 +1,17 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
-import 'package:fitness/services/fire_base_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fitness/components/return_button.dart';
 import 'package:flutter/material.dart';
 
 class TakePhotoPage extends StatefulWidget {
-  const TakePhotoPage({super.key});
+  final Function(List<String> photoPaths) onPhotosCompleted;
 
+  const TakePhotoPage({super.key, required this.onPhotosCompleted});
   @override
   State<TakePhotoPage> createState() => _TakePhotoPageState();
 }
@@ -18,6 +23,8 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
   bool _isPermissionGranted = false;
   int _selectedPoseIndex = 0;
   bool _isFrontCamera = true;
+
+  List<String> _photoPaths = [];
 
   final List<String> _poseImages = [
     'images/progress/front_position_cam.png',
@@ -87,13 +94,11 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
 
   @override
   void dispose() {
-    if (_cameraController.value.isInitialized) {
-      _cameraController.dispose();
-    }
+    _cameraController.dispose();
     super.dispose();
-  } 
+  }
 
-  // bayna mn smiytha bach ngelbo lcam sayidati :)
+  // nglbo l cam :)
   Future<void> _switchCamera() async {
     if (cameras.length < 2) return;
 
@@ -127,43 +132,107 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
     }
   }
 
-  // Future<void> _takePhoto() async {
-  //   if (!_cameraController.value.isInitialized) {
-  //     return;
-  //   }
-
-  //   try {
-  //     final XFile photo = await _cameraController.takePicture();
-
-  //     // hna najoutew logic bach nenregistrew les photos mn be3d ... to be continued ...
-
-  //     if (mounted) {
-  //       Navigator.pop(context, photo.path);
-  //     }
-  //   } catch (e) {
-  //     print('Erreur lors de la prise de photo: $e');
-  //   }
-  // }
   Future<void> _takePhoto() async {
     if (!_cameraController.value.isInitialized) return;
+
+    // hna nshowi dialog dyal loading bach l utilisateur ychouf wach kayn chi haja li kat tsawer
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
 
     try {
       final XFile photo = await _cameraController.takePicture();
 
-      // Upload la photo dans Firebase Storage + sauvegarde Firestore
-      await uploadProgressPhoto(photo.path);
-
-      if (mounted) {
-        Navigator.pop(context, true); // tu peux renvoyer un booléen ou autre info
+      // Hna ansawbo dossier local li anheto fih tsawer
+      final Directory appDir = await getApplicationDocumentsDirectory();
+      final DateTime now = DateTime.now();
+      final String monthFolder = '${now.year}-${now.month.toString().padLeft(2, '0')}';
+      final Directory monthDir = Directory('${appDir.path}/progress_photos/$monthFolder');
+      
+      if (!await monthDir.exists()) {
+        await monthDir.create(recursive: true);
       }
+
+      // le nom du fichier
+      final String poseName = 'pose_${_selectedPoseIndex + 1}';
+      final String fileName = '${now.millisecondsSinceEpoch}_$poseName.jpg';
+      final String filePath = '${monthDir.path}/$fileName';
+
+      // ncopiw tswira l local
+      final File localFile = File(filePath);
+      await localFile.writeAsBytes(await photo.readAsBytes());
+
+      // ajouter à la liste 
+      _photoPaths.add(filePath);
+
+      // ndiro liha savec f firebase 
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('progress_photos')
+            .add({
+          'pose': poseName,
+          'poseIndex': _selectedPoseIndex,
+          'localPath': filePath,
+          'month': monthFolder,
+          'timestamp': FieldValue.serverTimestamp(),
+          'createdAt': now.toIso8601String(),
+        });
+      }
+      Navigator.of(context).pop();
+
+      if (_selectedPoseIndex < _poseImages.length - 1) {
+        setState(() {
+          _selectedPoseIndex++;
+        });
+        
+        // Afficher un message de confirmation
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text('Photo $poseName prise avec succès !'),
+        //     duration: Duration(seconds: 2),
+        //     backgroundColor: Colors.green,
+        //   ),
+        // );
+      } else {
+        // Toutes les photos sont prises
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text('Toutes les photos ont été prises avec succès !'),
+        //     duration: Duration(seconds: 2),
+        //     backgroundColor: Colors.green,
+        //   ),
+        // );
+        // Attendre un peu avant de retourner pour que l'utilisateur voit le message
+        // await Future.delayed(Duration(seconds: 1));
+        
+        // Appeler le callback et retourner
+        widget.onPhotosCompleted(_photoPaths);
+        Navigator.pop(context, _photoPaths);
+      }
+      
     } catch (e) {
+      // Fermer le dialog de chargement en cas d'erreur
+      Navigator.of(context).pop();
+      
       print('Erreur lors de la prise de photo: $e');
-      // Optionnel : afficher un message d'erreur à l'utilisateur
+      
+      // Afficher un message d'erreur à l'utilisateur
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la prise de photo: ${e.toString()}'),
+          duration: Duration(seconds: 3),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
-
-
-  ///******************************************** FIN METHODE DES ACTIONS ********************************************///
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +242,7 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
         child: Stack(
           // <-- Stack drnaha bachykono 3ndna layers mabin les widgets : src : "Stack provides a solution when you need to overlay widgets. For instance, if you want to display text over an image, the Stack widget is ideal for such scenarios."
           children: [
-            // hna kifach ghadi tban lcamera sayidati :_:
+            // hna kifach ghadi tban lcamera :_:
             if (!_isLoading &&
                 _isPermissionGranted &&
                 _cameraController.value.isInitialized)
@@ -189,7 +258,6 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
                   ),
                 ),
               ),
-
             Column(
               children: [
                 /************************************** Header dyal la page **************************************/
@@ -206,9 +274,8 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
                     ],
                   ),
                 ),
-                /************************************** FIN Header **************************************/
-
-                /************************************** Section de la camera o tswera dyal lala sportif **************************************/
+                /************************************** Header dyal la page **************************************/
+                /************************************** Section de la camera o tswera dyal sportif **************************************/
                 Expanded(
                   child: Stack(
                     alignment: Alignment.center,
@@ -221,11 +288,15 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(Icons.camera_alt,
-                                  color: Colors.white, size: 50),
+                                color: Colors.white, 
+                                size: 50
+                              ),
                               SizedBox(height: 16),
                               Text(
                                 'Permission denied',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(
+                                  color: Colors.white
+                                ),
                               ),
                               SizedBox(height: 8),
                               ElevatedButton(
@@ -255,8 +326,7 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
                   ),
                 ),
                 /************************************** FIN Section de la camera **************************************/
-
-                /************************************** Barre des bouttons (camera/flash/switch cam) **************************************/
+                /**************************************  Hna la barre des bouttons (camera/flash/switch cam) **************************************/
                 Container(
                   height: 68,
                   width: 295,
@@ -281,7 +351,6 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
                           // Logique pour activer/désactiver le flash
                         },
                       ),
-
                       /************ Prendre la photo ************/
                       GestureDetector(
                         onTap: _takePhoto,
@@ -305,7 +374,6 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
                           ),
                         ),
                       ),
-
                       /************ Switch Camera ************/
                       IconButton(
                         icon: Icon(Icons.cameraswitch, color: Colors.white),
@@ -315,10 +383,8 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
                   ),
                 ),
                 /************************************** FIN Barre des bouttons **************************************/
-
                 const SizedBox(height: 20),
-
-                /************************************** Barre des poses **************************************/
+                /************************************** hna la barre deyal les poses li kaynin **************************************/
                 Container(
                   height: 130,
                   decoration: BoxDecoration(
