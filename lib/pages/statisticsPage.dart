@@ -4,17 +4,68 @@ import 'package:fitness/models/userStats.dart';
 import 'package:fitness/components/gradient.dart';
 import 'package:fitness/components/workoutButton.dart';
 import 'package:fitness/pages/statistics/caloriesBurned.dart';
-import 'package:fitness/pages/statistics/Steps.dart';
+import 'package:fitness/pages/statistics/steps.dart';
 import 'package:fitness/pages/statistics/TrainingTime.dart';
 import 'package:fitness/pages/statistics/sleepLog.dart';
 import 'package:fitness/pages/statistics/waterTracker.dart';
+import 'package:fitness/firebase_service.dart'; // Import your Firebase service
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fitness/pages/go.dart';
+import 'package:fitness/pages/statistics/StepsCalculator.dart';
 
-class Statistics extends StatelessWidget {
+class Statistics extends StatefulWidget {
   final UserStats stats;
-
-  const Statistics({super.key, required this.stats});
+  final uid = FirebaseAuth.instance.currentUser?.uid;
+  
+  Statistics({Key? key, required this.stats}) : super(key: key);
 
   @override
+  State<Statistics> createState() => _StatisticsState();
+ 
+}
+class _StatisticsState extends State<Statistics> {
+  final StepCounterService _stepCounterService = StepCounterService();
+ 
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialData();
+    _stepCounterService.onStepsUpdated = (steps) {
+      setState(() {
+        widget.stats.steps = steps;
+      });
+    };
+      _stepCounterService.onError = (error) {
+            print("Erreur podomètre : $error");
+          };
+
+          _stepCounterService.start();
+        }
+  Future<void> _loadInitialData() async {
+    // Charger d'abord les stats générales
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    final stats = await getTodayStats();
+    
+    if (mounted && stats != null) {
+      setState(() {
+        widget.stats.sleep = stats.sleep;
+        widget.stats.calories = stats.calories;
+        widget.stats.steps = stats.steps;
+        widget.stats.water = stats.water;
+        widget.stats.heartRate = stats.heartRate;
+        // Ne pas écraser trainingTime ici
+      });
+    }
+
+    // Ensuite charger le training time spécifiquement
+    final int todayTotal = await getDailyWorkoutTotal(DateTime.now());
+    if (mounted) {
+      setState(() {
+        widget.stats.trainingTime = todayTotal;
+        print("Training time updated: $todayTotal seconds"); // Debug log
+      });
+    }
+  }
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF2E2F55),
@@ -30,6 +81,7 @@ class Statistics extends StatelessWidget {
               height: 290,
             ),
           ),
+          
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -49,6 +101,7 @@ class Statistics extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: GradientComponent.gradientText(
                       text: "For Today",
+                      
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
@@ -60,26 +113,32 @@ class Statistics extends StatelessWidget {
                     children: [
                       Stack(
                         children: [
+                          
                           _buildCircleCard("Training Time",
-                              stats.trainingTime.toString(), ""),
+                              widget.stats.trainingTime.toString(), ""),
                         ],
                       ),
                       Stack(
                         children: [
-                          _buildCircleCard("Walk", stats.steps.toString(),
+                          _buildCircleCard("Walk", widget.stats.steps.toString(),
                               "   Steps \n Completed"),
                         ],
                       ),
-                      _buildInfoCard("Calories", "${stats.calories}\n  Kcal"),
-                      _buildInfoCard("Sleep", "${stats.sleep} \n  hours"),
+                      
+                      _buildInfoCard("Calories", "${widget.stats.calories}\n  Kcal"),
+                      _buildInfoCard(
+                        "Sleep",
+                        "${((widget.stats.sleep?.inMinutes ?? 0) / 60).toStringAsFixed(1)} \n  hours",
+                      ),
+                      
                       _buildImageCard(
                           "Water",
                           "images/statistics/water_img.png",
-                          "${stats.water} \n liters"),
+                          "${widget.stats.water} \n liters"),
                       _buildImageCard(
                           "Heart",
                           "images/statistics/heart_img.png",
-                          "${stats.heartRate} \n  bpm"),
+                          "${widget.stats.heartRate} \n  bpm"),
                     ],
                   ),
                   const SizedBox(height: 30),
@@ -147,14 +206,16 @@ class Statistics extends StatelessWidget {
                     title: 'Sleep Log',
                     subtitle:
                         'Log your sleep details to analyze your sleep patterns.',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SleepLog(),
-                        ),
-                      );
-                    },
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SleepLog(stats: widget.stats),
+                      ),
+                    );
+
+                  },
+
                   ),
                 ]),
               ),
@@ -165,7 +226,15 @@ class Statistics extends StatelessWidget {
     );
   }
 
+  // Modifier _buildCircleCard pour afficher correctement les minutes
   Widget _buildCircleCard(String title, String value, String text) {
+    String displayValue = value;
+    if (title == "Training Time") {
+      int timeInSeconds = int.tryParse(value) ?? 0;
+      int minutes = (timeInSeconds / 60).round();
+      displayValue = "$minutes";
+      print("Displaying training time: $minutes minutes"); // Debug log
+    }
     return Container(
       width: 160,
       height: 160,
@@ -233,6 +302,7 @@ class Statistics extends StatelessWidget {
   Widget _buildInfoCard(String title, String value) {
     // Split the value into number and unit
     final parts = value.split('\n');
+    print("UID actuel: ${widget.uid}"); 
     return Container(
       width: 154,
       height: 157,

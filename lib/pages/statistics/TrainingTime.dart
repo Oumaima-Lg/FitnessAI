@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
+import 'package:fitness/pages/statistics/chart.dart';
 
 class Training extends StatefulWidget {
   const Training({super.key});
@@ -9,9 +10,42 @@ class Training extends StatefulWidget {
 }
 
 class _TrainingState extends State<Training> {
-  bool isDaily = true;
 
   final String iconPath = 'images/statistics/training.png'; // <-- ton image ici
+    bool isDaily = false;
+  List<ChartData> monthlyData = [];
+  List<ChartData> dailyData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadChartData();
+  }
+
+  Future<void> _loadChartData() async {
+    // Simuler le chargement des données
+    await Future.delayed(const Duration(milliseconds: 500));
+    
+    setState(() {
+      monthlyData = [
+        ChartData('May', 45),
+        ChartData('Jun', 80),
+        ChartData('Jul', 25),
+        ChartData('Aug', 60),
+        ChartData('Sep', 90),
+      ];
+      
+      dailyData = [
+        ChartData('Mon', 20),
+        ChartData('Tue', 45),
+        ChartData('Wed', 30),
+        ChartData('Thu', 60),
+        ChartData('Fri', 10),
+        ChartData('Sat', 75),
+        ChartData('Sun', 40),
+      ];
+    });
+  }
 
 
   @override
@@ -73,6 +107,16 @@ class _TrainingState extends State<Training> {
                   ),
                 ),
                 // Graphique
+                Positioned(
+                  top: 200, // Adjust this value as needed
+                  child: (monthlyData.isNotEmpty && dailyData.isNotEmpty)
+                    ? LineChartWidget(
+                        isDaily: isDaily,
+                        dailyData: dailyData,
+                        monthlyData: monthlyData,
+                      )
+                    : const CircularProgressIndicator(),
+                ),
                
               ],
             ),

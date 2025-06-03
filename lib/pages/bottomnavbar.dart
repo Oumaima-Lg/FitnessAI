@@ -16,7 +16,7 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomNavState extends State<BottomNavBar> {
   late List<Widget> pages;
-
+  late UserStats userStats;
   late HomePage homePage;
   // late ProgressePage homePage;
   late ExercicePage exercicePage;
@@ -33,18 +33,12 @@ class _BottomNavState extends State<BottomNavBar> {
     exercicePage = ExercicePage();
     profilePage = ProfilePage();
     alimentationPage = AlimHomePage();
-    statistics = Statistics(
-      stats: UserStats(
-        trainingTime: 2628,
-        steps: 2628,
-        calories: 510.43,
-        sleep: "08:00",
-        water: 2.1,
-        heartRate: 105,
-      ),
-    );
-
+    // page4 = Page4();
+    userStats =
+        UserStats(); // Initialize userStats with default or required values
+    statistics = Statistics(stats: userStats);
     pages = [homePage, exercicePage, alimentationPage, statistics, profilePage];
+    // pages = [homePage, exercicePage, alimentationPage, statistics, profilePage];
     super.initState();
   }
 

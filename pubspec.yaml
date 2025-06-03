@@ -57,6 +57,9 @@ dependencies:
 
 
 
+  pedometer: ^4.1.1 
+  syncfusion_flutter_charts: ^20.4.48
+  percent_indicator: ^4.2.2
 
   flutter_map: ^7.0.0
   geolocator: ^10.0.0

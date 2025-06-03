@@ -11,7 +11,6 @@ buildscript {
         mavenCentral()
     }
 
-<<<<<<< HEAD
     dependencies {
         // classpath 'com.android.tools.build:gradle:7.3.0'
         // classpath 'com.android.tools.build:gradle:8.2.1'
@@ -22,27 +21,6 @@ buildscript {
         // classpath 'com.google.gms:google-services:4.3.15'
         classpath 'com.android.tools.build:gradle:8.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-=======
-// plugins {
-//   // ...
-
-//   // Add the dependency for the Google services Gradle plugin
-//   id 'com.google.gms.google-services' version '4.3.15' apply false
-// //   + id 'com.google.gms.google-services' version '4.3.15' apply false
-
-// }
-
-buildscript {
-    ext.kotlin_version = '2.1.0'
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        // Add the classpath for the Android Gradle plugin here
-        classpath 'com.android.tools.build:gradle:8.2.1'
-
->>>>>>> origin/oio_oumi
         classpath 'com.google.gms:google-services:4.3.15'
     }
 }

@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fitness/components/textStyle/textstyle.dart';
+import 'package:fitness/pages/statistics/chart.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+String? get currentUserId => FirebaseAuth.instance.currentUser?.uid;
 
 class Steps extends StatefulWidget {
   const Steps({super.key});
@@ -9,9 +15,79 @@ class Steps extends StatefulWidget {
 }
 
 class _StepsState extends State<Steps> {
-  bool isDaily = true;
 
   final String iconPath = 'images/statistics/steps.png'; // <-- ton image ici
+    bool isDaily = false;
+  List<ChartData> monthlyData = [];
+  List<ChartData> dailyData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadChartData();
+  }
+
+  Future<void> _loadChartData() async {
+  final uid = currentUserId;
+  if (uid == null) return;
+
+  final now = DateTime.now();
+  final firestore = FirebaseFirestore.instance;
+
+  try {
+    // 1. Données journalières (7 derniers jours)
+    final dailyStatsQuery = await firestore
+        .collection('users')
+        .doc(uid)
+        .collection('dailyStats')
+        .orderBy('date', descending: true)
+        .limit(7)
+        .get();
+
+    final dailyList = dailyStatsQuery.docs
+        .map((doc) {
+          final data = doc.data();
+          final date = DateTime.parse(data['date']);
+          final steps = data['steps'] ?? 0;
+          final dayLabel = DateFormat.E().format(date); // Mon, Tue, ...
+          return ChartData(dayLabel, steps);
+        })
+        .toList()
+        .reversed
+        .toList(); // Pour afficher du plus ancien au plus récent
+
+    // 2. Données mensuelles (30 derniers jours, groupées par mois)
+    final last30DaysQuery = await firestore
+        .collection('users')
+        .doc(uid)
+        .collection('dailyStats')
+        .orderBy('date', descending: true)
+        .limit(30)
+        .get();
+
+    final Map<String, int> monthTotals = {}; // ex: {"Jun": 12300}
+    for (final doc in last30DaysQuery.docs) {
+      final data = doc.data();
+      final date = DateTime.parse(data['date']);
+      final steps = (data['steps'] ?? 0);
+      final month = DateFormat.MMM().format(date); // Jun, Jul...
+
+      monthTotals[month] = (monthTotals[month] ?? 0) + (steps is int ? steps : (steps as num).toInt());
+    }
+
+    final monthList = monthTotals.entries
+        .map((e) => ChartData(e.key, e.value as double))
+        .toList();
+
+    setState(() {
+      dailyData = dailyList;
+      monthlyData = monthList;
+    });
+  } catch (e) {
+    print('Erreur de chargement des données Firestore : $e');
+  }
+}
+
 
 
   @override
@@ -73,6 +149,16 @@ class _StepsState extends State<Steps> {
                   ),
                 ),
                 // Graphique
+                Positioned(
+                  top: 200, // Adjust this value as needed
+                  child: (monthlyData.isNotEmpty && dailyData.isNotEmpty)
+                    ? LineChartWidget(
+                        isDaily: isDaily,
+                        dailyData: dailyData,
+                        monthlyData: monthlyData,
+                      )
+                    : const CircularProgressIndicator(),
+                ),
                
               ],
             ),
