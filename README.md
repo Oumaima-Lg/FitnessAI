@@ -22,4 +22,7 @@ Adding a coach later in the project.
 
 <img width="375" height="812" alt="Page 1 - Recommendation des meals_" src="https://github.com/user-attachments/assets/30727de6-899f-433f-ab55-064b8cd55dfa" />
 
-<img width="440" height="956" alt="Page 1" src="https://github.com/user-attachments/assets/5823e7e6-6355-4d7f-9765-95a6d2ee2815" />
+
+<img width="440" height="956" alt="Page 2" src="https://github.com/user-attachments/assets/1837481c-c308-4752-bec6-fb4643becfc2" />
+
+<img width="440" height="956" alt="Page 5" src="https://github.com/user-attachments/assets/0502a429-a692-4b86-8de8-06b35e68bf42" />
